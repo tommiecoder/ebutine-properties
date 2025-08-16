@@ -36,11 +36,65 @@ export default function HeroSection() {
         ></div>
         <div className="absolute inset-0 bg-gradient-to-br from-ebutine-dark/75 via-ebutine-blue/60 to-ebutine-dark/75"></div>
         
-        {/* Floating Property Elements */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-1/4 left-1/4 w-2 h-2 bg-ebutine-orange rounded-full animate-pulse opacity-60"></div>
-          <div className="absolute top-1/2 right-1/3 w-3 h-3 bg-white/30 rounded-full animate-bounce opacity-40" style={{animationDelay: '1s'}}></div>
-          <div className="absolute bottom-1/3 left-1/2 w-1 h-1 bg-ebutine-orange rounded-full animate-ping opacity-50" style={{animationDelay: '2s'}}></div>
+        {/* Animated Property Images */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          {/* Floating Property Icons */}
+          <div className="absolute top-16 left-10 opacity-20 animate-float-slow">
+            <div className="bg-white/20 rounded-2xl p-4 backdrop-blur-sm">
+              <div className="w-12 h-12 bg-ebutine-orange rounded-lg flex items-center justify-center">
+                <i className="fas fa-home text-white text-xl"></i>
+              </div>
+            </div>
+          </div>
+          
+          <div className="absolute top-32 right-16 opacity-20 animate-float" style={{animationDelay: '2s'}}>
+            <div className="bg-white/20 rounded-2xl p-4 backdrop-blur-sm">
+              <div className="w-12 h-12 bg-ebutine-blue rounded-lg flex items-center justify-center">
+                <i className="fas fa-building text-white text-xl"></i>
+              </div>
+            </div>
+          </div>
+          
+          <div className="absolute bottom-24 left-20 opacity-20 animate-float-delayed">
+            <div className="bg-white/20 rounded-2xl p-4 backdrop-blur-sm">
+              <div className="w-12 h-12 bg-ebutine-orange rounded-lg flex items-center justify-center">
+                <i className="fas fa-key text-white text-xl"></i>
+              </div>
+            </div>
+          </div>
+          
+          <div className="absolute bottom-40 right-24 opacity-20 animate-float" style={{animationDelay: '1.5s'}}>
+            <div className="bg-white/20 rounded-2xl p-4 backdrop-blur-sm">
+              <div className="w-12 h-12 bg-ebutine-blue rounded-lg flex items-center justify-center">
+                <i className="fas fa-city text-white text-xl"></i>
+              </div>
+            </div>
+          </div>
+          
+          {/* Floating Property Images */}
+          <div className="absolute top-20 right-32 opacity-15 animate-float-slow" style={{animationDelay: '3s'}}>
+            <img 
+              src="https://images.unsplash.com/photo-1580587771525-78b9dba3b914?ixlib=rb-4.0.3&w=150&h=150&fit=crop" 
+              alt="Modern House" 
+              className="w-20 h-20 object-cover rounded-2xl shadow-lg"
+            />
+          </div>
+          
+          <div className="absolute top-1/2 left-16 opacity-15 animate-float-delayed" style={{animationDelay: '4s'}}>
+            <img 
+              src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&w=150&h=150&fit=crop" 
+              alt="Luxury Property" 
+              className="w-24 h-24 object-cover rounded-2xl shadow-lg"
+            />
+          </div>
+          
+          <div className="absolute bottom-32 right-1/3 opacity-15 animate-float" style={{animationDelay: '2.5s'}}>
+            <img 
+              src="https://images.unsplash.com/photo-1582407947304-fd86f028f716?ixlib=rb-4.0.3&w=150&h=150&fit=crop" 
+              alt="Commercial Building" 
+              className="w-16 h-16 object-cover rounded-2xl shadow-lg"
+            />
+          </div>
         </div>
       </div>
       

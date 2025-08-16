@@ -18,7 +18,7 @@ import NotFound from "@/pages/not-found";
 
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
-import WhatsAppButton from "@/components/WhatsAppButton";
+import FloatingWhatsApp from "@/components/FloatingWhatsApp";
 
 function Router() {
   // Track page views when routes change
@@ -70,7 +70,7 @@ function Router() {
         </Switch>
       </main>
       <Footer />
-      <WhatsAppButton />
+      <FloatingWhatsApp />
     </div>
   );
 }

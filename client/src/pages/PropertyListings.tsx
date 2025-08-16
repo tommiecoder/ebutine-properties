@@ -10,11 +10,11 @@ import type { Property } from "@shared/schema";
 
 export default function PropertyListings() {
   const [filters, setFilters] = useState({
-    propertyType: "",
-    location: "",
-    priceRange: "",
-    bedrooms: "",
-    purpose: "",
+    propertyType: "all",
+    location: "all",
+    priceRange: "all",
+    bedrooms: "all",
+    purpose: "all",
   });
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -27,11 +27,11 @@ export default function PropertyListings() {
     if (!isInitialized) {
       const urlParams = new URLSearchParams(window.location.search);
       const initialFilters = {
-        propertyType: urlParams.get("type") || "",
-        location: urlParams.get("location") || "",
-        priceRange: urlParams.get("budget") || "",
-        bedrooms: "",
-        purpose: "",
+        propertyType: urlParams.get("type") || "all",
+        location: urlParams.get("location") || "all",
+        priceRange: urlParams.get("budget") || "all",
+        bedrooms: "all",
+        purpose: "all",
       };
       setFilters(initialFilters);
       setIsInitialized(true);
@@ -42,10 +42,10 @@ export default function PropertyListings() {
     queryKey: ["/api/properties", filters],
     queryFn: async () => {
       const params = new URLSearchParams();
-      if (filters.propertyType && filters.propertyType !== "All Types") {
+      if (filters.propertyType && filters.propertyType !== "all") {
         params.set("type", filters.propertyType);
       }
-      if (filters.location && filters.location !== "All Locations") {
+      if (filters.location && filters.location !== "all") {
         params.set("location", filters.location);
       }
       
@@ -57,7 +57,7 @@ export default function PropertyListings() {
 
   // Filter properties client-side for additional filters not handled by API
   const filteredProperties = properties.filter(property => {
-    if (filters.priceRange && filters.priceRange !== "Any Price") {
+    if (filters.priceRange && filters.priceRange !== "all") {
       const price = parseFloat(property.price);
       const [min, max] = filters.priceRange.includes("+") 
         ? [parseFloat(filters.priceRange.replace(/[^\d]/g, "")), Infinity]
@@ -66,7 +66,7 @@ export default function PropertyListings() {
       if (price < min || price > max) return false;
     }
 
-    if (filters.bedrooms && filters.bedrooms !== "Any" && property.bedrooms) {
+    if (filters.bedrooms && filters.bedrooms !== "all" && property.bedrooms) {
       const bedCount = parseInt(property.bedrooms);
       if (filters.bedrooms === "1-2" && (bedCount < 1 || bedCount > 2)) return false;
       if (filters.bedrooms === "3-4" && (bedCount < 3 || bedCount > 4)) return false;
@@ -139,7 +139,7 @@ export default function PropertyListings() {
                       <SelectValue placeholder="All Types" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">All Types</SelectItem>
+                      <SelectItem value="all">All Types</SelectItem>
                       <SelectItem value="residential_land">Residential Land</SelectItem>
                       <SelectItem value="commercial_land">Commercial Land</SelectItem>
                       <SelectItem value="luxury_home">Luxury Homes</SelectItem>
@@ -155,7 +155,7 @@ export default function PropertyListings() {
                       <SelectValue placeholder="All Locations" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">All Locations</SelectItem>
+                      <SelectItem value="all">All Locations</SelectItem>
                       <SelectItem value="Ajah">Ajah</SelectItem>
                       <SelectItem value="Sangotedo">Sangotedo</SelectItem>
                       <SelectItem value="Ibeju-Lekki">Ibeju-Lekki</SelectItem>
@@ -173,7 +173,7 @@ export default function PropertyListings() {
                       <SelectValue placeholder="Any Price" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">Any Price</SelectItem>
+                      <SelectItem value="all">Any Price</SelectItem>
                       <SelectItem value="5-15">₦5M - ₦15M</SelectItem>
                       <SelectItem value="15-30">₦15M - ₦30M</SelectItem>
                       <SelectItem value="30-50">₦30M - ₦50M</SelectItem>
@@ -190,7 +190,7 @@ export default function PropertyListings() {
                       <SelectValue placeholder="Any" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">Any</SelectItem>
+                      <SelectItem value="all">Any</SelectItem>
                       <SelectItem value="1-2">1-2 Bedrooms</SelectItem>
                       <SelectItem value="3-4">3-4 Bedrooms</SelectItem>
                       <SelectItem value="5+">5+ Bedrooms</SelectItem>
@@ -205,7 +205,7 @@ export default function PropertyListings() {
                       <SelectValue placeholder="Any Purpose" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">Any Purpose</SelectItem>
+                      <SelectItem value="all">Any Purpose</SelectItem>
                       <SelectItem value="investment">Investment</SelectItem>
                       <SelectItem value="personal">Personal Use</SelectItem>
                       <SelectItem value="rental">Rental Income</SelectItem>
@@ -252,11 +252,11 @@ export default function PropertyListings() {
               <Button 
                 onClick={() => {
                   setFilters({
-                    propertyType: "",
-                    location: "",
-                    priceRange: "",
-                    bedrooms: "",
-                    purpose: "",
+                    propertyType: "all",
+                    location: "all",
+                    priceRange: "all",
+                    bedrooms: "all",
+                    purpose: "all",
                   });
                   setCurrentPage(1);
                 }}
