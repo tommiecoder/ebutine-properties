@@ -1,0 +1,81 @@
+Build a modern, professional, and SEO-optimized website for a Nigerian real estate company named Ebutine Properties. The company specializes in Residential and Commercial Lands, Luxury Homes, Property Management, and Property Development.
+The design should reflect honesty, integrity, affordability, and professionalism, while maintaining a premium look to attract local and diaspora clients. Use the brand colors from the provided logo (blue-grey and orange accents).
+
+Goals & Objectives:
+SEO Visibility – Optimize for Nigerian real estate keywords such as “buy land in Lagos,” “affordable luxury homes Nigeria,” “diaspora real estate Nigeria,” and “commercial land in Lagos.” Use structured data/schema for property listings. Blog articles should rank for investment-related keywords.
+
+Lead Pre-Qualification – Add smart lead capture forms with fields like budget range, property type (residential/commercial/luxury), preferred location, and purchase purpose (investment, personal use, rental income).
+
+Lead Conversion – Include multiple CTAs: “Book a Free Consultation,” “Request a Callback,” “Get Verified Listings,” and “View Properties.” Integrate WhatsApp chat, phone, and email buttons for instant connection.
+
+Target Audience:
+Age: 25–65 years
+
+Location: Nigeria (Lagos focus), Diaspora (UK, China, Australia, Canada)
+
+Profile: Married & single professionals, business people, investors seeking verified properties in developed areas.
+
+Website Structure:
+Home Page:
+
+Hero section with property search bar + tagline (“Diasporas First Choice for Verified Properties in Nigeria”).
+
+Featured listings (Residential, Commercial, Luxury Homes).
+
+Quick contact CTA (WhatsApp, Phone).
+
+About Us:
+
+Story of Ebutine Properties, core values (honesty, integrity, affordability).
+
+Highlight USP: verified properties, after-sales support, estate progress updates.
+
+Services Page:
+
+Residential & Commercial Lands
+
+Luxury Homes
+
+Property Development
+
+Property Management
+
+Property Listings Page:
+
+Filter by location, price, type (Residential, Commercial, Luxury).
+
+Each property should include: high-quality images, map, price, features, inquiry form, and CTA.
+
+Why Choose Us:
+
+Benefits for local and diaspora clients.
+
+Client testimonials and trust badges (verified listings, secure transactions).
+
+Contact Page:
+
+Contact form (linked to Supabase for storage).
+
+Display office address, email, phone, and WhatsApp integration.
+
+Google Map embed for Greenland Estate, Sangotedo Ajah, Lagos.
+
+Tech & Functionality Requirements:
+Tech Stack: Replit + Supabase + CMS Layer (one Supabase backend for multiple clients).
+
+Mobile-first design with fast loading.
+
+CMS Layer for easy property updates.
+
+WhatsApp integration for quick diaspora and local inquiries.
+
+Email marketing integration for lead nurturing.
+
+Analytics integration (Google Analytics, Facebook Pixel) for tracking conversions.
+
+Contact Information to Display:
+House No 2, Road 4,
+ Greenland Estate, Olokonla
+ Sangotedo Ajah, Lagos.
+ 📧 ebutineproperties@gmail.com
+ 📞 +2349061461411
