@@ -112,11 +112,11 @@ export default function Home() {
                 description: "Complete property management services for diaspora investors."
               }
             ].map((service, index) => (
-              <Card key={index} className="hover:shadow-lg transition-shadow">
+              <Card key={index} className="hover:shadow-2xl hover:scale-105 transition-all duration-300 group border-2 border-transparent hover:border-ebutine-orange/20">
                 <CardContent className="text-center p-8">
-                  <div className="text-4xl mb-4">{service.icon}</div>
-                  <h3 className="text-xl font-semibold text-ebutine-dark mb-4">{service.title}</h3>
-                  <p className="text-ebutine-blue text-sm">{service.description}</p>
+                  <div className="text-4xl mb-4 group-hover:scale-110 transition-transform duration-300">{service.icon}</div>
+                  <h3 className="text-xl font-semibold text-ebutine-dark mb-4 group-hover:text-ebutine-orange transition-colors duration-300">{service.title}</h3>
+                  <p className="text-ebutine-blue text-sm group-hover:text-gray-700 transition-colors duration-300">{service.description}</p>
                 </CardContent>
               </Card>
             ))}

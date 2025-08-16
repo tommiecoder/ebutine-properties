@@ -98,10 +98,10 @@ export default function About() {
                 description: "Our 24/7 support team ensures clients across different time zones receive assistance whenever they need it."
               }
             ].map((value, index) => (
-              <Card key={index} className="hover:shadow-lg transition-shadow text-center">
+              <Card key={index} className="hover:shadow-2xl hover:scale-105 transition-all duration-300 text-center group border-2 border-transparent hover:border-ebutine-orange/20">
                 <CardContent className="p-8">
-                  <value.icon className="h-12 w-12 text-ebutine-orange mb-4 mx-auto" />
-                  <h3 className="text-xl font-semibold text-ebutine-dark mb-4">{value.title}</h3>
+                  <value.icon className="h-12 w-12 text-ebutine-orange mb-4 mx-auto group-hover:scale-110 group-hover:text-orange-600 transition-all duration-300" />
+                  <h3 className="text-xl font-semibold text-ebutine-dark mb-4 group-hover:text-ebutine-orange transition-colors duration-300">{value.title}</h3>
                   <p className="text-ebutine-blue">{value.description}</p>
                 </CardContent>
               </Card>

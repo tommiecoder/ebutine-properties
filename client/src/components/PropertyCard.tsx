@@ -46,7 +46,7 @@ export default function PropertyCard({ property, onViewDetails, onInquire }: Pro
           </button>
         </div>
       </div>
-      
+
       <CardContent className="p-6">
         <h3 className="text-xl font-semibold text-ebutine-dark mb-2" data-testid={`property-title-${property.id}`}>
           {property.title}
@@ -58,7 +58,7 @@ export default function PropertyCard({ property, onViewDetails, onInquire }: Pro
         <p className="text-2xl font-bold text-ebutine-dark mb-4" data-testid={`property-price-${property.id}`}>
           {formatPrice(property.price)}
         </p>
-        
+
         {/* Property Details */}
         <div className="grid grid-cols-3 gap-4 text-sm text-ebutine-blue mb-4">
           {property.bedrooms && (

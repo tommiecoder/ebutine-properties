@@ -21,16 +21,21 @@ export default function PropertyListings() {
   const propertiesPerPage = 9;
 
   // Parse URL params on component mount
+  const [isInitialized, setIsInitialized] = useState(false);
+  
   useState(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const initialFilters = {
-      propertyType: urlParams.get("type") || "",
-      location: urlParams.get("location") || "",
-      priceRange: urlParams.get("budget") || "",
-      bedrooms: "",
-      purpose: "",
-    };
-    setFilters(initialFilters);
+    if (!isInitialized) {
+      const urlParams = new URLSearchParams(window.location.search);
+      const initialFilters = {
+        propertyType: urlParams.get("type") || "",
+        location: urlParams.get("location") || "",
+        priceRange: urlParams.get("budget") || "",
+        bedrooms: "",
+        purpose: "",
+      };
+      setFilters(initialFilters);
+      setIsInitialized(true);
+    }
   });
 
   const { data: properties = [], isLoading } = useQuery<Property[]>({
@@ -112,10 +117,10 @@ export default function PropertyListings() {
       </section>
 
       {/* Filters Section */}
-      <section className="py-12 bg-white border-b">
+      <section className="py-12 bg-gradient-to-br from-gray-50 to-white border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <Card className="shadow-lg">
-            <CardContent className="p-6">
+          <Card className="shadow-2xl border-0 bg-white/80 backdrop-blur-sm">
+            <CardContent className="p-8">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-2xl font-bold text-ebutine-dark flex items-center">
                   <SlidersHorizontal className="mr-3 h-6 w-6" />
