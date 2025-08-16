@@ -97,13 +97,28 @@
   --chart-3: hsl(197, 37%, 24%);
   --chart-4: hsl(43, 74%, 66%);
   --chart-5: hsl(27, 87%, 67%);
-  --radius: 0.5rem;
+  --radius: 1rem;
 
-  /* Ebutine Brand Colors */
+  /* Enhanced Ebutine Brand Colors */
   --ebutine-blue: hsl(220, 13%, 46%);
+  --ebutine-blue-light: hsl(220, 13%, 60%);
+  --ebutine-blue-dark: hsl(220, 13%, 32%);
   --ebutine-orange: hsl(24, 95%, 53%);
+  --ebutine-orange-light: hsl(24, 95%, 65%);
+  --ebutine-orange-dark: hsl(24, 95%, 41%);
   --ebutine-dark: hsl(220, 26%, 14%);
+  --ebutine-dark-light: hsl(220, 26%, 20%);
   --ebutine-light: hsl(220, 14%, 96%);
+  --ebutine-light-dark: hsl(220, 14%, 90%);
+  
+  /* Advanced Shadows */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+  --shadow-orange: 0 20px 25px -5px rgb(255 165 0 / 0.3), 0 8px 10px -6px rgb(255 165 0 / 0.2);
+  --shadow-blue: 0 20px 25px -5px rgb(59 130 246 / 0.3), 0 8px 10px -6px rgb(59 130 246 / 0.2);
 }
 
 .dark {
@@ -144,8 +159,12 @@
 }
 
 @layer utilities {
+  /* Text Colors */
   .text-ebutine-blue {
     color: var(--ebutine-blue);
+  }
+  .text-ebutine-blue-light {
+    color: var(--ebutine-blue-light);
   }
   .text-ebutine-orange {
     color: var(--ebutine-orange);
@@ -153,6 +172,8 @@
   .text-ebutine-dark {
     color: var(--ebutine-dark);
   }
+  
+  /* Background Colors */
   .bg-ebutine-blue {
     background-color: var(--ebutine-blue);
   }
@@ -165,13 +186,86 @@
   .bg-ebutine-light {
     background-color: var(--ebutine-light);
   }
+  
+  /* Gradient Backgrounds */
+  .bg-gradient-ebutine {
+    background: linear-gradient(135deg, var(--ebutine-blue) 0%, var(--ebutine-dark) 100%);
+  }
+  .bg-gradient-ebutine-orange {
+    background: linear-gradient(135deg, var(--ebutine-orange) 0%, var(--ebutine-orange-dark) 100%);
+  }
+  .bg-gradient-warm {
+    background: linear-gradient(135deg, rgb(254, 202, 202) 0%, rgb(252, 165, 165) 50%, var(--ebutine-orange) 100%);
+  }
+  .bg-gradient-cool {
+    background: linear-gradient(135deg, var(--ebutine-light) 0%, rgb(219, 234, 254) 50%, var(--ebutine-blue) 100%);
+  }
+  
+  /* Border Colors */
   .border-ebutine-orange {
     border-color: var(--ebutine-orange);
   }
+  .border-ebutine-blue {
+    border-color: var(--ebutine-blue);
+  }
+  
+  /* Hover Effects */
   .hover\:bg-ebutine-orange:hover {
     background-color: var(--ebutine-orange);
   }
   .hover\:text-ebutine-orange:hover {
     color: var(--ebutine-orange);
+  }
+  .hover\:shadow-orange:hover {
+    box-shadow: var(--shadow-orange);
+  }
+  .hover\:shadow-blue:hover {
+    box-shadow: var(--shadow-blue);
+  }
+  
+  /* Enhanced Shadows */
+  .shadow-ebutine {
+    box-shadow: var(--shadow-xl);
+  }
+  .shadow-ebutine-orange {
+    box-shadow: var(--shadow-orange);
+  }
+  .shadow-ebutine-blue {
+    box-shadow: var(--shadow-blue);
+  }
+  
+  /* Glass Effect */
+  .glass {
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+  }
+  
+  /* Enhanced Transitions */
+  .transition-all-smooth {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  /* Button Enhancements */
+  .btn-primary {
+    @apply bg-gradient-ebutine-orange text-white font-semibold py-3 px-8 rounded-xl shadow-lg hover:shadow-ebutine-orange transition-all-smooth transform hover:scale-105;
+  }
+  
+  .btn-secondary {
+    @apply bg-white text-ebutine-blue border-2 border-ebutine-blue font-semibold py-3 px-8 rounded-xl shadow-lg hover:bg-ebutine-blue hover:text-white transition-all-smooth;
+  }
+  
+  /* Card Enhancements */
+  .card-enhanced {
+    @apply bg-white rounded-2xl shadow-lg hover:shadow-ebutine transition-all-smooth transform hover:-translate-y-2;
+  }
+  
+  /* Typography Enhancements */
+  .text-gradient {
+    background: linear-gradient(135deg, var(--ebutine-blue) 0%, var(--ebutine-orange) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
 }

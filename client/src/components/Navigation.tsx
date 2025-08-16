@@ -23,7 +23,7 @@ export default function Navigation() {
   };
 
   return (
-    <nav className="bg-white shadow-lg sticky top-0 z-50">
+    <nav className="bg-white/95 backdrop-blur-md shadow-ebutine sticky top-0 z-50 border-b border-ebutine-light-dark">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16 md:h-20">
           <Link href="/">
@@ -37,10 +37,10 @@ export default function Navigation() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`px-3 py-2 text-sm font-medium transition-colors ${
+                  className={`px-4 py-2 text-sm font-semibold rounded-lg transition-all-smooth ${
                     isActive(link.href)
-                      ? "text-ebutine-dark"
-                      : "text-ebutine-blue hover:text-ebutine-orange"
+                      ? "text-white bg-gradient-ebutine-orange shadow-lg"
+                      : "text-ebutine-blue hover:text-ebutine-orange hover:bg-ebutine-light/50"
                   }`}
                   data-testid={`nav-link-${link.label.toLowerCase().replace(/\s+/g, '-')}`}
                 >
@@ -63,7 +63,7 @@ export default function Navigation() {
               href="https://wa.me/2349061461411" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+              className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-6 py-2 rounded-xl text-sm font-semibold transition-all-smooth transform hover:scale-105 shadow-lg hover:shadow-xl"
               data-testid="whatsapp-link"
             >
               <i className="fab fa-whatsapp mr-2"></i>WhatsApp

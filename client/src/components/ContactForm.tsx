@@ -59,8 +59,8 @@ export default function ContactForm() {
   };
 
   return (
-    <div>
-      <h3 className="text-2xl font-bold text-ebutine-dark mb-8">Send us a Message</h3>
+    <div className="card-enhanced p-8">
+      <h3 className="text-3xl font-bold text-gradient mb-8">Send us a Message</h3>
       
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6" data-testid="contact-form">
@@ -267,7 +267,7 @@ export default function ContactForm() {
 
           <Button 
             type="submit" 
-            className="w-full bg-ebutine-orange hover:bg-orange-600 text-white font-semibold py-4 px-6"
+            className="btn-primary w-full py-4 px-8 text-lg"
             disabled={mutation.isPending}
             data-testid="submit-contact-form"
           >

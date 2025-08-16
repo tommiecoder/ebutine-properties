@@ -63,7 +63,7 @@ export default function HeroSection() {
         </p>
 
         {/* Property Search Bar */}
-        <div className="max-w-4xl mx-auto bg-white rounded-2xl p-6 shadow-2xl mb-8 animate-fade-in-up backdrop-blur-sm bg-white/95" style={{animationDelay: '0.4s'}}>
+        <div className="max-w-4xl mx-auto glass rounded-3xl p-8 shadow-ebutine mb-8 animate-fade-in-up border border-white/20" style={{animationDelay: '0.4s'}}>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
               <label className="block text-sm font-medium text-ebutine-dark mb-2">Property Type</label>
@@ -110,7 +110,7 @@ export default function HeroSection() {
             <div className="flex items-end">
               <Button 
                 onClick={handleSearch}
-                className="w-full bg-ebutine-orange hover:bg-orange-600 text-white font-semibold"
+                className="btn-primary w-full"
                 data-testid="search-properties-button"
               >
                 <Search className="mr-2 h-4 w-4" />
@@ -124,8 +124,7 @@ export default function HeroSection() {
         <div className="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-6 animate-fade-in-up" style={{animationDelay: '0.6s'}}>
           <Link href="/contact">
             <Button 
-              size="lg" 
-              className="bg-ebutine-orange hover:bg-orange-600 text-white font-semibold py-4 px-8 text-lg"
+              className="btn-primary text-lg px-10 py-4"
               data-testid="book-consultation-button"
             >
               Book Free Consultation
@@ -137,9 +136,7 @@ export default function HeroSection() {
             rel="noopener noreferrer"
           >
             <Button 
-              variant="outline" 
-              size="lg" 
-              className="border-2 border-white text-white hover:bg-white hover:text-ebutine-dark font-semibold py-4 px-8 text-lg"
+              className="glass border-2 border-white/50 text-white hover:bg-white/20 hover:border-white font-semibold py-4 px-10 text-lg rounded-xl transition-all-smooth transform hover:scale-105"
               data-testid="whatsapp-hero-button"
             >
               <i className="fab fa-whatsapp mr-2"></i>WhatsApp Us
