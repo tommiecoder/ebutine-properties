@@ -15,17 +15,29 @@ export default function Footer() {
               Verified properties, transparent dealings, exceptional service.
             </p>
             <div className="flex space-x-4">
-              <a href="#" className="text-gray-300 hover:text-ebutine-orange transition-colors" data-testid="facebook-link">
-                <i className="fab fa-facebook text-xl"></i>
+              <a 
+                href="https://www.facebook.com/ebutineproperties" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="text-gray-300 hover:text-blue-500 transition-all duration-300 transform hover:scale-110" 
+                data-testid="facebook-link"
+              >
+                <i className="fab fa-facebook text-2xl"></i>
               </a>
-              <a href="#" className="text-gray-300 hover:text-ebutine-orange transition-colors" data-testid="instagram-link">
-                <i className="fab fa-instagram text-xl"></i>
+              <a 
+                href="https://www.instagram.com/ebutineproperties" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="text-gray-300 hover:text-pink-500 transition-all duration-300 transform hover:scale-110" 
+                data-testid="instagram-link"
+              >
+                <i className="fab fa-instagram text-2xl"></i>
               </a>
-              <a href="#" className="text-gray-300 hover:text-ebutine-orange transition-colors" data-testid="linkedin-link">
-                <i className="fab fa-linkedin text-xl"></i>
+              <a href="#" className="text-gray-300 hover:text-blue-400 transition-all duration-300 transform hover:scale-110" data-testid="linkedin-link">
+                <i className="fab fa-linkedin text-2xl"></i>
               </a>
-              <a href="#" className="text-gray-300 hover:text-ebutine-orange transition-colors" data-testid="youtube-link">
-                <i className="fab fa-youtube text-xl"></i>
+              <a href="#" className="text-gray-300 hover:text-red-500 transition-all duration-300 transform hover:scale-110" data-testid="youtube-link">
+                <i className="fab fa-youtube text-2xl"></i>
               </a>
             </div>
           </div>
@@ -36,9 +48,8 @@ export default function Footer() {
             <ul className="space-y-3">
               <li><Link href="/" className="text-gray-300 hover:text-ebutine-orange transition-colors">Home</Link></li>
               <li><Link href="/about" className="text-gray-300 hover:text-ebutine-orange transition-colors">About Us</Link></li>
-              <li><Link href="/services" className="text-gray-300 hover:text-ebutine-orange transition-colors">Services</Link></li>
               <li><Link href="/properties" className="text-gray-300 hover:text-ebutine-orange transition-colors">Properties</Link></li>
-              <li><Link href="/why-choose-us" className="text-gray-300 hover:text-ebutine-orange transition-colors">Why Choose Us</Link></li>
+              <li><Link href="/gallery" className="text-gray-300 hover:text-ebutine-orange transition-colors">Gallery</Link></li>
               <li><Link href="/contact" className="text-gray-300 hover:text-ebutine-orange transition-colors">Contact</Link></li>
             </ul>
           </div>
@@ -63,9 +74,7 @@ export default function Footer() {
               <div className="flex items-start">
                 <MapPin className="h-5 w-5 text-ebutine-orange mt-1 mr-3" />
                 <div className="text-gray-300">
-                  <p>House No 2, Road 4,</p>
-                  <p>Greenland Estate, Olokonla</p>
-                  <p>Sangotedo Ajah, Lagos</p>
+                  <p>Lagos, Nigeria</p>
                 </div>
               </div>
               <div className="flex items-center">

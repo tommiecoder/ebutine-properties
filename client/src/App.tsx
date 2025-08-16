@@ -10,11 +10,10 @@ import { Helmet } from "react-helmet";
 
 import Home from "@/pages/Home";
 import About from "@/pages/About";
-import Services from "@/pages/Services";
 import PropertyListings from "@/pages/PropertyListings";
-import WhyChooseUs from "@/pages/WhyChooseUs";
 import Contact from "@/pages/Contact";
 import NotFound from "@/pages/not-found";
+import Gallery from "@/pages/Gallery";
 
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
@@ -23,19 +22,19 @@ import FloatingWhatsApp from "@/components/FloatingWhatsApp";
 function Router() {
   // Track page views when routes change
   useAnalytics();
-  
+
   return (
     <div className="min-h-screen flex flex-col">
       <Helmet>
         <title>Ebutine Properties - Diaspora's First Choice for Verified Properties in Nigeria</title>
         <meta name="description" content="Premium real estate company in Lagos, Nigeria. Buy land, luxury homes, commercial properties. Trusted by diaspora clients. Verified listings in developed areas." />
         <meta name="keywords" content="buy land in Lagos, luxury homes Nigeria, commercial land Lagos, diaspora real estate Nigeria, verified properties Nigeria" />
-        
+
         {/* Open Graph / Facebook */}
         <meta property="og:type" content="website" />
         <meta property="og:title" content="Ebutine Properties - Verified Real Estate in Nigeria" />
         <meta property="og:description" content="Premium properties in Lagos. Residential & commercial lands, luxury homes. Trusted by diaspora clients worldwide." />
-        
+
         {/* Structured Data for Real Estate */}
         <script type="application/ld+json">
           {JSON.stringify({
@@ -56,16 +55,15 @@ function Router() {
           })}
         </script>
       </Helmet>
-      
+
       <Navigation />
       <main className="flex-grow">
         <Switch>
           <Route path="/" component={Home} />
           <Route path="/about" component={About} />
-          <Route path="/services" component={Services} />
           <Route path="/properties" component={PropertyListings} />
-          <Route path="/why-choose-us" component={WhyChooseUs} />
           <Route path="/contact" component={Contact} />
+          <Route path="/gallery" component={Gallery} />
           <Route component={NotFound} />
         </Switch>
       </main>

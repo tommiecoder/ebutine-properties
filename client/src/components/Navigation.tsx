@@ -10,9 +10,8 @@ export default function Navigation() {
   const navLinks = [
     { href: "/", label: "Home" },
     { href: "/about", label: "About" },
-    { href: "/services", label: "Services" },
     { href: "/properties", label: "Properties" },
-    { href: "/why-choose-us", label: "Why Choose Us" },
+    { href: "/gallery", label: "Gallery" },
     { href: "/contact", label: "Contact" },
   ];
 
@@ -29,7 +28,7 @@ export default function Navigation() {
           <Link href="/">
             <Logo />
           </Link>
-          
+
           {/* Desktop Navigation */}
           <div className="hidden md:block">
             <div className="ml-10 flex items-baseline space-x-8">
@@ -52,16 +51,16 @@ export default function Navigation() {
 
           {/* Contact Actions */}
           <div className="hidden md:flex items-center space-x-4">
-            <a 
-              href="tel:+2349061461411" 
+            <a
+              href="tel:+2349061461411"
               className="text-ebutine-blue hover:text-ebutine-orange transition-colors"
               data-testid="phone-link"
             >
               <Phone className="h-5 w-5" />
             </a>
-            <a 
-              href="https://wa.me/2349061461411" 
-              target="_blank" 
+            <a
+              href="https://wa.me/2349061461411"
+              target="_blank"
               rel="noopener noreferrer"
               className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-6 py-2 rounded-xl text-sm font-semibold transition-all-smooth transform hover:scale-105 shadow-lg hover:shadow-xl"
               data-testid="whatsapp-link"
@@ -72,7 +71,7 @@ export default function Navigation() {
 
           {/* Mobile menu button */}
           <div className="md:hidden">
-            <button 
+            <button
               className="text-ebutine-blue hover:text-ebutine-orange"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               data-testid="mobile-menu-button"
@@ -86,7 +85,7 @@ export default function Navigation() {
       {/* Mobile Navigation Menu */}
       {mobileMenuOpen && (
         <div className="md:hidden">
-          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white border-t">
+          <div className="px-2 pt-2 pb-3 space-y-1 bg-white border-t">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
@@ -103,16 +102,16 @@ export default function Navigation() {
               </Link>
             ))}
             <div className="flex space-x-4 px-3 py-2">
-              <a 
-                href="tel:+2349061461411" 
+              <a
+                href="tel:+2349061461411"
                 className="text-ebutine-blue hover:text-ebutine-orange"
                 data-testid="mobile-phone-link"
               >
                 <Phone className="h-5 w-5" />
               </a>
-              <a 
-                href="https://wa.me/2349061461411" 
-                target="_blank" 
+              <a
+                href="https://wa.me/2349061461411"
+                target="_blank"
                 rel="noopener noreferrer"
                 className="bg-green-500 text-white px-4 py-2 rounded-lg text-sm"
                 data-testid="mobile-whatsapp-link"

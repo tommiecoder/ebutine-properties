@@ -33,6 +33,21 @@
   50% { transform: translateY(-15px) rotate(90deg); }
 }
 
+@keyframes shimmer {
+  0% { background-position: -200px 0; }
+  100% { background-position: calc(200px + 100%) 0; }
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+@keyframes bounce-subtle {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
 @keyframes slideInFromLeft {
   0% { transform: translateX(-100px); opacity: 0; }
   100% { transform: translateX(0); opacity: 1; }
