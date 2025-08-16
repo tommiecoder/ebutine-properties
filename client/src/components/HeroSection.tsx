@@ -27,14 +27,21 @@ export default function HeroSection() {
       <div className="absolute inset-0">
         <div 
           style={{
-            backgroundImage: "url('https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1920&h=1080')",
+            backgroundImage: "url('https://images.unsplash.com/photo-1564013799919-ab600027ffc6?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&h=1080')",
             backgroundSize: "cover",
             backgroundPosition: "center",
-            animation: "slowZoom 20s ease-in-out infinite alternate"
+            animation: "slowZoom 20s ease-in-out infinite alternate, slowPan 30s ease-in-out infinite"
           }}
           className="absolute inset-0 scale-110"
         ></div>
-        <div className="absolute inset-0 bg-gradient-to-br from-ebutine-dark/80 via-ebutine-blue/70 to-ebutine-dark/80"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-ebutine-dark/75 via-ebutine-blue/60 to-ebutine-dark/75"></div>
+        
+        {/* Floating Property Elements */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-1/4 left-1/4 w-2 h-2 bg-ebutine-orange rounded-full animate-pulse opacity-60"></div>
+          <div className="absolute top-1/2 right-1/3 w-3 h-3 bg-white/30 rounded-full animate-bounce opacity-40" style={{animationDelay: '1s'}}></div>
+          <div className="absolute bottom-1/3 left-1/2 w-1 h-1 bg-ebutine-orange rounded-full animate-ping opacity-50" style={{animationDelay: '2s'}}></div>
+        </div>
       </div>
       
       {/* Floating Elements */}

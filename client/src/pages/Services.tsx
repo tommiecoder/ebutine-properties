@@ -34,10 +34,10 @@ export default function Services() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
             {/* Service 1 - Residential Land */}
-            <Card className="hover:shadow-2xl transition-shadow duration-300 border border-gray-100">
+            <Card className="hover:shadow-2xl transition-all duration-300 border border-gray-100 hover:border-ebutine-orange/20 group">
               <CardContent className="p-8">
-                <div className="bg-ebutine-orange bg-opacity-10 w-16 h-16 rounded-full flex items-center justify-center mb-6">
-                  <Home className="h-8 w-8 text-ebutine-orange" />
+                <div className="bg-gradient-to-br from-ebutine-orange/10 to-ebutine-orange/20 w-16 h-16 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                  <Home className="h-8 w-8 text-ebutine-orange group-hover:animate-pulse" />
                 </div>
                 <h3 className="text-2xl font-semibold text-ebutine-dark mb-4">Residential Land</h3>
                 <p className="text-ebutine-blue mb-6">
@@ -65,10 +65,10 @@ export default function Services() {
             </Card>
 
             {/* Service 2 - Commercial Land */}
-            <Card className="hover:shadow-2xl transition-shadow duration-300 border border-gray-100">
+            <Card className="hover:shadow-2xl transition-all duration-300 border border-gray-100 hover:border-ebutine-orange/20 group">
               <CardContent className="p-8">
-                <div className="bg-ebutine-orange bg-opacity-10 w-16 h-16 rounded-full flex items-center justify-center mb-6">
-                  <Building2 className="h-8 w-8 text-ebutine-orange" />
+                <div className="bg-gradient-to-br from-blue-500/10 to-blue-600/20 w-16 h-16 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                  <Building2 className="h-8 w-8 text-blue-600 group-hover:animate-pulse" />
                 </div>
                 <h3 className="text-2xl font-semibold text-ebutine-dark mb-4">Commercial Land</h3>
                 <p className="text-ebutine-blue mb-6">
@@ -96,10 +96,10 @@ export default function Services() {
             </Card>
 
             {/* Service 3 - Luxury Homes */}
-            <Card className="hover:shadow-2xl transition-shadow duration-300 border border-gray-100">
+            <Card className="hover:shadow-2xl transition-all duration-300 border border-gray-100 hover:border-ebutine-orange/20 group">
               <CardContent className="p-8">
-                <div className="bg-ebutine-orange bg-opacity-10 w-16 h-16 rounded-full flex items-center justify-center mb-6">
-                  <Crown className="h-8 w-8 text-ebutine-orange" />
+                <div className="bg-gradient-to-br from-yellow-400/10 to-yellow-500/20 w-16 h-16 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                  <Crown className="h-8 w-8 text-yellow-600 group-hover:animate-pulse" />
                 </div>
                 <h3 className="text-2xl font-semibold text-ebutine-dark mb-4">Luxury Homes</h3>
                 <p className="text-ebutine-blue mb-6">
@@ -127,10 +127,10 @@ export default function Services() {
             </Card>
 
             {/* Service 4 - Property Management */}
-            <Card className="hover:shadow-2xl transition-shadow duration-300 border border-gray-100">
+            <Card className="hover:shadow-2xl transition-all duration-300 border border-gray-100 hover:border-ebutine-orange/20 group">
               <CardContent className="p-8">
-                <div className="bg-ebutine-orange bg-opacity-10 w-16 h-16 rounded-full flex items-center justify-center mb-6">
-                  <Wrench className="h-8 w-8 text-ebutine-orange" />
+                <div className="bg-gradient-to-br from-green-500/10 to-green-600/20 w-16 h-16 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                  <Wrench className="h-8 w-8 text-green-600 group-hover:animate-pulse" />
                 </div>
                 <h3 className="text-2xl font-semibold text-ebutine-dark mb-4">Property Management</h3>
                 <p className="text-ebutine-blue mb-6">
@@ -176,24 +176,32 @@ export default function Services() {
                 icon: TrendingUp,
                 title: "Property Development",
                 description: "Custom development projects from concept to completion. We work with experienced architects and contractors to bring your vision to life.",
-                features: ["Architectural design", "Construction management", "Project timeline monitoring", "Quality assurance"]
+                features: ["Architectural design", "Construction management", "Project timeline monitoring", "Quality assurance"],
+                color: "from-purple-500/10 to-purple-600/20",
+                iconColor: "text-purple-600"
               },
               {
                 icon: FileText,
                 title: "Legal Support",
                 description: "Complete legal documentation and title processing services. Our legal team ensures all transactions are compliant and secure.",
-                features: ["Title verification", "Contract preparation", "Due diligence", "Registration assistance"]
+                features: ["Title verification", "Contract preparation", "Due diligence", "Registration assistance"],
+                color: "from-red-500/10 to-red-600/20",
+                iconColor: "text-red-600"
               },
               {
                 icon: Calculator,
                 title: "Investment Advisory",
                 description: "Expert guidance on real estate investment strategies and market analysis. Make informed decisions with our professional insights.",
-                features: ["Market analysis", "ROI calculations", "Investment strategies", "Portfolio planning"]
+                features: ["Market analysis", "ROI calculations", "Investment strategies", "Portfolio planning"],
+                color: "from-indigo-500/10 to-indigo-600/20",
+                iconColor: "text-indigo-600"
               }
             ].map((service, index) => (
-              <Card key={index} className="hover:shadow-lg transition-shadow">
+              <Card key={index} className="hover:shadow-2xl transition-all duration-300 hover:border-ebutine-orange/20 group">
                 <CardContent className="p-8 text-center">
-                  <service.icon className="h-12 w-12 text-ebutine-orange mb-4 mx-auto" />
+                  <div className={`bg-gradient-to-br ${service.color} w-16 h-16 rounded-full flex items-center justify-center mb-4 mx-auto group-hover:scale-110 transition-transform duration-300`}>
+                    <service.icon className={`h-8 w-8 ${service.iconColor} group-hover:animate-pulse`} />
+                  </div>
                   <h3 className="text-xl font-semibold text-ebutine-dark mb-4">{service.title}</h3>
                   <p className="text-ebutine-blue mb-6">{service.description}</p>
                   <ul className="space-y-2 text-sm text-ebutine-blue text-left">
@@ -244,8 +252,8 @@ export default function Services() {
                 description: "Seamless transaction process with ongoing after-sales support and property management."
               }
             ].map((step, index) => (
-              <div key={index} className="text-center">
-                <div className="bg-ebutine-orange text-white w-16 h-16 rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-4">
+              <div key={index} className="text-center group">
+                <div className="bg-gradient-to-br from-ebutine-orange to-orange-600 text-white w-16 h-16 rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-4 shadow-lg group-hover:scale-110 group-hover:shadow-xl transition-all duration-300">
                   {step.step}
                 </div>
                 <h3 className="text-xl font-semibold text-ebutine-dark mb-4">{step.title}</h3>

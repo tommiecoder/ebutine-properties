@@ -89,12 +89,12 @@ export default function Footer() {
                 </a>
               </div>
               <div className="flex items-center">
-                <i className="fab fa-whatsapp text-green-500 mr-3 text-lg"></i>
+                <i className="fab fa-whatsapp text-green-500 mr-3 text-lg animate-pulse"></i>
                 <a 
                   href="https://wa.me/2349061461411" 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="text-gray-300 hover:text-green-500 transition-colors"
+                  className="text-green-400 hover:text-green-300 transition-colors font-semibold"
                   data-testid="footer-whatsapp-link"
                 >
                   WhatsApp Chat
