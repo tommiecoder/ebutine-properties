@@ -1,7 +1,11 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
-import { Phone, Menu, X } from "lucide-react";
+import { Menu, X, Phone } from "lucide-react";
 import Logo from "./Logo";
+
+const scrollToTop = () => {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+};
 
 export default function Navigation() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -25,7 +29,7 @@ export default function Navigation() {
     <nav className="bg-white/95 backdrop-blur-md shadow-ebutine sticky top-0 z-50 border-b border-ebutine-light-dark">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16 md:h-20">
-          <Link href="/">
+          <Link href="/" onClick={scrollToTop} className="flex items-center">
             <Logo />
           </Link>
 
@@ -36,6 +40,7 @@ export default function Navigation() {
                 <Link
                   key={link.href}
                   href={link.href}
+                  onClick={scrollToTop}
                   className={`px-4 py-2 text-sm font-semibold rounded-lg transition-all-smooth ${
                     isActive(link.href)
                       ? "text-white bg-gradient-ebutine-orange shadow-lg"
@@ -90,12 +95,15 @@ export default function Navigation() {
               <Link
                 key={link.href}
                 href={link.href}
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  scrollToTop();
+                }}
                 className={`block px-3 py-2 text-base font-medium ${
                   isActive(link.href)
                     ? "text-ebutine-dark"
                     : "text-ebutine-blue hover:text-ebutine-orange"
                 }`}
-                onClick={() => setMobileMenuOpen(false)}
                 data-testid={`mobile-nav-link-${link.label.toLowerCase().replace(/\s+/g, '-')}`}
               >
                 {link.label}

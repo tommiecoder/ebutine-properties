@@ -298,7 +298,7 @@ export default function WhyChooseUs() {
       </section>
 
       {/* Contact CTA */}
-      <section className="py-20 bg-ebutine-dark text-white">
+      <section className="py-20 bg-gradient-to-br from-ebutine-orange to-orange-600 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-4xl font-bold mb-6">Ready to Experience the Difference?</h2>
           <p className="text-xl text-gray-300 mb-12 max-w-2xl mx-auto">
