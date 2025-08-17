@@ -153,30 +153,30 @@ export default function HeroSection() {
       <div className="relative z-10 flex items-center justify-center min-h-screen">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           {/* Dynamic Content */}
-          <div className="mb-12">
-            <div className="inline-block bg-ebutine-orange/20 backdrop-blur-sm px-6 py-2 rounded-full border border-ebutine-orange/30 mb-6">
-              <span className="text-ebutine-orange font-semibold text-lg">
+          <div className="mb-16">
+            <div className="inline-block bg-ebutine-orange/80 backdrop-blur-sm px-8 py-3 rounded-full border border-ebutine-orange mb-8 shadow-lg">
+              <span className="text-white font-bold text-xl drop-shadow-lg">
                 {slides[currentSlide].highlight}
               </span>
             </div>
             
-            <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
+            <h1 className="text-5xl md:text-7xl font-bold text-white mb-8 leading-tight drop-shadow-2xl text-shadow-strong">
               {slides[currentSlide].title}
             </h1>
             
-            <p className="text-xl md:text-2xl text-gray-200 mb-12 max-w-4xl mx-auto leading-relaxed">
+            <p className="text-xl md:text-2xl text-white mb-16 max-w-4xl mx-auto leading-relaxed drop-shadow-lg font-medium">
               {slides[currentSlide].subtitle}
             </p>
           </div>
 
           {/* Enhanced Search Bar */}
-          <div className="max-w-5xl mx-auto mb-12">
-            <div className="glass rounded-3xl p-8 shadow-2xl border border-white/30 backdrop-blur-md">
+          <div className="max-w-6xl mx-auto mb-16">
+            <div className="bg-white/95 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border border-white/50">
               <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                 <div>
-                  <label className="block text-sm font-semibold text-white mb-3">Property Type</label>
+                  <label className="block text-sm font-bold text-ebutine-dark mb-3">Property Type</label>
                   <Select value={searchFilters.propertyType} onValueChange={(value) => setSearchFilters(prev => ({...prev, propertyType: value}))}>
-                    <SelectTrigger className="bg-white/10 border-white/20 text-white backdrop-blur-sm">
+                    <SelectTrigger className="bg-gray-50 border-gray-200 text-ebutine-dark font-medium">
                       <SelectValue placeholder="All Types" />
                     </SelectTrigger>
                     <SelectContent>
@@ -188,9 +188,9 @@ export default function HeroSection() {
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-semibold text-white mb-3">Location</label>
+                  <label className="block text-sm font-bold text-ebutine-dark mb-3">Location</label>
                   <Select value={searchFilters.location} onValueChange={(value) => setSearchFilters(prev => ({...prev, location: value}))}>
-                    <SelectTrigger className="bg-white/10 border-white/20 text-white backdrop-blur-sm">
+                    <SelectTrigger className="bg-gray-50 border-gray-200 text-ebutine-dark font-medium">
                       <SelectValue placeholder="Lagos" />
                     </SelectTrigger>
                     <SelectContent>
@@ -204,9 +204,9 @@ export default function HeroSection() {
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-semibold text-white mb-3">Budget Range</label>
+                  <label className="block text-sm font-bold text-ebutine-dark mb-3">Budget Range</label>
                   <Select value={searchFilters.budget} onValueChange={(value) => setSearchFilters(prev => ({...prev, budget: value}))}>
-                    <SelectTrigger className="bg-white/10 border-white/20 text-white backdrop-blur-sm">
+                    <SelectTrigger className="bg-gray-50 border-gray-200 text-ebutine-dark font-medium">
                       <SelectValue placeholder="Any Budget" />
                     </SelectTrigger>
                     <SelectContent>
@@ -221,7 +221,7 @@ export default function HeroSection() {
                 <div className="flex items-end">
                   <Button 
                     onClick={handleSearch}
-                    className="btn-primary w-full bg-ebutine-orange hover:bg-orange-600 text-white font-bold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                    className="w-full bg-ebutine-orange hover:bg-orange-600 text-white font-bold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
                   >
                     <Search className="mr-2 h-5 w-5" />
                     Search Properties
@@ -244,7 +244,7 @@ export default function HeroSection() {
               target="_blank" 
               rel="noopener noreferrer"
             >
-              <Button className="bg-transparent border-2 border-white text-white hover:bg-white hover:text-ebutine-dark font-bold py-4 px-10 text-lg rounded-xl transition-all duration-300 transform hover:scale-105 backdrop-blur-sm">
+              <Button className="bg-white/20 border-2 border-white text-white hover:bg-white hover:text-ebutine-dark font-bold py-4 px-10 text-lg rounded-xl transition-all duration-300 transform hover:scale-105 backdrop-blur-sm">
                 <i className="fab fa-whatsapp mr-3 text-xl"></i>
                 WhatsApp Us
               </Button>

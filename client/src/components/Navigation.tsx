@@ -62,7 +62,7 @@ export default function Navigation() {
               href="https://wa.me/2349061461411"
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-6 py-2 rounded-xl text-sm font-semibold transition-all-smooth transform hover:scale-105 shadow-lg hover:shadow-xl"
+              className="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-xl text-sm font-bold transition-all-smooth transform hover:scale-105 shadow-lg hover:shadow-xl"
               data-testid="whatsapp-link"
             >
               <i className="fab fa-whatsapp mr-2"></i>WhatsApp
@@ -113,7 +113,7 @@ export default function Navigation() {
                 href="https://wa.me/2349061461411"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="bg-green-500 text-white px-4 py-2 rounded-lg text-sm"
+                className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-bold"
                 data-testid="mobile-whatsapp-link"
               >
                 <i className="fab fa-whatsapp mr-2"></i>WhatsApp

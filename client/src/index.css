@@ -283,4 +283,21 @@
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
+  
+  .text-shadow-strong {
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7), 1px 1px 4px rgba(0, 0, 0, 0.5);
+  }
+  
+  /* Enhanced Button Styles */
+  .btn-primary {
+    @apply bg-ebutine-orange hover:bg-orange-600 text-white font-semibold py-3 px-8 rounded-xl shadow-lg hover:shadow-ebutine-orange transition-all-smooth transform hover:scale-105;
+  }
+  
+  .btn-secondary {
+    @apply bg-white text-ebutine-blue border-2 border-ebutine-blue font-semibold py-3 px-8 rounded-xl shadow-lg hover:bg-ebutine-blue hover:text-white transition-all-smooth;
+  }
+  
+  .btn-outline {
+    @apply bg-transparent border-2 border-white text-white hover:bg-white hover:text-ebutine-dark font-semibold py-3 px-8 rounded-xl shadow-lg backdrop-blur-sm transition-all-smooth;
+  }
 }
