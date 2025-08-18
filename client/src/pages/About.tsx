@@ -3,7 +3,7 @@ import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "wouter";
-import { Handshake, Shield, DollarSign, Headphones, Users, Award, Globe, Target } from "lucide-react";
+import { Handshake, Shield, DollarSign, Headphones, Users, Award, Globe, Target, TrendingUp } from "lucide-react";
 
 export default function About() {
   return (
@@ -33,10 +33,13 @@ export default function About() {
                 At Ebutine Properties, we help Nigerians at home and in the Diaspora acquire safe, profitable and verified real estate investments. We specialize in both Residential and Commercial properties across prime locations in Nigeria.
               </p>
               <p className="text-lg text-ebutine-blue mb-6">
-                We understand the challenges Nigerians abroad face when investing back home. The lack of trust, transparency, and the fear of being defrauded of their hard earned money. To solve these problems, Ebutine Properties was incorporated.
+                We understand the challenges Nigerians abroad face when investing in back home. The lack of trust, transparency, and the fear of being defrauded of their hard earned money. To solve these problems, Ebutine Properties was incorporated. Our company is built on three core values: Trust, Integrity, and Professionalism. With a dedicated team and verified properties, we ensure that every transaction is transparent, easy, and rewarding.
+              </p>
+              <p className="text-lg text-ebutine-blue mb-6">
+                Whether you're looking to build your dream home, expand your investment portfolio, or secure land for future growth, we're here to guide you all the way through - from selecting the right property to documentations.
               </p>
               <p className="text-lg text-ebutine-blue mb-8">
-                Whether you're looking to build your dream home, expand your investment portfolio, or secure land for future growth, we're here to guide you all the way through - from selecting the right property to documentations.
+                With satisfied clients across the United Kingdom, United States, Canada, Australia, China and beyond, we take pride in connecting Nigerians worldwide to safe and profitable real estate investments in Nigeria.
               </p>
               
               <Link href="/contact">
@@ -161,7 +164,7 @@ export default function About() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-4xl font-bold text-ebutine-dark mb-6">Beyond Property Sales</h2>
           <p className="text-xl text-ebutine-blue mb-12 max-w-3xl mx-auto">
-            At Ebutine Properties, we don't just sell properties. Our philosophy centers on empowering our clients to:
+            At Ebutine Properties, we don't just sell properties, we help you BUILD WEALTH, MULTIPLY WEALTH AND SUSTAIN WEALTH.
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
