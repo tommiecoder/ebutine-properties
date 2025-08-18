@@ -33,12 +33,6 @@ export default function Footer() {
               >
                 <i className="fab fa-instagram text-2xl"></i>
               </a>
-              <a href="#" className="text-gray-300 hover:text-blue-400 transition-all duration-300 transform hover:scale-110" data-testid="linkedin-link">
-                <i className="fab fa-linkedin text-2xl"></i>
-              </a>
-              <a href="#" className="text-gray-300 hover:text-red-500 transition-all duration-300 transform hover:scale-110" data-testid="youtube-link">
-                <i className="fab fa-youtube text-2xl"></i>
-              </a>
             </div>
           </div>
 

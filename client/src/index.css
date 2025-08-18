@@ -173,7 +173,7 @@
   }
   /* Favicon */
   link[rel="icon"] {
-    content: url('/images/image3.png');
+    content: url('/public/favicon.png');
   }
 }
 
@@ -331,7 +331,7 @@
 
   /* Ready to Invest section styling */
   .ready-to-invest {
-    background: white;
+    background: white !important;
     color: #2c3e50;
   }
 
@@ -342,16 +342,35 @@
     border: none !important;
   }
 
-  .ready-to-invest .btn-secondary {
+  .ready-to-invest .btn-secondary,
+  .ready-to-invest button[variant="outline"] {
     background: #2c3e50 !important;
     color: white !important;
     border: 2px solid #2c3e50 !important;
   }
 
-  .ready-to-invest .btn-secondary:hover {
-    background: white !important;
-    color: #2c3e50 !important;
+  .ready-to-invest .btn-secondary:hover,
+  .ready-to-invest button[variant="outline"]:hover {
+    background: #34495e !important;
+    color: white !important;
+    border: 2px solid #34495e !important;
+  }
+
+  /* Specific styling for WhatsApp and other second buttons */
+  .ready-to-invest a[href*="whatsapp"],
+  .ready-to-invest a[href*="wa.me"],
+  .ready-to-invest a[href*="tel:"] {
+    background: #2c3e50 !important;
+    color: white !important;
     border: 2px solid #2c3e50 !important;
+  }
+
+  .ready-to-invest a[href*="whatsapp"]:hover,
+  .ready-to-invest a[href*="wa.me"]:hover,
+  .ready-to-invest a[href*="tel:"]:hover {
+    background: #34495e !important;
+    color: white !important;
+    border: 2px solid #34495e !important;
   }
 
   /* Footer Social Icons Removal */
