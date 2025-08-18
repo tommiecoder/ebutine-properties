@@ -87,6 +87,7 @@ export default function HeroSection() {
               }}
               className="absolute inset-0"
             ></div>
+            <div className="absolute inset-0 bg-black/60"></div>
             <div className="absolute inset-0 bg-gradient-to-br from-ebutine-dark/80 via-ebutine-blue/70 to-ebutine-dark/90"></div>
           </div>
         ))}
