@@ -1,4 +1,3 @@
-
 import { Helmet } from "react-helmet";
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
@@ -74,8 +73,8 @@ export default function Gallery() {
     { key: "commercial", label: "Commercial" }
   ];
 
-  const filteredImages = selectedCategory === "all" 
-    ? galleryImages 
+  const filteredImages = selectedCategory === "all"
+    ? galleryImages
     : galleryImages.filter(img => img.category === selectedCategory);
 
   return (
@@ -140,11 +139,11 @@ export default function Gallery() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-br from-ebutine-orange to-orange-600 text-white">
+      <section className="py-20 ready-to-invest">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-4xl font-bold mb-6">Interested in Any of These Properties?</h2>
-          <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
-            Contact us today to schedule a viewing or get more information
+          <h2 className="text-4xl font-bold mb-6">Ready to Invest?</h2>
+          <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+            See a property you like? Get in touch with our experts today
           </p>
           <div className="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-6">
             <a href="https://wa.me/2349061461411" target="_blank" rel="noopener noreferrer">
@@ -153,7 +152,7 @@ export default function Gallery() {
               </Button>
             </a>
             <a href="tel:+2349061461411">
-              <Button variant="outline" size="lg" className="border-2 border-white text-white hover:bg-white hover:text-ebutine-dark font-semibold py-4 px-8 text-lg">
+              <Button variant="outline" size="lg" className="border-2 border-ebutine-dark text-ebutine-dark hover:bg-ebutine-dark hover:text-white font-semibold py-4 px-8 text-lg">
                 Call Us Now
               </Button>
             </a>

@@ -22,7 +22,7 @@ export default function PropertyListings() {
 
   // Parse URL params on component mount
   const [isInitialized, setIsInitialized] = useState(false);
-  
+
   useState(() => {
     if (!isInitialized) {
       const urlParams = new URLSearchParams(window.location.search);
@@ -48,7 +48,7 @@ export default function PropertyListings() {
       if (filters.location && filters.location !== "all") {
         params.set("location", filters.location);
       }
-      
+
       const response = await fetch(`/api/properties?${params.toString()}`);
       if (!response.ok) throw new Error("Failed to fetch properties");
       return response.json();
@@ -59,10 +59,10 @@ export default function PropertyListings() {
   const filteredProperties = properties.filter(property => {
     if (filters.priceRange && filters.priceRange !== "all") {
       const price = parseFloat(property.price);
-      const [min, max] = filters.priceRange.includes("+") 
+      const [min, max] = filters.priceRange.includes("+")
         ? [parseFloat(filters.priceRange.replace(/[^\d]/g, "")), Infinity]
         : filters.priceRange.split("-").map(p => parseFloat(p.replace(/[^\d]/g, "")) * 1000000);
-      
+
       if (price < min || price > max) return false;
     }
 
@@ -130,7 +130,7 @@ export default function PropertyListings() {
                   {filteredProperties.length} properties found
                 </div>
               </div>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-ebutine-dark mb-2">Property Type</label>
@@ -215,7 +215,7 @@ export default function PropertyListings() {
                 </div>
 
                 <div className="flex items-end">
-                  <Button 
+                  <Button
                     className="w-full bg-ebutine-orange hover:bg-orange-600 text-white font-semibold"
                     onClick={() => {
                       // Filters are applied automatically via state changes
@@ -249,7 +249,7 @@ export default function PropertyListings() {
               <p className="text-ebutine-blue mb-8">
                 No properties match your current search criteria. Try adjusting your filters or browse all properties.
               </p>
-              <Button 
+              <Button
                 onClick={() => {
                   setFilters({
                     propertyType: "all",
@@ -281,7 +281,7 @@ export default function PropertyListings() {
               {/* Pagination */}
               {totalPages > 1 && (
                 <div className="flex justify-center items-center space-x-4" data-testid="pagination">
-                  <Button 
+                  <Button
                     variant="outline"
                     onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                     disabled={currentPage === 1}
@@ -290,7 +290,7 @@ export default function PropertyListings() {
                     <ChevronLeft className="mr-2 h-4 w-4" />
                     Previous
                   </Button>
-                  
+
                   <div className="flex space-x-2">
                     {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
                       const pageNum = i + 1;
@@ -307,8 +307,8 @@ export default function PropertyListings() {
                       );
                     })}
                   </div>
-                  
-                  <Button 
+
+                  <Button
                     variant="outline"
                     onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
                     disabled={currentPage === totalPages}
@@ -325,13 +325,13 @@ export default function PropertyListings() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-br from-ebutine-orange to-orange-600 text-white">
+      <section className="py-20 ready-to-invest">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-4xl font-bold mb-6">Didn't Find What You're Looking For?</h2>
-          <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
-            Contact our experts for personalized property recommendations based on your specific requirements
+          <h2 className="text-4xl font-bold mb-6">Ready to Invest?</h2>
+          <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+            Get personalized property recommendations from our experts
           </p>
-          
+
           <div className="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-6">
             <Button size="lg" className="bg-ebutine-orange hover:bg-orange-600 text-white font-semibold py-4 px-8 text-lg">
               <a href="/contact">Request Custom Search</a>

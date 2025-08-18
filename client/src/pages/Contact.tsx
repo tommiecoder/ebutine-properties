@@ -60,7 +60,7 @@ export default function Contact() {
               <div className="space-y-6 mb-8">
                 <div className="flex items-start">
                   <div className="bg-ebutine-orange bg-opacity-10 p-3 rounded-lg mr-4">
-                    <i className="fas fa-map-marker-alt text-2xl text-ebutine-orange"></i>
+                    <i className="fas fa-building text-2xl text-ebutine-orange"></i>
                   </div>
                   <div>
                     <h4 className="font-semibold text-ebutine-dark mb-1">Office Address</h4>
@@ -74,7 +74,7 @@ export default function Contact() {
 
                 <div className="flex items-start">
                   <div className="bg-ebutine-orange bg-opacity-10 p-3 rounded-lg mr-4">
-                    <i className="fas fa-phone-alt text-2xl text-ebutine-orange"></i>
+                    <i className="fas fa-phone text-2xl text-ebutine-orange"></i>
                   </div>
                   <div>
                     <h4 className="font-semibold text-ebutine-dark mb-1">Phone</h4>
@@ -92,7 +92,7 @@ export default function Contact() {
 
                 <div className="flex items-start">
                   <div className="bg-ebutine-orange bg-opacity-10 p-3 rounded-lg mr-4">
-                    <i className="fas fa-envelope-open text-2xl text-ebutine-orange"></i>
+                    <i className="fas fa-envelope text-2xl text-ebutine-orange"></i>
                   </div>
                   <div>
                     <h4 className="font-semibold text-ebutine-dark mb-1">Email</h4>

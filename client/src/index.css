@@ -332,42 +332,57 @@
   /* Ready to Invest section styling */
   .ready-to-invest {
     background: white !important;
-    color: #2c3e50;
+    color: #2c3e50 !important;
   }
 
-  /* Ensure button text is always visible */
-  .ready-to-invest .btn-primary {
+  /* Ensure all button text is always visible */
+  .ready-to-invest .btn-primary,
+  .ready-to-invest button {
     background: #f39c12 !important;
     color: white !important;
     border: none !important;
   }
 
   .ready-to-invest .btn-secondary,
-  .ready-to-invest button[variant="outline"] {
+  .ready-to-invest button[variant="outline"],
+  .ready-to-invest a button,
+  .ready-to-invest a[class*="border"] {
     background: #2c3e50 !important;
     color: white !important;
     border: 2px solid #2c3e50 !important;
   }
 
   .ready-to-invest .btn-secondary:hover,
-  .ready-to-invest button[variant="outline"]:hover {
+  .ready-to-invest button[variant="outline"]:hover,
+  .ready-to-invest a button:hover,
+  .ready-to-invest a[class*="border"]:hover {
     background: #34495e !important;
     color: white !important;
     border: 2px solid #34495e !important;
   }
 
-  /* Specific styling for WhatsApp and other second buttons */
-  .ready-to-invest a[href*="whatsapp"],
-  .ready-to-invest a[href*="wa.me"],
-  .ready-to-invest a[href*="tel:"] {
+  /* Specific styling for all second buttons including WhatsApp, View Properties, etc. */
+  .ready-to-invest a[href*="whatsapp"] button,
+  .ready-to-invest a[href*="wa.me"] button,
+  .ready-to-invest a[href*="tel:"] button,
+  .ready-to-invest a[href*="properties"] button,
+  .ready-to-invest a[href*="/properties"] button,
+  .ready-to-invest a button[variant="outline"],
+  .ready-to-invest a .border-white,
+  .ready-to-invest a .border-2 {
     background: #2c3e50 !important;
     color: white !important;
     border: 2px solid #2c3e50 !important;
   }
 
-  .ready-to-invest a[href*="whatsapp"]:hover,
-  .ready-to-invest a[href*="wa.me"]:hover,
-  .ready-to-invest a[href*="tel:"]:hover {
+  .ready-to-invest a[href*="whatsapp"] button:hover,
+  .ready-to-invest a[href*="wa.me"] button:hover,
+  .ready-to-invest a[href*="tel:"] button:hover,
+  .ready-to-invest a[href*="properties"] button:hover,
+  .ready-to-invest a[href*="/properties"] button:hover,
+  .ready-to-invest a button[variant="outline"]:hover,
+  .ready-to-invest a .border-white:hover,
+  .ready-to-invest a .border-2:hover {
     background: #34495e !important;
     color: white !important;
     border: 2px solid #34495e !important;

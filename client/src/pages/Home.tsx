@@ -136,28 +136,28 @@ export default function Home() {
       <TestimonialsSection />
 
       {/* Quick Contact */}
-      <section className="py-20 bg-gradient-to-br from-ebutine-orange to-orange-600 text-white">
+      <section className="py-20 ready-to-invest">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-4xl font-bold mb-6">Ready to Invest?</h2>
-          <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
+          <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
             Get in touch with our experts today and start your real estate investment journey
           </p>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
             <div className="flex flex-col items-center">
               <Phone className="h-12 w-12 text-ebutine-orange mb-4" />
-              <h3 className="text-lg font-semibold mb-2">Call Us</h3>
-              <a href="tel:+2349061461411" className="text-gray-300 hover:text-white">+234 906 146 1411</a>
+              <h3 className="text-lg font-semibold mb-2 text-ebutine-dark">Call Us</h3>
+              <a href="tel:+2349061461411" className="text-ebutine-blue hover:text-ebutine-orange">+234 906 146 1411</a>
             </div>
             <div className="flex flex-col items-center">
               <Mail className="h-12 w-12 text-ebutine-orange mb-4" />
-              <h3 className="text-lg font-semibold mb-2">Email Us</h3>
-              <a href="mailto:ebutineproperties@gmail.com" className="text-gray-300 hover:text-white">ebutineproperties@gmail.com</a>
+              <h3 className="text-lg font-semibold mb-2 text-ebutine-dark">Email Us</h3>
+              <a href="mailto:ebutineproperties@gmail.com" className="text-ebutine-blue hover:text-ebutine-orange">ebutineproperties@gmail.com</a>
             </div>
             <div className="flex flex-col items-center">
               <MapPin className="h-12 w-12 text-ebutine-orange mb-4" />
-              <h3 className="text-lg font-semibold mb-2">Visit Us</h3>
-              <p className="text-gray-300">Greenland Estate, Lagos</p>
+              <h3 className="text-lg font-semibold mb-2 text-ebutine-dark">Visit Us</h3>
+              <p className="text-ebutine-blue">Greenland Estate, Lagos</p>
             </div>
           </div>
 

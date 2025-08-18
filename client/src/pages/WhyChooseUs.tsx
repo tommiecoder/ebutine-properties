@@ -298,28 +298,28 @@ export default function WhyChooseUs() {
       </section>
 
       {/* Contact CTA */}
-      <section className="py-20 bg-gradient-to-br from-ebutine-orange to-orange-600 text-white">
+      <section className="py-20 ready-to-invest">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-4xl font-bold mb-6">Ready to Experience the Difference?</h2>
-          <p className="text-xl text-gray-300 mb-12 max-w-2xl mx-auto">
+          <p className="text-xl text-gray-600 mb-12 max-w-2xl mx-auto">
             Join thousands of satisfied clients who have trusted Ebutine Properties with their real estate investments
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
             <div className="flex flex-col items-center">
               <Phone className="h-12 w-12 text-ebutine-orange mb-4" />
-              <h3 className="text-lg font-semibold mb-2">Call Us Now</h3>
-              <a href="tel:+2349061461411" className="text-gray-300 hover:text-white">+234 906 146 1411</a>
+              <h3 className="text-lg font-semibold mb-2 text-ebutine-dark">Call Us Now</h3>
+              <a href="tel:+2349061461411" className="text-ebutine-blue hover:text-ebutine-orange">+234 906 146 1411</a>
             </div>
             <div className="flex flex-col items-center">
               <i className="fab fa-whatsapp text-5xl text-green-500 mb-4"></i>
-              <h3 className="text-lg font-semibold mb-2">WhatsApp Chat</h3>
-              <a href="https://wa.me/2349061461411" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-white">Start Conversation</a>
+              <h3 className="text-lg font-semibold mb-2 text-ebutine-dark">WhatsApp Chat</h3>
+              <a href="https://wa.me/2349061461411" target="_blank" rel="noopener noreferrer" className="text-ebutine-blue hover:text-ebutine-orange">Start Conversation</a>
             </div>
             <div className="flex flex-col items-center">
               <MapPin className="h-12 w-12 text-ebutine-orange mb-4" />
-              <h3 className="text-lg font-semibold mb-2">Visit Our Office</h3>
-              <p className="text-gray-300">Greenland Estate, Lagos</p>
+              <h3 className="text-lg font-semibold mb-2 text-ebutine-dark">Visit Our Office</h3>
+              <p className="text-ebutine-blue">Greenland Estate, Lagos</p>
             </div>
           </div>
           
