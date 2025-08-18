@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -125,7 +125,7 @@
   --ebutine-dark-light: hsl(220, 26%, 20%);
   --ebutine-light: hsl(220, 14%, 96%);
   --ebutine-light-dark: hsl(220, 14%, 90%);
-  
+
   /* Advanced Shadows */
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
@@ -171,9 +171,37 @@
     @apply bg-background text-foreground;
     font-family: 'Inter', sans-serif;
   }
+  /* Favicon */
+  link[rel="icon"] {
+    content: url('/images/image3.png');
+  }
 }
 
 @layer utilities {
+  /* Contact Section Icons */
+  .contact-icon {
+    width: 24px;
+    height: 24px;
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 8px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+  }
+
+  .icon-office {
+    background-image: url('/icons/building.svg'); /* Replace with your office icon */
+  }
+
+  .icon-phone {
+    background-image: url('/icons/phone.svg'); /* Replace with your phone icon */
+  }
+
+  .icon-email {
+    background-image: url('/icons/mail.svg'); /* Replace with your email icon */
+  }
+
   /* Text Colors */
   .text-ebutine-blue {
     color: var(--ebutine-blue);
@@ -187,7 +215,7 @@
   .text-ebutine-dark {
     color: var(--ebutine-dark);
   }
-  
+
   /* Background Colors */
   .bg-ebutine-blue {
     background-color: var(--ebutine-blue);
@@ -201,7 +229,7 @@
   .bg-ebutine-light {
     background-color: var(--ebutine-light);
   }
-  
+
   /* Gradient Backgrounds */
   .bg-gradient-ebutine {
     background: linear-gradient(135deg, var(--ebutine-blue) 0%, var(--ebutine-dark) 100%);
@@ -215,7 +243,7 @@
   .bg-gradient-cool {
     background: linear-gradient(135deg, var(--ebutine-light) 0%, rgb(219, 234, 254) 50%, var(--ebutine-blue) 100%);
   }
-  
+
   /* Border Colors */
   .border-ebutine-orange {
     border-color: var(--ebutine-orange);
@@ -223,7 +251,7 @@
   .border-ebutine-blue {
     border-color: var(--ebutine-blue);
   }
-  
+
   /* Hover Effects */
   .hover\:bg-ebutine-orange:hover {
     background-color: var(--ebutine-orange);
@@ -237,7 +265,7 @@
   .hover\:shadow-blue:hover {
     box-shadow: var(--shadow-blue);
   }
-  
+
   /* Enhanced Shadows */
   .shadow-ebutine {
     box-shadow: var(--shadow-xl);
@@ -248,7 +276,7 @@
   .shadow-ebutine-blue {
     box-shadow: var(--shadow-blue);
   }
-  
+
   /* Glass Effect */
   .glass {
     background: rgba(255, 255, 255, 0.25);
@@ -256,26 +284,26 @@
     -webkit-backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.18);
   }
-  
+
   /* Enhanced Transitions */
   .transition-all-smooth {
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
-  
+
   /* Button Enhancements */
   .btn-primary {
     @apply bg-gradient-ebutine-orange text-white font-semibold py-3 px-8 rounded-xl shadow-lg hover:shadow-ebutine-orange transition-all-smooth transform hover:scale-105;
   }
-  
+
   .btn-secondary {
     @apply bg-white text-ebutine-blue border-2 border-ebutine-blue font-semibold py-3 px-8 rounded-xl shadow-lg hover:bg-ebutine-blue hover:text-white transition-all-smooth;
   }
-  
+
   /* Card Enhancements */
   .card-enhanced {
     @apply bg-white rounded-2xl shadow-lg hover:shadow-ebutine transition-all-smooth transform hover:-translate-y-2;
   }
-  
+
   /* Typography Enhancements */
   .text-gradient {
     background: linear-gradient(135deg, var(--ebutine-blue) 0%, var(--ebutine-orange) 100%);
@@ -283,21 +311,52 @@
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
-  
+
   .text-shadow-strong {
     text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7), 1px 1px 4px rgba(0, 0, 0, 0.5);
   }
-  
+
   /* Enhanced Button Styles */
   .btn-primary {
     @apply bg-ebutine-orange hover:bg-orange-600 text-white font-semibold py-3 px-8 rounded-xl shadow-lg hover:shadow-ebutine-orange transition-all-smooth transform hover:scale-105;
   }
-  
+
   .btn-secondary {
     @apply bg-white text-ebutine-blue border-2 border-ebutine-blue font-semibold py-3 px-8 rounded-xl shadow-lg hover:bg-ebutine-blue hover:text-white transition-all-smooth;
   }
-  
+
   .btn-outline {
     @apply bg-transparent border-2 border-white text-white hover:bg-white hover:text-ebutine-dark font-semibold py-3 px-8 rounded-xl shadow-lg backdrop-blur-sm transition-all-smooth;
+  }
+
+  /* Ready to Invest section styling */
+  .ready-to-invest {
+    background: white;
+    color: #2c3e50;
+  }
+
+  /* Ensure button text is always visible */
+  .ready-to-invest .btn-primary {
+    background: #f39c12 !important;
+    color: white !important;
+    border: none !important;
+  }
+
+  .ready-to-invest .btn-secondary {
+    background: #2c3e50 !important;
+    color: white !important;
+    border: 2px solid #2c3e50 !important;
+  }
+
+  .ready-to-invest .btn-secondary:hover {
+    background: white !important;
+    color: #2c3e50 !important;
+    border: 2px solid #2c3e50 !important;
+  }
+
+  /* Footer Social Icons Removal */
+  .footer-social-icons a[href*="linkedin"],
+  .footer-social-icons a[href*="youtube"] {
+    display: none;
   }
 }
