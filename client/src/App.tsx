@@ -11,6 +11,7 @@ import { Helmet } from "react-helmet";
 import Home from "@/pages/Home";
 import About from "@/pages/About";
 import PropertyListings from "@/pages/PropertyListings";
+import PropertyDetails from "@/pages/PropertyDetails";
 import Contact from "@/pages/Contact";
 import NotFound from "@/pages/not-found";
 import Gallery from "@/pages/Gallery";
@@ -63,6 +64,7 @@ function Router() {
           <Route path="/" component={Home} />
           <Route path="/about" component={About} />
           <Route path="/properties" component={PropertyListings} />
+          <Route path="/properties/:id" component={PropertyDetails} />
           <Route path="/contact" component={Contact} />
           <Route path="/gallery" component={Gallery} />
           <Route path="/admin/upload" component={AdminUpload} />

@@ -190,8 +190,17 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getProperty(id: string): Promise<Property | undefined> {
-    const result = await db.select().from(properties).where(eq(properties.id, id)).limit(1);
-    return result[0];
+    try {
+      if (db && !this.fallbackToMemory) {
+        const result = await db.select().from(properties).where(eq(properties.id, id)).limit(1);
+        return result[0];
+      } else {
+        return this.memoryProperties.get(id);
+      }
+    } catch (error) {
+      this.fallbackToMemory = true;
+      return this.memoryProperties.get(id);
+    }
   }
 
   async createProperty(property: InsertProperty): Promise<Property> {
@@ -225,8 +234,31 @@ export class DatabaseStorage implements IStorage {
       updatedAt: new Date(),
     };
     
-    await db.update(properties).set(updateData).where(eq(properties.id, id));
-    return this.getProperty(id);
+    try {
+      if (db && !this.fallbackToMemory) {
+        await db.update(properties).set(updateData).where(eq(properties.id, id));
+        return this.getProperty(id);
+      } else {
+        // Fallback to memory storage
+        const existing = this.memoryProperties.get(id);
+        if (existing) {
+          const updated = { ...existing, ...updateData };
+          this.memoryProperties.set(id, updated);
+          return updated;
+        }
+        return undefined;
+      }
+    } catch (error) {
+      console.log("Database update failed, using memory storage");
+      this.fallbackToMemory = true;
+      const existing = this.memoryProperties.get(id);
+      if (existing) {
+        const updated = { ...existing, ...updateData };
+        this.memoryProperties.set(id, updated);
+        return updated;
+      }
+      return undefined;
+    }
   }
 
   async deleteProperty(id: string): Promise<boolean> {

@@ -88,8 +88,8 @@ export default function PropertyListings() {
   };
 
   const handleViewDetails = (id: string) => {
-    // Navigate to property details - for now show in new tab
-    window.open(`/properties/${id}`, '_blank');
+    // Navigate to property details page
+    window.location.href = `/properties/${id}`;
   };
 
   const handleInquire = (id: string) => {
