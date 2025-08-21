@@ -1,5 +1,9 @@
+
 import { type User, type InsertUser, type Property, type InsertProperty, type Contact, type InsertContact, type PropertyInquiry, type InsertPropertyInquiry } from "@shared/schema";
 import { randomUUID } from "crypto";
+import { db } from "./db";
+import { users, properties, contacts, propertyInquiries } from "@shared/schema";
+import { eq, and, gte, lte, sql } from "drizzle-orm";
 
 export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
@@ -28,104 +32,95 @@ export interface IStorage {
   createPropertyInquiry(inquiry: InsertPropertyInquiry): Promise<PropertyInquiry>;
 }
 
-export class MemStorage implements IStorage {
-  private users: Map<string, User>;
-  private properties: Map<string, Property>;
-  private contacts: Map<string, Contact>;
-  private propertyInquiries: Map<string, PropertyInquiry>;
-
+export class DatabaseStorage implements IStorage {
   constructor() {
-    this.users = new Map();
-    this.properties = new Map();
-    this.contacts = new Map();
-    this.propertyInquiries = new Map();
     this.seedData();
   }
 
-  private seedData() {
-    // Seed sample properties
-    const sampleProperties: Property[] = [
-      {
-        id: "1",
-        title: "Luxury 4BR Duplex",
-        description: "Elegant 4-bedroom duplex in gated estate with modern amenities",
-        type: "luxury_home",
-        price: "85000000",
-        location: "Sangotedo, Ajah Lagos",
-        address: "Greenland Estate, Sangotedo",
-        size: "4 bedrooms",
-        bedrooms: "4",
-        bathrooms: "5",
-        parking: "2",
-        features: ["Modern Kitchen", "Swimming Pool", "24/7 Security", "Fitted Wardrobes"],
-        images: ["https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?ixlib=rb-4.0.3"],
-        videos: ["https://example.com/property1-tour.mp4"],
-        status: "available",
-        featured: true,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-      {
-        id: "2",
-        title: "Commercial Land",
-        description: "Strategic commercial property in high-traffic area",
-        type: "commercial_land",
-        price: "35000000",
-        location: "Ibeju-Lekki, Lagos",
-        address: "Ibeju-Lekki Free Trade Zone",
-        size: "2,000 sqm",
-        bedrooms: null,
-        bathrooms: null,
-        parking: null,
-        features: ["C of O", "Tarred Road", "High ROI Potential"],
-        images: ["https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-4.0.3"],
-        videos: ["https://example.com/commercial-land-overview.mp4"],
-        status: "available",
-        featured: true,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-      {
-        id: "3",
-        title: "Residential Land",
-        description: "Prime residential land with infrastructure",
-        type: "residential_land",
-        price: "12500000",
-        location: "Greenland Estate, Sangotedo",
-        address: "Greenland Estate, Road 4",
-        size: "650 sqm",
-        bedrooms: null,
-        bathrooms: null,
-        parking: null,
-        features: ["Verified Title", "All Utilities", "Gated Estate"],
-        images: ["https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3"],
-        videos: null,
-        status: "available",
-        featured: false,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      }
-    ];
+  private async seedData() {
+    try {
+      // Check if properties already exist
+      const existingProperties = await db.select().from(properties).limit(1);
+      if (existingProperties.length > 0) return;
 
-    sampleProperties.forEach(property => {
-      this.properties.set(property.id, property);
-    });
+      // Seed sample properties
+      const sampleProperties = [
+        {
+          id: randomUUID(),
+          title: "Luxury 4BR Duplex",
+          description: "Elegant 4-bedroom duplex in gated estate with modern amenities",
+          type: "luxury_home",
+          price: "85000000",
+          location: "Sangotedo, Ajah Lagos",
+          address: "Greenland Estate, Sangotedo",
+          size: "4 bedrooms",
+          bedrooms: "4",
+          bathrooms: "5",
+          parking: "2",
+          features: ["Modern Kitchen", "Swimming Pool", "24/7 Security", "Fitted Wardrobes"],
+          images: ["https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?ixlib=rb-4.0.3"],
+          videos: ["https://example.com/property1-tour.mp4"],
+          status: "available",
+          featured: true,
+        },
+        {
+          id: randomUUID(),
+          title: "Commercial Land",
+          description: "Strategic commercial property in high-traffic area",
+          type: "commercial_land",
+          price: "35000000",
+          location: "Ibeju-Lekki, Lagos",
+          address: "Ibeju-Lekki Free Trade Zone",
+          size: "2,000 sqm",
+          bedrooms: null,
+          bathrooms: null,
+          parking: null,
+          features: ["C of O", "Tarred Road", "High ROI Potential"],
+          images: ["https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-4.0.3"],
+          videos: ["https://example.com/commercial-land-overview.mp4"],
+          status: "available",
+          featured: true,
+        },
+        {
+          id: randomUUID(),
+          title: "Residential Land",
+          description: "Prime residential land with infrastructure",
+          type: "residential_land",
+          price: "12500000",
+          location: "Greenland Estate, Sangotedo",
+          address: "Greenland Estate, Road 4",
+          size: "650 sqm",
+          bedrooms: null,
+          bathrooms: null,
+          parking: null,
+          features: ["Verified Title", "All Utilities", "Gated Estate"],
+          images: ["https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3"],
+          videos: null,
+          status: "available",
+          featured: false,
+        }
+      ];
+
+      await db.insert(properties).values(sampleProperties);
+    } catch (error) {
+      console.log("Database seeding skipped (tables may not exist yet)");
+    }
   }
 
   async getUser(id: string): Promise<User | undefined> {
-    return this.users.get(id);
+    const result = await db.select().from(users).where(eq(users.id, id)).limit(1);
+    return result[0];
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.username === username,
-    );
+    const result = await db.select().from(users).where(eq(users.username, username)).limit(1);
+    return result[0];
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
     const id = randomUUID();
     const user: User = { ...insertUser, id };
-    this.users.set(id, user);
+    await db.insert(users).values(user);
     return user;
   }
 
@@ -136,124 +131,109 @@ export class MemStorage implements IStorage {
     maxPrice?: number;
     featured?: boolean;
   }): Promise<Property[]> {
-    let properties = Array.from(this.properties.values());
-
+    let query = db.select().from(properties);
+    
+    const conditions = [];
+    
     if (filters) {
       if (filters.type && filters.type !== "All Types") {
-        properties = properties.filter(p => p.type === filters.type);
+        conditions.push(eq(properties.type, filters.type));
       }
       if (filters.location && filters.location !== "All Locations") {
-        properties = properties.filter(p => p.location.includes(filters.location!));
+        conditions.push(sql`${properties.location} ILIKE ${`%${filters.location}%`}`);
       }
       if (filters.featured !== undefined) {
-        properties = properties.filter(p => p.featured === filters.featured);
+        conditions.push(eq(properties.featured, filters.featured));
       }
       if (filters.minPrice) {
-        properties = properties.filter(p => parseFloat(p.price) >= filters.minPrice!);
+        conditions.push(gte(sql`CAST(${properties.price} AS DECIMAL)`, filters.minPrice));
       }
       if (filters.maxPrice) {
-        properties = properties.filter(p => parseFloat(p.price) <= filters.maxPrice!);
+        conditions.push(lte(sql`CAST(${properties.price} AS DECIMAL)`, filters.maxPrice));
       }
     }
 
-    return properties.sort((a, b) => (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0));
+    if (conditions.length > 0) {
+      query = query.where(and(...conditions));
+    }
+
+    const result = await query.orderBy(sql`${properties.createdAt} DESC`);
+    return result;
   }
 
   async getProperty(id: string): Promise<Property | undefined> {
-    return this.properties.get(id);
+    const result = await db.select().from(properties).where(eq(properties.id, id)).limit(1);
+    return result[0];
   }
 
   async createProperty(property: InsertProperty): Promise<Property> {
     const id = randomUUID();
-    const newProperty: Property = {
+    const newProperty = {
       ...property,
       id,
       createdAt: new Date(),
       updatedAt: new Date(),
-      address: property.address || null,
-      description: property.description || null,
-      size: property.size || null,
-      bedrooms: property.bedrooms || null,
-      bathrooms: property.bathrooms || null,
-      parking: property.parking || null,
-      features: (property.features as string[]) || null,
-      images: (property.images as string[]) || null,
-      videos: (property.videos as string[]) || null,
     };
-    this.properties.set(id, newProperty);
-    return newProperty;
+    
+    await db.insert(properties).values(newProperty);
+    return newProperty as Property;
   }
 
   async updateProperty(id: string, property: Partial<InsertProperty>): Promise<Property | undefined> {
-    const existing = this.properties.get(id);
-    if (!existing) return undefined;
-
-    const updated: Property = {
-      ...existing,
+    const updateData = {
       ...property,
       updatedAt: new Date(),
-      address: property.address !== undefined ? property.address : existing.address,
-      description: property.description !== undefined ? property.description : existing.description,
-      size: property.size !== undefined ? property.size : existing.size,
-      bedrooms: property.bedrooms !== undefined ? property.bedrooms : existing.bedrooms,
-      bathrooms: property.bathrooms !== undefined ? property.bathrooms : existing.bathrooms,
-      parking: property.parking !== undefined ? property.parking : existing.parking,
-      features: property.features !== undefined ? (property.features as string[]) : existing.features,
-      images: property.images !== undefined ? (property.images as string[]) : existing.images,
-      videos: property.videos !== undefined ? (property.videos as string[]) : existing.videos,
-      status: (property as any).status !== undefined ? (property as any).status : existing.status,
     };
-    this.properties.set(id, updated);
-    return updated;
+    
+    await db.update(properties).set(updateData).where(eq(properties.id, id));
+    return this.getProperty(id);
   }
 
   async deleteProperty(id: string): Promise<boolean> {
-    return this.properties.delete(id);
+    const result = await db.delete(properties).where(eq(properties.id, id));
+    return result.rowCount !== null && result.rowCount > 0;
   }
 
   async getContacts(): Promise<Contact[]> {
-    return Array.from(this.contacts.values())
-      .sort((a, b) => b.createdAt!.getTime() - a.createdAt!.getTime());
+    const result = await db.select().from(contacts).orderBy(sql`${contacts.createdAt} DESC`);
+    return result;
   }
 
   async createContact(contact: InsertContact): Promise<Contact> {
     const id = randomUUID();
-    const newContact: Contact = {
+    const newContact = {
       ...contact,
       id,
-      status: "new",
+      status: "new" as const,
       createdAt: new Date(),
-      location: contact.location || null,
-      propertyType: contact.propertyType || null,
-      budget: contact.budget || null,
-      purpose: contact.purpose || null,
-      message: contact.message || null,
-      contactMethod: contact.contactMethod || null,
     };
-    this.contacts.set(id, newContact);
-    return newContact;
+    
+    await db.insert(contacts).values(newContact);
+    return newContact as Contact;
   }
 
   async getPropertyInquiries(propertyId?: string): Promise<PropertyInquiry[]> {
-    let inquiries = Array.from(this.propertyInquiries.values());
+    let query = db.select().from(propertyInquiries);
+    
     if (propertyId) {
-      inquiries = inquiries.filter(i => i.propertyId === propertyId);
+      query = query.where(eq(propertyInquiries.propertyId, propertyId));
     }
-    return inquiries.sort((a, b) => b.createdAt!.getTime() - a.createdAt!.getTime());
+    
+    const result = await query.orderBy(sql`${propertyInquiries.createdAt} DESC`);
+    return result;
   }
 
   async createPropertyInquiry(inquiry: InsertPropertyInquiry): Promise<PropertyInquiry> {
     const id = randomUUID();
-    const newInquiry: PropertyInquiry = {
+    const newInquiry = {
       ...inquiry,
       id,
       createdAt: new Date(),
-      message: inquiry.message || null,
-      propertyId: inquiry.propertyId || null,
     };
-    this.propertyInquiries.set(id, newInquiry);
-    return newInquiry;
+    
+    await db.insert(propertyInquiries).values(newInquiry);
+    return newInquiry as PropertyInquiry;
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();
