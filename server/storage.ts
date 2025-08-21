@@ -59,6 +59,7 @@ export class MemStorage implements IStorage {
         parking: "2",
         features: ["Modern Kitchen", "Swimming Pool", "24/7 Security", "Fitted Wardrobes"],
         images: ["https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?ixlib=rb-4.0.3"],
+        videos: ["https://example.com/property1-tour.mp4"],
         status: "available",
         featured: true,
         createdAt: new Date(),
@@ -78,6 +79,7 @@ export class MemStorage implements IStorage {
         parking: null,
         features: ["C of O", "Tarred Road", "High ROI Potential"],
         images: ["https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-4.0.3"],
+        videos: ["https://example.com/commercial-land-overview.mp4"],
         status: "available",
         featured: true,
         createdAt: new Date(),
@@ -97,6 +99,7 @@ export class MemStorage implements IStorage {
         parking: null,
         features: ["Verified Title", "All Utilities", "Gated Estate"],
         images: ["https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3"],
+        videos: null,
         status: "available",
         featured: false,
         createdAt: new Date(),
@@ -175,6 +178,7 @@ export class MemStorage implements IStorage {
       parking: property.parking || null,
       features: (property.features as string[]) || null,
       images: (property.images as string[]) || null,
+      videos: (property.videos as string[]) || null,
     };
     this.properties.set(id, newProperty);
     return newProperty;
@@ -196,6 +200,7 @@ export class MemStorage implements IStorage {
       parking: property.parking !== undefined ? property.parking : existing.parking,
       features: property.features !== undefined ? (property.features as string[]) : existing.features,
       images: property.images !== undefined ? (property.images as string[]) : existing.images,
+      videos: property.videos !== undefined ? (property.videos as string[]) : existing.videos,
     };
     this.properties.set(id, updated);
     return updated;

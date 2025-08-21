@@ -1,7 +1,9 @@
-import { Heart, Bed, Bath, Car, MapPin, Phone } from "lucide-react";
+import { Heart, Bed, Bath, Car, MapPin, Phone, Play } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { useState } from "react";
+import PropertyVideoModal from "./PropertyVideoModal";
 import type { Property } from "@shared/schema";
 
 interface PropertyCardProps {
@@ -11,6 +13,8 @@ interface PropertyCardProps {
 }
 
 export default function PropertyCard({ property, onViewDetails, onInquire }: PropertyCardProps) {
+  const [showVideoModal, setShowVideoModal] = useState(false);
+  
   const formatPrice = (price: string) => {
     const num = parseFloat(price);
     if (num >= 1000000) {
@@ -38,7 +42,16 @@ export default function PropertyCard({ property, onViewDetails, onInquire }: Pro
         <div className="absolute top-4 left-4">
           {getStatusBadge(property.status, property.featured || false)}
         </div>
-        <div className="absolute top-4 right-4">
+        <div className="absolute top-4 right-4 flex space-x-2">
+          {property.videos && property.videos.length > 0 && (
+            <button 
+              onClick={() => setShowVideoModal(true)}
+              className="glass p-2 rounded-full bg-black/40 hover:bg-black/60 transition-colors"
+              title="View property videos"
+            >
+              <Play className="h-4 w-4 text-white" />
+            </button>
+          )}
           <button 
             className="glass p-3 rounded-full hover:bg-white/40 transition-all-smooth transform hover:scale-110"
             data-testid={`favorite-button-${property.id}`}
@@ -114,6 +127,13 @@ export default function PropertyCard({ property, onViewDetails, onInquire }: Pro
           </Button>
         </div>
       </CardContent>
+      
+      <PropertyVideoModal
+        isOpen={showVideoModal}
+        onClose={() => setShowVideoModal(false)}
+        videos={property.videos || []}
+        propertyTitle={property.title}
+      />
     </Card>
   );
 }

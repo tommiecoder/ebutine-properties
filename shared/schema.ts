@@ -23,6 +23,7 @@ export const properties = pgTable("properties", {
   parking: text("parking"),
   features: jsonb("features").$type<string[]>(), // Array of features
   images: jsonb("images").$type<string[]>(), // Array of image URLs
+  videos: jsonb("videos").$type<string[]>(), // Array of video URLs
   status: text("status").notNull().default("available"), // 'available', 'sold', 'reserved'
   featured: boolean("featured").default(false),
   createdAt: timestamp("created_at").defaultNow(),
