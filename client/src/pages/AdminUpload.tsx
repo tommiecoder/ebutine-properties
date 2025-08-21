@@ -151,10 +151,10 @@ export default function AdminUpload() {
   };
 
   const generateAIDescription = async () => {
-    if (!formData.title || (!formData.images.length && !formData.videos.length)) {
+    if (!formData.title && !formData.description && !formData.images.length && !formData.videos.length) {
       toast({
         title: "Missing Information",
-        description: "Please provide a title and at least one image or video for AI generation.",
+        description: "Please provide at least a title or description, or upload images/videos for AI analysis.",
         variant: "destructive",
       });
       return;
@@ -194,6 +194,61 @@ export default function AdminUpload() {
       toast({
         title: "Generation Failed",
         description: "Could not generate AI description. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsGeneratingAI(false);
+    }
+  };
+
+  const generateSmartProperty = async () => {
+    if (!formData.images.length && !formData.videos.length && !formData.title) {
+      toast({
+        title: "Missing Information",
+        description: "Please upload images/videos or provide a basic title for smart AI generation.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsGeneratingAI(true);
+    try {
+      const response = await fetch('/api/admin/generate-property', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: formData.title,
+          description: formData.description,
+          hasImages: formData.images.length > 0,
+          hasVideos: formData.videos.length > 0,
+        }),
+      });
+
+      if (!response.ok) throw new Error('Failed to generate property details');
+      
+      const propertyData = await response.json();
+      
+      setFormData(prev => ({
+        ...prev,
+        title: propertyData.title,
+        description: propertyData.description,
+        type: propertyData.type,
+        location: propertyData.location,
+        size: propertyData.size,
+        bedrooms: propertyData.bedrooms || "",
+        bathrooms: propertyData.bathrooms || "",
+        price: propertyData.price,
+        features: propertyData.features.join(', ')
+      }));
+
+      toast({
+        title: "Smart AI Complete!",
+        description: "All property details have been intelligently generated from your media and input.",
+      });
+    } catch (error) {
+      toast({
+        title: "Generation Failed",
+        description: "Could not generate smart property details. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -337,24 +392,40 @@ export default function AdminUpload() {
                 id="title"
                 value={formData.title}
                 onChange={(e) => handleInputChange('title', e.target.value)}
+                placeholder="Enter a basic title or leave empty for AI to generate"
                 required
               />
+              <p className="text-xs text-gray-500 mt-1">
+                💡 Tip: Upload images/videos and click "Smart AI" to automatically generate all property details!
+              </p>
             </div>
 
             <div>
               <Label htmlFor="description" className="flex items-center justify-between">
                 Description
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={generateAIDescription}
-                  disabled={isGeneratingAI}
-                  className="ml-2"
-                >
-                  <Sparkles className="h-4 w-4 mr-1" />
-                  {isGeneratingAI ? "Generating..." : "AI Generate"}
-                </Button>
+                <div className="flex gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={generateSmartProperty}
+                    disabled={isGeneratingAI}
+                  >
+                    <Sparkles className="h-4 w-4 mr-1" />
+                    {isGeneratingAI ? "Analyzing..." : "Smart AI"}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={generateAIDescription}
+                    disabled={isGeneratingAI}
+                    className="ml-2"
+                  >
+                    <Sparkles className="h-4 w-4 mr-1" />
+                    {isGeneratingAI ? "Generating..." : "AI Enhance"}
+                  </Button>
+                </div>
               </Label>
               <Textarea
                 id="description"

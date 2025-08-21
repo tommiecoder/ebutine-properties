@@ -33,6 +33,11 @@ export interface IStorage {
 }
 
 export class DatabaseStorage implements IStorage {
+  private fallbackToMemory = false;
+  private memoryProperties = new Map<string, Property>();
+  private memoryContacts = new Map<string, Contact>();
+  private memoryInquiries = new Map<string, PropertyInquiry>();
+
   constructor() {
     this.seedData();
   }
@@ -131,34 +136,57 @@ export class DatabaseStorage implements IStorage {
     maxPrice?: number;
     featured?: boolean;
   }): Promise<Property[]> {
-    let query = db.select().from(properties);
-    
-    const conditions = [];
-    
-    if (filters) {
-      if (filters.type && filters.type !== "All Types") {
-        conditions.push(eq(properties.type, filters.type));
-      }
-      if (filters.location && filters.location !== "All Locations") {
-        conditions.push(sql`${properties.location} ILIKE ${`%${filters.location}%`}`);
-      }
-      if (filters.featured !== undefined) {
-        conditions.push(eq(properties.featured, filters.featured));
-      }
-      if (filters.minPrice) {
-        conditions.push(gte(sql`CAST(${properties.price} AS DECIMAL)`, filters.minPrice));
-      }
-      if (filters.maxPrice) {
-        conditions.push(lte(sql`CAST(${properties.price} AS DECIMAL)`, filters.maxPrice));
-      }
-    }
+    try {
+      if (db && !this.fallbackToMemory) {
+        let query = db.select().from(properties);
+        
+        const conditions = [];
+        
+        if (filters) {
+          if (filters.type && filters.type !== "All Types") {
+            conditions.push(eq(properties.type, filters.type));
+          }
+          if (filters.location && filters.location !== "All Locations") {
+            conditions.push(sql`${properties.location} ILIKE ${`%${filters.location}%`}`);
+          }
+          if (filters.featured !== undefined) {
+            conditions.push(eq(properties.featured, filters.featured));
+          }
+          if (filters.minPrice) {
+            conditions.push(gte(sql`CAST(${properties.price} AS DECIMAL)`, filters.minPrice));
+          }
+          if (filters.maxPrice) {
+            conditions.push(lte(sql`CAST(${properties.price} AS DECIMAL)`, filters.maxPrice));
+          }
+        }
 
-    if (conditions.length > 0) {
-      query = query.where(and(...conditions));
-    }
+        if (conditions.length > 0) {
+          query = query.where(and(...conditions));
+        }
 
-    const result = await query.orderBy(sql`${properties.createdAt} DESC`);
-    return result;
+        const result = await query.orderBy(sql`${properties.createdAt} DESC`);
+        return result;
+      } else {
+        // Fallback to memory storage
+        let result = Array.from(this.memoryProperties.values());
+        
+        if (filters) {
+          result = result.filter(property => {
+            if (filters.type && filters.type !== "All Types" && property.type !== filters.type) return false;
+            if (filters.location && filters.location !== "All Locations" && !property.location.toLowerCase().includes(filters.location.toLowerCase())) return false;
+            if (filters.featured !== undefined && property.featured !== filters.featured) return false;
+            if (filters.minPrice && parseFloat(property.price) < filters.minPrice) return false;
+            if (filters.maxPrice && parseFloat(property.price) > filters.maxPrice) return false;
+            return true;
+          });
+        }
+        
+        return result.sort((a, b) => new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime());
+      }
+    } catch (error) {
+      this.fallbackToMemory = true;
+      return Array.from(this.memoryProperties.values());
+    }
   }
 
   async getProperty(id: string): Promise<Property | undefined> {
@@ -175,8 +203,20 @@ export class DatabaseStorage implements IStorage {
       updatedAt: new Date(),
     };
     
-    await db.insert(properties).values(newProperty);
-    return newProperty as Property;
+    try {
+      if (db) {
+        await db.insert(properties).values(newProperty);
+      } else {
+        this.fallbackToMemory = true;
+        this.memoryProperties.set(id, newProperty as Property);
+      }
+      return newProperty as Property;
+    } catch (error) {
+      console.log("Database insert failed, using memory storage");
+      this.fallbackToMemory = true;
+      this.memoryProperties.set(id, newProperty as Property);
+      return newProperty as Property;
+    }
   }
 
   async updateProperty(id: string, property: Partial<InsertProperty>): Promise<Property | undefined> {

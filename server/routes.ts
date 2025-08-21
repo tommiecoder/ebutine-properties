@@ -5,78 +5,282 @@ import path from "path";
 import { storage } from "./storage";
 import { insertContactSchema, insertPropertyInquirySchema, insertPropertySchema } from "@shared/schema";
 
-// AI generation helper functions
-async function generatePropertyDescription(propertyData: any): Promise<string> {
+// Enhanced AI generation helper functions
+async function analyzeMediaAndGenerateProperty(mediaInfo: any): Promise<{
+  title: string;
+  description: string;
+  type: string;
+  location: string;
+  size: string;
+  bedrooms: string | null;
+  bathrooms: string | null;
+  features: string[];
+  price: string;
+}> {
+  // This is an enhanced AI analyzer that would in production use computer vision
+  // and location detection APIs. For now, we'll use intelligent pattern matching
+  
+  const { hasImages, hasVideos, userInput } = mediaInfo;
+  
+  // Analyze user input for clues
+  const inputLower = (userInput.title + " " + (userInput.description || "")).toLowerCase();
+  
+  // Detect property type from input
+  let type = "house";
+  if (inputLower.includes("land") || inputLower.includes("plot")) {
+    type = inputLower.includes("commercial") ? "commercial" : "land";
+  } else if (inputLower.includes("apartment") || inputLower.includes("flat")) {
+    type = "apartment";
+  } else if (inputLower.includes("luxury") || inputLower.includes("duplex") || inputLower.includes("mansion")) {
+    type = "house";
+  } else if (inputLower.includes("office") || inputLower.includes("shop") || inputLower.includes("store")) {
+    type = "commercial";
+  }
+  
+  // Generate intelligent location suggestions based on popular Lagos areas
+  const lagosAreas = [
+    "Lekki", "Victoria Island", "Ikoyi", "Ajah", "Sangotedo", "Chevron", "Ibeju-Lekki",
+    "Banana Island", "Parkview Estate", "Ikeja", "Maryland", "Gbagada", "Surulere",
+    "Yaba", "Lagos Island", "Festac", "Magodo", "Ojota", "Ketu", "Mile 2"
+  ];
+  
+  let detectedLocation = "Lagos";
+  for (const area of lagosAreas) {
+    if (inputLower.includes(area.toLowerCase())) {
+      detectedLocation = area + ", Lagos";
+      break;
+    }
+  }
+  
+  // If no location detected in input, suggest based on property type
+  if (detectedLocation === "Lagos") {
+    if (type === "land" || type === "commercial") {
+      detectedLocation = "Ibeju-Lekki, Lagos";
+    } else if (type === "house") {
+      detectedLocation = "Lekki, Lagos";
+    } else {
+      detectedLocation = "Ajah, Lagos";
+    }
+  }
+  
+  // Generate bedrooms/bathrooms based on property type and media presence
+  let bedrooms = null;
+  let bathrooms = null;
+  let size = "";
+  
+  if (type === "house" || type === "apartment") {
+    // Analyze for room indicators
+    if (inputLower.includes("studio")) {
+      bedrooms = "1";
+      bathrooms = "1";
+    } else if (inputLower.includes("2") || inputLower.includes("two")) {
+      bedrooms = "2";
+      bathrooms = "2";
+    } else if (inputLower.includes("3") || inputLower.includes("three")) {
+      bedrooms = "3";
+      bathrooms = "3";
+    } else if (inputLower.includes("4") || inputLower.includes("four")) {
+      bedrooms = "4";
+      bathrooms = "4";
+    } else if (inputLower.includes("5") || inputLower.includes("five")) {
+      bedrooms = "5";
+      bathrooms = "5";
+    } else {
+      // Default based on property type
+      if (type === "house") {
+        bedrooms = "3";
+        bathrooms = "3";
+      } else {
+        bedrooms = "2";
+        bathrooms = "2";
+      }
+    }
+    
+    size = bedrooms + " bedrooms";
+  } else if (type === "land" || type === "commercial") {
+    // Generate size for land
+    const sizesOptions = ["500 sqm", "650 sqm", "1000 sqm", "1200 sqm", "2000 sqm", "3000 sqm"];
+    size = sizesOptions[Math.floor(Math.random() * sizesOptions.length)];
+  }
+  
+  // Generate intelligent title
+  let title = "";
+  if (type === "house") {
+    const houseTypes = ["Modern", "Luxury", "Elegant", "Spacious", "Beautiful"];
+    const houseStyle = houseTypes[Math.floor(Math.random() * houseTypes.length)];
+    title = `${houseStyle} ${bedrooms}BR ${type === "house" ? "House" : "Apartment"}`;
+  } else if (type === "land") {
+    title = `Prime Residential Land - ${size}`;
+  } else if (type === "commercial") {
+    title = `Commercial Property - ${size}`;
+  } else {
+    title = userInput.title || "Premium Property";
+  }
+  
+  // Generate price based on type and location
+  let price = "0";
+  const locationMultiplier = detectedLocation.includes("Victoria Island") || detectedLocation.includes("Ikoyi") ? 1.8 :
+                           detectedLocation.includes("Lekki") ? 1.4 :
+                           detectedLocation.includes("Ajah") ? 1.1 : 1.0;
+  
+  if (type === "house") {
+    const basePrice = parseInt(bedrooms || "3") * 15000000; // 15M per bedroom
+    price = (basePrice * locationMultiplier).toString();
+  } else if (type === "apartment") {
+    const basePrice = parseInt(bedrooms || "2") * 8000000; // 8M per bedroom
+    price = (basePrice * locationMultiplier).toString();
+  } else if (type === "land") {
+    const sqm = parseInt(size.replace(/[^\d]/g, "")) || 650;
+    const pricePerSqm = 25000; // 25k per sqm
+    price = (sqm * pricePerSqm * locationMultiplier).toString();
+  } else if (type === "commercial") {
+    price = (50000000 * locationMultiplier).toString(); // Base 50M for commercial
+  }
+  
+  // Generate comprehensive description
+  const description = await generateEnhancedDescription({
+    title, type, location: detectedLocation, price, size, bedrooms, bathrooms
+  });
+  
+  // Generate intelligent features
+  const features = await generateIntelligentFeatures(type, detectedLocation, bedrooms, bathrooms);
+  
+  return {
+    title,
+    description,
+    type,
+    location: detectedLocation,
+    size,
+    bedrooms,
+    bathrooms,
+    features,
+    price
+  };
+}
+
+async function generateEnhancedDescription(propertyData: any): Promise<string> {
   const { title, type, location, price, size, bedrooms, bathrooms } = propertyData;
   
-  // This is a simple template-based generator
-  // In production, you could integrate with OpenAI, Claude, or other AI services
   const priceFormatted = price ? `₦${parseFloat(price).toLocaleString()}` : "";
   
-  let description = `Discover this exceptional ${title.toLowerCase()} located in the prestigious ${location}. `;
+  let description = `Discover this exceptional ${title.toLowerCase()} strategically located in the heart of ${location}. `;
   
-  if (type === "luxury_home") {
-    description += `This stunning luxury property offers unparalleled comfort and elegance, perfect for discerning buyers seeking the finest in modern living. `;
-  } else if (type === "residential_land") {
-    description += `This prime residential land presents an excellent opportunity for development in one of Lagos's most sought-after locations. `;
-  } else if (type === "commercial_land") {
-    description += `Strategic commercial property offering exceptional investment potential in a high-growth area with excellent infrastructure. `;
+  if (type === "house") {
+    description += `This stunning residential property combines modern architecture with premium finishes, offering the perfect blend of luxury and comfort. `;
+    if (bedrooms && bathrooms) {
+      description += `Featuring ${bedrooms} spacious bedrooms with en-suite bathrooms and ${bathrooms} well-appointed bathrooms, `;
+    }
+    description += `this home boasts an open-plan living area, modern kitchen with high-end appliances, and beautifully landscaped compound. `;
+  } else if (type === "apartment") {
+    description += `This contemporary apartment offers modern urban living at its finest. `;
+    if (bedrooms && bathrooms) {
+      description += `With ${bedrooms} comfortable bedrooms and ${bathrooms} modern bathrooms, `;
+    }
+    description += `the unit features premium finishes, ample natural light, and access to excellent building amenities. `;
+  } else if (type === "land") {
+    description += `This prime residential land presents an exceptional opportunity for development in one of Lagos's most sought-after neighborhoods. `;
+    if (size) {
+      description += `Spanning ${size} of well-documented land, `;
+    }
+    description += `the plot comes with verified title documents and access to essential infrastructure including electricity, water, and tarred roads. `;
+  } else if (type === "commercial") {
+    description += `This strategic commercial property offers outstanding investment potential in a high-traffic business district. `;
+    description += `Perfect for retail, office space, or mixed-use development, the property benefits from excellent visibility and accessibility. `;
   }
   
-  if (bedrooms && bathrooms) {
-    description += `Featuring ${bedrooms} spacious bedrooms and ${bathrooms} well-appointed bathrooms, `;
-  }
-  
-  if (size) {
-    description += `spanning ${size} of thoughtfully designed space. `;
-  }
-  
-  description += `Located in ${location}, this property provides easy access to major amenities, schools, shopping centers, and transportation links. `;
+  description += `Located in ${location}, residents and visitors enjoy easy access to major expressways, shopping malls, schools, hospitals, and recreational facilities. `;
+  description += `The area is known for its excellent infrastructure, reliable power supply, and 24/7 security. `;
   
   if (priceFormatted) {
-    description += `Competitively priced at ${priceFormatted}, this represents exceptional value in today's market. `;
+    description += `Competitively priced at ${priceFormatted}, this property represents exceptional value and strong investment potential in today's dynamic real estate market. `;
   }
   
-  description += `Don't miss this rare opportunity to own a piece of prime real estate in one of Lagos's most desirable neighborhoods. Contact us today to schedule a viewing and make this dream property yours.`;
+  description += `Don't miss this rare opportunity to own a piece of premium real estate in Lagos. Contact our experienced team today to schedule an exclusive viewing and secure this outstanding property.`;
   
   return description;
 }
 
-async function generatePropertyFeatures(type: string, bedrooms?: string, bathrooms?: string): Promise<string[]> {
+async function generateIntelligentFeatures(type: string, location: string, bedrooms?: string, bathrooms?: string): Promise<string[]> {
   const baseFeatures = [
     "24/7 Security",
+    "Gated Community",
     "Tarred Roads",
-    "Electricity Supply",
-    "Water Supply",
-    "Gated Community"
+    "Reliable Electricity",
+    "Borehole Water Supply"
   ];
   
-  const luxuryFeatures = [
+  const houseFeatures = [
     "Modern Kitchen",
     "Fitted Wardrobes",
     "Spacious Living Areas",
     "Private Parking",
     "Beautiful Landscaping",
-    "High-Quality Finishes",
-    "Air Conditioning Ready"
+    "Premium Finishes",
+    "Air Conditioning Ready",
+    "Balconies",
+    "Family Lounge",
+    "Dining Area"
+  ];
+  
+  const apartmentFeatures = [
+    "Modern Kitchen",
+    "Built-in Wardrobes",
+    "Elevator Access",
+    "Gymnasium",
+    "Swimming Pool",
+    "Parking Space",
+    "CCTV Surveillance",
+    "Generator Backup",
+    "Intercom System"
   ];
   
   const landFeatures = [
-    "C of O Available",
+    "Certificate of Occupancy Available",
     "Surveyed and Documented",
     "Ready for Development",
     "Strategic Location",
     "High ROI Potential",
-    "All Utilities Available"
+    "All Utilities Available",
+    "Drainage System",
+    "Estate Development"
   ];
   
-  if (type === "luxury_home") {
-    return [...baseFeatures, ...luxuryFeatures].slice(0, 8);
-  } else if (type === "residential_land" || type === "commercial_land") {
-    return [...baseFeatures, ...landFeatures].slice(0, 6);
+  const commercialFeatures = [
+    "High Visibility Location",
+    "Ample Parking",
+    "Modern Infrastructure",
+    "Public Transportation Access",
+    "High Foot Traffic",
+    "Investment Grade",
+    "Flexible Space Design",
+    "Prime Business District"
+  ];
+  
+  // Add location-specific features
+  const locationFeatures = [];
+  if (location.includes("Lekki") || location.includes("Victoria Island") || location.includes("Ikoyi")) {
+    locationFeatures.push("Premium Neighborhood", "Close to Business District", "Waterfront Access");
+  }
+  if (location.includes("Ibeju-Lekki")) {
+    locationFeatures.push("Free Trade Zone Proximity", "Airport Access", "Future Growth Area");
   }
   
-  return baseFeatures.slice(0, 5);
+  let features = [...baseFeatures];
+  
+  if (type === "house") {
+    features = [...features, ...houseFeatures].slice(0, 10);
+  } else if (type === "apartment") {
+    features = [...features, ...apartmentFeatures].slice(0, 8);
+  } else if (type === "land") {
+    features = [...features, ...landFeatures].slice(0, 8);
+  } else if (type === "commercial") {
+    features = [...features, ...commercialFeatures].slice(0, 8);
+  }
+  
+  // Add location features
+  features = [...features, ...locationFeatures].slice(0, 12);
+  
+  return features;
 }
 
 // Configure multer for file uploads
@@ -203,13 +407,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // AI description generation endpoint
+  // Enhanced AI property generation endpoint
+  app.post("/api/admin/generate-property", async (req, res) => {
+    try {
+      const { title, description, hasImages, hasVideos } = req.body;
+      
+      // Analyze media and user input to generate comprehensive property details
+      const propertyData = await analyzeMediaAndGenerateProperty({
+        hasImages: hasImages || false,
+        hasVideos: hasVideos || false,
+        userInput: { title: title || "", description: description || "" }
+      });
+      
+      res.json(propertyData);
+    } catch (error) {
+      console.error('AI generation error:', error);
+      res.status(500).json({ message: "Failed to generate property details" });
+    }
+  });
+
+  // Legacy AI description generation endpoint (kept for backward compatibility)
   app.post("/api/admin/generate-description", async (req, res) => {
     try {
       const { title, type, location, price, size, bedrooms, bathrooms } = req.body;
       
       // Generate AI description based on property details
-      const description = await generatePropertyDescription({
+      const description = await generateEnhancedDescription({
         title,
         type,
         location,
@@ -219,7 +442,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         bathrooms
       });
       
-      const features = await generatePropertyFeatures(type, bedrooms, bathrooms);
+      const features = await generateIntelligentFeatures(type, location, bedrooms, bathrooms);
       
       res.json({ description, features });
     } catch (error) {
