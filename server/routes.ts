@@ -183,10 +183,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const propertyData = {
         ...req.body,
-        price: parseFloat(req.body.price),
-        size: req.body.size ? parseFloat(req.body.size) : null,
-        bedrooms: req.body.bedrooms ? parseInt(req.body.bedrooms) : null,
-        bathrooms: req.body.bathrooms ? parseInt(req.body.bathrooms) : null,
+        price: req.body.price.toString(),
+        size: req.body.size || null,
+        bedrooms: req.body.bedrooms || null,
+        bathrooms: req.body.bathrooms || null,
         images: imageUrls,
         videos: videoUrls,
         features: req.body.features ? req.body.features.split(',').map((f: string) => f.trim()) : [],
