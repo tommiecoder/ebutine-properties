@@ -5,6 +5,80 @@ import path from "path";
 import { storage } from "./storage";
 import { insertContactSchema, insertPropertyInquirySchema, insertPropertySchema } from "@shared/schema";
 
+// AI generation helper functions
+async function generatePropertyDescription(propertyData: any): Promise<string> {
+  const { title, type, location, price, size, bedrooms, bathrooms } = propertyData;
+  
+  // This is a simple template-based generator
+  // In production, you could integrate with OpenAI, Claude, or other AI services
+  const priceFormatted = price ? `₦${parseFloat(price).toLocaleString()}` : "";
+  
+  let description = `Discover this exceptional ${title.toLowerCase()} located in the prestigious ${location}. `;
+  
+  if (type === "luxury_home") {
+    description += `This stunning luxury property offers unparalleled comfort and elegance, perfect for discerning buyers seeking the finest in modern living. `;
+  } else if (type === "residential_land") {
+    description += `This prime residential land presents an excellent opportunity for development in one of Lagos's most sought-after locations. `;
+  } else if (type === "commercial_land") {
+    description += `Strategic commercial property offering exceptional investment potential in a high-growth area with excellent infrastructure. `;
+  }
+  
+  if (bedrooms && bathrooms) {
+    description += `Featuring ${bedrooms} spacious bedrooms and ${bathrooms} well-appointed bathrooms, `;
+  }
+  
+  if (size) {
+    description += `spanning ${size} of thoughtfully designed space. `;
+  }
+  
+  description += `Located in ${location}, this property provides easy access to major amenities, schools, shopping centers, and transportation links. `;
+  
+  if (priceFormatted) {
+    description += `Competitively priced at ${priceFormatted}, this represents exceptional value in today's market. `;
+  }
+  
+  description += `Don't miss this rare opportunity to own a piece of prime real estate in one of Lagos's most desirable neighborhoods. Contact us today to schedule a viewing and make this dream property yours.`;
+  
+  return description;
+}
+
+async function generatePropertyFeatures(type: string, bedrooms?: string, bathrooms?: string): Promise<string[]> {
+  const baseFeatures = [
+    "24/7 Security",
+    "Tarred Roads",
+    "Electricity Supply",
+    "Water Supply",
+    "Gated Community"
+  ];
+  
+  const luxuryFeatures = [
+    "Modern Kitchen",
+    "Fitted Wardrobes",
+    "Spacious Living Areas",
+    "Private Parking",
+    "Beautiful Landscaping",
+    "High-Quality Finishes",
+    "Air Conditioning Ready"
+  ];
+  
+  const landFeatures = [
+    "C of O Available",
+    "Surveyed and Documented",
+    "Ready for Development",
+    "Strategic Location",
+    "High ROI Potential",
+    "All Utilities Available"
+  ];
+  
+  if (type === "luxury_home") {
+    return [...baseFeatures, ...luxuryFeatures].slice(0, 8);
+  } else if (type === "residential_land" || type === "commercial_land") {
+    return [...baseFeatures, ...landFeatures].slice(0, 6);
+  }
+  
+  return baseFeatures.slice(0, 5);
+}
+
 // Configure multer for file uploads
 const upload = multer({
   storage: multer.diskStorage({
@@ -126,6 +200,59 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Property upload error:', error);
       res.status(400).json({ message: "Invalid property data", error });
+    }
+  });
+
+  // AI description generation endpoint
+  app.post("/api/admin/generate-description", async (req, res) => {
+    try {
+      const { title, type, location, price, size, bedrooms, bathrooms } = req.body;
+      
+      // Generate AI description based on property details
+      const description = await generatePropertyDescription({
+        title,
+        type,
+        location,
+        price,
+        size,
+        bedrooms,
+        bathrooms
+      });
+      
+      const features = await generatePropertyFeatures(type, bedrooms, bathrooms);
+      
+      res.json({ description, features });
+    } catch (error) {
+      console.error('AI generation error:', error);
+      res.status(500).json({ message: "Failed to generate description" });
+    }
+  });
+
+  // Delete property endpoint
+  app.delete("/api/admin/properties/:id", async (req, res) => {
+    try {
+      const success = await storage.deleteProperty(req.params.id);
+      if (!success) {
+        return res.status(404).json({ message: "Property not found" });
+      }
+      res.json({ message: "Property deleted successfully" });
+    } catch (error) {
+      console.error('Delete property error:', error);
+      res.status(500).json({ message: "Failed to delete property" });
+    }
+  });
+
+  // Mark property as sold endpoint
+  app.patch("/api/admin/properties/:id/sold", async (req, res) => {
+    try {
+      const property = await storage.updateProperty(req.params.id, { status: "sold" });
+      if (!property) {
+        return res.status(404).json({ message: "Property not found" });
+      }
+      res.json(property);
+    } catch (error) {
+      console.error('Update property error:', error);
+      res.status(500).json({ message: "Failed to update property" });
     }
   });
 

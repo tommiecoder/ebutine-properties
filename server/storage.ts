@@ -201,6 +201,7 @@ export class MemStorage implements IStorage {
       features: property.features !== undefined ? (property.features as string[]) : existing.features,
       images: property.images !== undefined ? (property.images as string[]) : existing.images,
       videos: property.videos !== undefined ? (property.videos as string[]) : existing.videos,
+      status: (property as any).status !== undefined ? (property as any).status : existing.status,
     };
     this.properties.set(id, updated);
     return updated;
