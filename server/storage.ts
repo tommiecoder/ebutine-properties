@@ -5,7 +5,7 @@ export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
-  
+
   // Properties
   getProperties(filters?: {
     type?: string;
@@ -18,11 +18,11 @@ export interface IStorage {
   createProperty(property: InsertProperty): Promise<Property>;
   updateProperty(id: string, property: Partial<InsertProperty>): Promise<Property | undefined>;
   deleteProperty(id: string): Promise<boolean>;
-  
+
   // Contacts
   getContacts(): Promise<Contact[]>;
   createContact(contact: InsertContact): Promise<Contact>;
-  
+
   // Property Inquiries
   getPropertyInquiries(propertyId?: string): Promise<PropertyInquiry[]>;
   createPropertyInquiry(inquiry: InsertPropertyInquiry): Promise<PropertyInquiry>;
@@ -66,7 +66,7 @@ export class MemStorage implements IStorage {
         updatedAt: new Date(),
       },
       {
-        id: "2", 
+        id: "2",
         title: "Commercial Land",
         description: "Strategic commercial property in high-traffic area",
         type: "commercial_land",
@@ -89,7 +89,7 @@ export class MemStorage implements IStorage {
         id: "3",
         title: "Residential Land",
         description: "Prime residential land with infrastructure",
-        type: "residential_land", 
+        type: "residential_land",
         price: "12500000",
         location: "Greenland Estate, Sangotedo",
         address: "Greenland Estate, Road 4",
@@ -137,7 +137,7 @@ export class MemStorage implements IStorage {
     featured?: boolean;
   }): Promise<Property[]> {
     let properties = Array.from(this.properties.values());
-    
+
     if (filters) {
       if (filters.type && filters.type !== "All Types") {
         properties = properties.filter(p => p.type === filters.type);
@@ -155,7 +155,7 @@ export class MemStorage implements IStorage {
         properties = properties.filter(p => parseFloat(p.price) <= filters.maxPrice!);
       }
     }
-    
+
     return properties.sort((a, b) => (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0));
   }
 
@@ -187,7 +187,7 @@ export class MemStorage implements IStorage {
   async updateProperty(id: string, property: Partial<InsertProperty>): Promise<Property | undefined> {
     const existing = this.properties.get(id);
     if (!existing) return undefined;
-    
+
     const updated: Property = {
       ...existing,
       ...property,

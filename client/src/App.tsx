@@ -14,6 +14,7 @@ import PropertyListings from "@/pages/PropertyListings";
 import Contact from "@/pages/Contact";
 import NotFound from "@/pages/not-found";
 import Gallery from "@/pages/Gallery";
+import AdminUpload from "@/pages/AdminUpload";
 
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
@@ -64,6 +65,7 @@ function Router() {
           <Route path="/properties" component={PropertyListings} />
           <Route path="/contact" component={Contact} />
           <Route path="/gallery" component={Gallery} />
+          <Route path="/admin/upload" component={AdminUpload} />
           <Route component={NotFound} />
         </Switch>
       </main>

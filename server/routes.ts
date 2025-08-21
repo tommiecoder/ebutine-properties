@@ -1,7 +1,26 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
+import multer from "multer";
+import path from "path";
 import { storage } from "./storage";
-import { insertContactSchema, insertPropertyInquirySchema } from "@shared/schema";
+import { insertContactSchema, insertPropertyInquirySchema, insertPropertySchema } from "@shared/schema";
+
+// Configure multer for file uploads
+const upload = multer({
+  storage: multer.diskStorage({
+    destination: (req, file, cb) => {
+      const uploadDir = file.mimetype.startsWith('video/') ? 'uploads/videos' : 'uploads/images';
+      cb(null, uploadDir);
+    },
+    filename: (req, file, cb) => {
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+      cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+    }
+  }),
+  limits: {
+    fileSize: 100 * 1024 * 1024 // 100MB limit
+  }
+});
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Properties routes
@@ -73,6 +92,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(inquiries);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch inquiries" });
+    }
+  });
+
+  // Admin property upload route
+  app.post("/api/admin/properties", upload.fields([
+    { name: 'images', maxCount: 10 },
+    { name: 'videos', maxCount: 5 }
+  ]), async (req, res) => {
+    try {
+      const files = req.files as { [fieldname: string]: Express.Multer.File[] };
+      
+      // Process uploaded files
+      const imageUrls = files.images ? files.images.map(file => `/uploads/images/${file.filename}`) : [];
+      const videoUrls = files.videos ? files.videos.map(file => `/uploads/videos/${file.filename}`) : [];
+      
+      const propertyData = {
+        ...req.body,
+        price: parseFloat(req.body.price),
+        size: req.body.size ? parseFloat(req.body.size) : null,
+        bedrooms: req.body.bedrooms ? parseInt(req.body.bedrooms) : null,
+        bathrooms: req.body.bathrooms ? parseInt(req.body.bathrooms) : null,
+        images: imageUrls,
+        videos: videoUrls,
+        features: req.body.features ? req.body.features.split(',').map((f: string) => f.trim()) : [],
+        featured: false
+      };
+
+      const validatedData = insertPropertySchema.parse(propertyData);
+      const property = await storage.createProperty(validatedData);
+      
+      res.status(201).json(property);
+    } catch (error) {
+      console.error('Property upload error:', error);
+      res.status(400).json({ message: "Invalid property data", error });
     }
   });
 
