@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -32,7 +31,8 @@ export default function AdminUpload() {
   const [isGeneratingAI, setIsGeneratingAI] = useState(false);
   const [editingProperty, setEditingProperty] = useState<Property | null>(null);
   const [isEditing, setIsEditing] = useState(false);
-  
+  const [thumbnail, setThumbnail] = useState<string>('');
+
   // Fetch existing properties for management
   const { data: properties = [], refetch } = useQuery<Property[]>({
     queryKey: ["/api/properties"],
@@ -55,11 +55,19 @@ export default function AdminUpload() {
           fileArray.map(file => compressImage(file))
         );
         setFormData(prev => ({ ...prev, [field]: compressedImages }));
+        if (compressedImages.length > 0 && !thumbnail) {
+          const thumb = await generateThumbnail(compressedImages[0]);
+          setThumbnail(thumb);
+        }
       } else if (field === 'videos') {
         const compressedVideos = await Promise.all(
           fileArray.map(file => compressVideo(file))
         );
         setFormData(prev => ({ ...prev, [field]: compressedVideos }));
+        if (compressedVideos.length > 0 && !thumbnail) {
+          const thumb = await generateThumbnail(compressedVideos[0]);
+          setThumbnail(thumb);
+        }
       }
     }
   };
@@ -69,13 +77,13 @@ export default function AdminUpload() {
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d')!;
       const img = new Image();
-      
+
       img.onload = () => {
         const MAX_WIDTH = 1200;
         const MAX_HEIGHT = 800;
-        
+
         let { width, height } = img;
-        
+
         if (width > height) {
           if (width > MAX_WIDTH) {
             height = (height * MAX_WIDTH) / width;
@@ -87,12 +95,12 @@ export default function AdminUpload() {
             height = MAX_HEIGHT;
           }
         }
-        
+
         canvas.width = width;
         canvas.height = height;
-        
+
         ctx.drawImage(img, 0, 0, width, height);
-        
+
         canvas.toBlob((blob) => {
           if (blob) {
             const compressedFile = new File([blob], file.name, {
@@ -103,7 +111,7 @@ export default function AdminUpload() {
           }
         }, 'image/jpeg', quality);
       };
-      
+
       img.src = URL.createObjectURL(file);
     });
   };
@@ -112,6 +120,63 @@ export default function AdminUpload() {
     // For video compression, we'll reduce the file size by limiting resolution
     // In a real implementation, you might use ffmpeg.wasm or similar
     return Promise.resolve(file); // Placeholder - actual video compression would need additional libraries
+  };
+
+  const generateThumbnail = (file: File): Promise<string> => {
+    return new Promise((resolve) => {
+      if (file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = (e) => resolve(e.target?.result as string);
+        reader.readAsDataURL(file);
+      } else if (file.type.startsWith('video/')) {
+        const video = document.createElement('video');
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+
+        video.onloadedmetadata = () => {
+          canvas.width = video.videoWidth;
+          canvas.height = video.videoHeight;
+          video.currentTime = 1; // Get frame at 1 second
+        };
+
+        video.onseeked = () => {
+          if (ctx) {
+            ctx.drawImage(video, 0, 0);
+            resolve(canvas.toDataURL());
+          } else {
+            resolve(''); // Return empty string if canvas context is not available
+          }
+        };
+
+        video.src = URL.createObjectURL(file);
+      } else {
+        resolve(''); // Return empty string for unsupported file types
+      }
+    });
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const files = Array.from(e.target.files);
+      setFormData(prev => ({ ...prev, images: files })); // Directly set new files
+
+      if (files.length > 0 && !thumbnail) { // Only generate if no thumbnail exists yet
+        const thumb = await generateThumbnail(files[0]);
+        setThumbnail(thumb);
+      }
+    }
+  };
+
+  const handleVideoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const files = Array.from(e.target.files);
+      setFormData(prev => ({ ...prev, videos: files })); // Directly set new files
+
+      if (files.length > 0 && !thumbnail) { // Only generate if no thumbnail exists yet
+        const thumb = await generateThumbnail(files[0]);
+        setThumbnail(thumb);
+      }
+    }
   };
 
   const startEdit = (property: Property) => {
@@ -127,9 +192,12 @@ export default function AdminUpload() {
       bedrooms: property.bedrooms || "",
       bathrooms: property.bathrooms || "",
       features: property.features ? property.features.join(', ') : "",
-      images: [],
-      videos: []
+      images: [], // Reset images on edit start
+      videos: []  // Reset videos on edit start
     });
+    // Assuming thumbnail is stored with the property or needs to be fetched/generated again
+    // For simplicity, we'll clear it here if editing, and it can be regenerated if new files are uploaded.
+    setThumbnail('');
   };
 
   const cancelEdit = () => {
@@ -148,6 +216,7 @@ export default function AdminUpload() {
       images: [],
       videos: []
     });
+    setThumbnail('');
   };
 
   const generateAIDescription = async () => {
@@ -177,9 +246,9 @@ export default function AdminUpload() {
       });
 
       if (!response.ok) throw new Error('Failed to generate description');
-      
+
       const { description, features } = await response.json();
-      
+
       setFormData(prev => ({
         ...prev,
         description,
@@ -225,9 +294,9 @@ export default function AdminUpload() {
       });
 
       if (!response.ok) throw new Error('Failed to generate property details');
-      
+
       const propertyData = await response.json();
-      
+
       setFormData(prev => ({
         ...prev,
         title: propertyData.title,
@@ -258,7 +327,7 @@ export default function AdminUpload() {
 
   const deleteProperty = async (id: string) => {
     if (!confirm("Are you sure you want to delete this property?")) return;
-    
+
     try {
       const response = await fetch(`/api/admin/properties/${id}`, {
         method: 'DELETE',
@@ -308,7 +377,7 @@ export default function AdminUpload() {
 
     try {
       const formDataToSend = new FormData();
-      
+
       // Add text fields
       Object.entries(formData).forEach(([key, value]) => {
         if (key !== 'images' && key !== 'videos') {
@@ -322,17 +391,26 @@ export default function AdminUpload() {
           formDataToSend.append('images', file);
         });
       }
-      
+
       if (formData.videos.length > 0) {
         formData.videos.forEach(file => {
           formDataToSend.append('videos', file);
         });
       }
 
-      const url = isEditing && editingProperty 
-        ? `/api/admin/properties/${editingProperty.id}` 
+      // Append thumbnail if it exists
+      if (thumbnail) {
+        // Convert data URL to File object to append
+        const blob = await fetch(thumbnail).then(res => res.blob());
+        const thumbnailFile = new File([blob], 'thumbnail.jpeg', { type: 'image/jpeg' });
+        formDataToSend.append('thumbnail', thumbnailFile);
+      }
+
+
+      const url = isEditing && editingProperty
+        ? `/api/admin/properties/${editingProperty.id}`
         : '/api/admin/properties';
-      
+
       const method = isEditing ? 'PUT' : 'POST';
 
       const response = await fetch(url, {
@@ -341,7 +419,8 @@ export default function AdminUpload() {
       });
 
       if (!response.ok) {
-        throw new Error(`Failed to ${isEditing ? 'update' : 'upload'} property`);
+        const errorData = await response.json(); // Try to get more error details
+        throw new Error(`Failed to ${isEditing ? 'update' : 'upload'} property: ${errorData.message || response.statusText}`);
       }
 
       toast({
@@ -353,10 +432,10 @@ export default function AdminUpload() {
       cancelEdit();
       refetch();
 
-    } catch (error) {
+    } catch (error: any) { // Explicitly type error as any or unknown
       toast({
         title: "Error",
-        description: `Failed to ${isEditing ? 'update' : 'upload'} property. Please try again.`,
+        description: `Failed to ${isEditing ? 'update' : 'upload'} property. ${error.message}`,
         variant: "destructive",
       });
     } finally {
@@ -371,7 +450,7 @@ export default function AdminUpload() {
           <TabsTrigger value="upload">Upload Property</TabsTrigger>
           <TabsTrigger value="manage">Manage Properties</TabsTrigger>
         </TabsList>
-        
+
         <TabsContent value="upload">
           <Card>
             <CardHeader>
@@ -523,8 +602,14 @@ export default function AdminUpload() {
                 type="file"
                 multiple
                 accept="image/*"
-                onChange={(e) => handleFileChange('images', e.target.files)}
+                onChange={handleImageUpload}
               />
+              {thumbnail && !isEditing && ( // Display thumbnail only when not editing and thumbnail is available
+                <div className="mt-2">
+                  <p className="text-sm text-gray-600 mb-1">Generated Thumbnail:</p>
+                  <img src={thumbnail} alt="Generated Thumbnail" className="w-32 h-32 object-cover rounded" />
+                </div>
+              )}
             </div>
 
             <div>
@@ -535,8 +620,14 @@ export default function AdminUpload() {
                 type="file"
                 multiple
                 accept="video/*"
-                onChange={(e) => handleFileChange('videos', e.target.files)}
+                onChange={handleVideoUpload}
               />
+              {thumbnail && !isEditing && ( // Display thumbnail only when not editing and thumbnail is available
+                <div className="mt-2">
+                  <p className="text-sm text-gray-600 mb-1">Generated Thumbnail:</p>
+                  <img src={thumbnail} alt="Generated Thumbnail" className="w-32 h-32 object-cover rounded" />
+                </div>
+              )}
             </div>
 
             <Button type="submit" disabled={isSubmitting} className="w-full">
@@ -546,7 +637,7 @@ export default function AdminUpload() {
         </CardContent>
       </Card>
     </TabsContent>
-    
+
     <TabsContent value="manage">
       <Card>
         <CardHeader>

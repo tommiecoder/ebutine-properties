@@ -19,12 +19,12 @@ async function analyzeMediaAndGenerateProperty(mediaInfo: any): Promise<{
 }> {
   // This is an enhanced AI analyzer that would in production use computer vision
   // and location detection APIs. For now, we'll use intelligent pattern matching
-  
+
   const { hasImages, hasVideos, userInput } = mediaInfo;
-  
+
   // Analyze user input for clues
   const inputLower = (userInput.title + " " + (userInput.description || "")).toLowerCase();
-  
+
   // Detect property type from input
   let type = "house";
   if (inputLower.includes("land") || inputLower.includes("plot")) {
@@ -36,14 +36,14 @@ async function analyzeMediaAndGenerateProperty(mediaInfo: any): Promise<{
   } else if (inputLower.includes("office") || inputLower.includes("shop") || inputLower.includes("store")) {
     type = "commercial";
   }
-  
+
   // Generate intelligent location suggestions based on popular Lagos areas
   const lagosAreas = [
     "Lekki", "Victoria Island", "Ikoyi", "Ajah", "Sangotedo", "Chevron", "Ibeju-Lekki",
     "Banana Island", "Parkview Estate", "Ikeja", "Maryland", "Gbagada", "Surulere",
     "Yaba", "Lagos Island", "Festac", "Magodo", "Ojota", "Ketu", "Mile 2"
   ];
-  
+
   let detectedLocation = "Lagos";
   for (const area of lagosAreas) {
     if (inputLower.includes(area.toLowerCase())) {
@@ -51,7 +51,7 @@ async function analyzeMediaAndGenerateProperty(mediaInfo: any): Promise<{
       break;
     }
   }
-  
+
   // If no location detected in input, suggest based on property type
   if (detectedLocation === "Lagos") {
     if (type === "land" || type === "commercial") {
@@ -62,12 +62,12 @@ async function analyzeMediaAndGenerateProperty(mediaInfo: any): Promise<{
       detectedLocation = "Ajah, Lagos";
     }
   }
-  
+
   // Generate bedrooms/bathrooms based on property type and media presence
   let bedrooms = null;
   let bathrooms = null;
   let size = "";
-  
+
   if (type === "house" || type === "apartment") {
     // Analyze for room indicators
     if (inputLower.includes("studio")) {
@@ -95,14 +95,14 @@ async function analyzeMediaAndGenerateProperty(mediaInfo: any): Promise<{
         bathrooms = "2";
       }
     }
-    
+
     size = bedrooms + " bedrooms";
   } else if (type === "land" || type === "commercial") {
     // Generate size for land
     const sizesOptions = ["500 sqm", "650 sqm", "1000 sqm", "1200 sqm", "2000 sqm", "3000 sqm"];
     size = sizesOptions[Math.floor(Math.random() * sizesOptions.length)];
   }
-  
+
   // Generate intelligent title
   let title = "";
   if (type === "house") {
@@ -116,13 +116,13 @@ async function analyzeMediaAndGenerateProperty(mediaInfo: any): Promise<{
   } else {
     title = userInput.title || "Premium Property";
   }
-  
+
   // Generate price based on type and location
   let price = "0";
   const locationMultiplier = detectedLocation.includes("Victoria Island") || detectedLocation.includes("Ikoyi") ? 1.8 :
                            detectedLocation.includes("Lekki") ? 1.4 :
                            detectedLocation.includes("Ajah") ? 1.1 : 1.0;
-  
+
   if (type === "house") {
     const basePrice = parseInt(bedrooms || "3") * 15000000; // 15M per bedroom
     price = (basePrice * locationMultiplier).toString();
@@ -136,15 +136,15 @@ async function analyzeMediaAndGenerateProperty(mediaInfo: any): Promise<{
   } else if (type === "commercial") {
     price = (50000000 * locationMultiplier).toString(); // Base 50M for commercial
   }
-  
+
   // Generate comprehensive description
   const description = await generateEnhancedDescription({
     title, type, location: detectedLocation, price, size, bedrooms, bathrooms
   });
-  
+
   // Generate intelligent features
   const features = await generateIntelligentFeatures(type, detectedLocation, bedrooms, bathrooms);
-  
+
   return {
     title,
     description,
@@ -160,11 +160,11 @@ async function analyzeMediaAndGenerateProperty(mediaInfo: any): Promise<{
 
 async function generateEnhancedDescription(propertyData: any): Promise<string> {
   const { title, type, location, price, size, bedrooms, bathrooms } = propertyData;
-  
+
   const priceFormatted = price ? `₦${parseFloat(price).toLocaleString()}` : "";
-  
+
   let description = `Discover this exceptional ${title.toLowerCase()} strategically located in the heart of ${location}. `;
-  
+
   if (type === "house") {
     description += `This stunning residential property combines modern architecture with premium finishes, offering the perfect blend of luxury and comfort. `;
     if (bedrooms && bathrooms) {
@@ -187,16 +187,16 @@ async function generateEnhancedDescription(propertyData: any): Promise<string> {
     description += `This strategic commercial property offers outstanding investment potential in a high-traffic business district. `;
     description += `Perfect for retail, office space, or mixed-use development, the property benefits from excellent visibility and accessibility. `;
   }
-  
+
   description += `Located in ${location}, residents and visitors enjoy easy access to major expressways, shopping malls, schools, hospitals, and recreational facilities. `;
   description += `The area is known for its excellent infrastructure, reliable power supply, and 24/7 security. `;
-  
+
   if (priceFormatted) {
     description += `Competitively priced at ${priceFormatted}, this property represents exceptional value and strong investment potential in today's dynamic real estate market. `;
   }
-  
+
   description += `Don't miss this rare opportunity to own a piece of premium real estate in Lagos. Contact our experienced team today to schedule an exclusive viewing and secure this outstanding property.`;
-  
+
   return description;
 }
 
@@ -208,7 +208,7 @@ async function generateIntelligentFeatures(type: string, location: string, bedro
     "Reliable Electricity",
     "Borehole Water Supply"
   ];
-  
+
   const houseFeatures = [
     "Modern Kitchen",
     "Fitted Wardrobes",
@@ -221,7 +221,7 @@ async function generateIntelligentFeatures(type: string, location: string, bedro
     "Family Lounge",
     "Dining Area"
   ];
-  
+
   const apartmentFeatures = [
     "Modern Kitchen",
     "Built-in Wardrobes",
@@ -233,7 +233,7 @@ async function generateIntelligentFeatures(type: string, location: string, bedro
     "Generator Backup",
     "Intercom System"
   ];
-  
+
   const landFeatures = [
     "Certificate of Occupancy Available",
     "Surveyed and Documented",
@@ -244,7 +244,7 @@ async function generateIntelligentFeatures(type: string, location: string, bedro
     "Drainage System",
     "Estate Development"
   ];
-  
+
   const commercialFeatures = [
     "High Visibility Location",
     "Ample Parking",
@@ -255,7 +255,7 @@ async function generateIntelligentFeatures(type: string, location: string, bedro
     "Flexible Space Design",
     "Prime Business District"
   ];
-  
+
   // Add location-specific features
   const locationFeatures = [];
   if (location.includes("Lekki") || location.includes("Victoria Island") || location.includes("Ikoyi")) {
@@ -264,9 +264,9 @@ async function generateIntelligentFeatures(type: string, location: string, bedro
   if (location.includes("Ibeju-Lekki")) {
     locationFeatures.push("Free Trade Zone Proximity", "Airport Access", "Future Growth Area");
   }
-  
+
   let features = [...baseFeatures];
-  
+
   if (type === "house") {
     features = [...features, ...houseFeatures].slice(0, 10);
   } else if (type === "apartment") {
@@ -276,10 +276,10 @@ async function generateIntelligentFeatures(type: string, location: string, bedro
   } else if (type === "commercial") {
     features = [...features, ...commercialFeatures].slice(0, 8);
   }
-  
+
   // Add location features
   features = [...features, ...locationFeatures].slice(0, 12);
-  
+
   return features;
 }
 
@@ -312,7 +312,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         maxPrice: maxPrice ? parseFloat(maxPrice as string) : undefined,
         featured: featured === "true" ? true : undefined,
       };
-      
+
       const properties = await storage.getProperties(filters);
       res.json(properties);
     } catch (error) {
@@ -380,30 +380,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
   ]), async (req, res) => {
     try {
       const files = req.files as { [fieldname: string]: Express.Multer.File[] };
-      
+
       // Process uploaded files
       const imageUrls = files.images ? files.images.map(file => `/uploads/images/${file.filename}`) : [];
       const videoUrls = files.videos ? files.videos.map(file => `/uploads/videos/${file.filename}`) : [];
-      
-      const propertyData = {
-        ...req.body,
-        price: req.body.price.toString(),
-        size: req.body.size || null,
-        bedrooms: req.body.bedrooms || null,
-        bathrooms: req.body.bathrooms || null,
-        images: imageUrls,
-        videos: videoUrls,
-        features: req.body.features ? req.body.features.split(',').map((f: string) => f.trim()) : [],
-        featured: false
-      };
 
-      const validatedData = insertPropertySchema.parse(propertyData);
-      const property = await storage.createProperty(validatedData);
-      
-      res.status(201).json(property);
+      // This block is updated to include better error handling and logging
+      try {
+        console.log('📝 Creating property with data:', {
+          title: req.body.title,
+          images: imageUrls.length,
+          videos: videoUrls.length
+        });
+
+        const property = await storage.saveProperty({
+          title: req.body.title,
+          description: req.body.description,
+          price: parseFloat(req.body.price),
+          location: req.body.location,
+          type: req.body.type as 'residential' | 'commercial' | 'land',
+          size: req.body.size,
+          features: req.body.features ? req.body.features.split(',').map((f: string) => f.trim()) : [],
+          images: imageUrls,
+          videos: videoUrls,
+          thumbnail: imageUrls[0] || videoUrls[0] || '',
+          featured: req.body.featured === 'true',
+          createdAt: new Date()
+        });
+
+        console.log('✅ Property created successfully:', property.id);
+        res.json({ success: true, property });
+      } catch (error) {
+        console.error('❌ Error creating property:', error);
+        res.status(500).json({
+          success: false,
+          error: 'Failed to create property',
+          details: error instanceof Error ? error.message : 'Unknown error'
+        });
+      }
     } catch (error) {
-      console.error('Property upload error:', error);
-      res.status(400).json({ message: "Invalid property data", error });
+      console.error('Multer upload error:', error);
+      res.status(400).json({ message: "File upload failed", error });
     }
   });
 
@@ -411,14 +428,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/admin/generate-property", async (req, res) => {
     try {
       const { title, description, hasImages, hasVideos } = req.body;
-      
+
       // Analyze media and user input to generate comprehensive property details
       const propertyData = await analyzeMediaAndGenerateProperty({
         hasImages: hasImages || false,
         hasVideos: hasVideos || false,
         userInput: { title: title || "", description: description || "" }
       });
-      
+
       res.json(propertyData);
     } catch (error) {
       console.error('AI generation error:', error);
@@ -430,7 +447,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/admin/generate-description", async (req, res) => {
     try {
       const { title, type, location, price, size, bedrooms, bathrooms } = req.body;
-      
+
       // Generate AI description based on property details
       const description = await generateEnhancedDescription({
         title,
@@ -441,9 +458,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         bedrooms,
         bathrooms
       });
-      
+
       const features = await generateIntelligentFeatures(type, location, bedrooms, bathrooms);
-      
+
       res.json({ description, features });
     } catch (error) {
       console.error('AI generation error:', error);
@@ -472,21 +489,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
   ]), async (req, res) => {
     try {
       const files = req.files as { [fieldname: string]: Express.Multer.File[] };
-      
+
       // Get existing property to preserve current media if no new files uploaded
       const existingProperty = await storage.getProperty(req.params.id);
       if (!existingProperty) {
         return res.status(404).json({ message: "Property not found" });
       }
-      
+
       // Process uploaded files or keep existing ones
-      const imageUrls = files.images 
-        ? files.images.map(file => `/uploads/images/${file.filename}`) 
+      const imageUrls = files.images
+        ? files.images.map(file => `/uploads/images/${file.filename}`)
         : existingProperty.images;
-      const videoUrls = files.videos 
-        ? files.videos.map(file => `/uploads/videos/${file.filename}`) 
+      const videoUrls = files.videos
+        ? files.videos.map(file => `/uploads/videos/${file.filename}`)
         : existingProperty.videos;
-      
+
       const propertyData = {
         ...req.body,
         price: req.body.price.toString(),
@@ -502,7 +519,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!property) {
         return res.status(404).json({ message: "Property not found" });
       }
-      
+
       res.json(property);
     } catch (error) {
       console.error('Property update error:', error);

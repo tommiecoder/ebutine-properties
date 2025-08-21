@@ -1,7 +1,6 @@
-
 import { type User, type InsertUser, type Property, type InsertProperty, type Contact, type InsertContact, type PropertyInquiry, type InsertPropertyInquiry } from "@shared/schema";
 import { randomUUID } from "crypto";
-import { db } from "./db";
+import { db, isDbConnected } from "./db";
 import { users, properties, contacts, propertyInquiries } from "@shared/schema";
 import { eq, and, gte, lte, sql } from "drizzle-orm";
 
@@ -137,11 +136,11 @@ export class DatabaseStorage implements IStorage {
     featured?: boolean;
   }): Promise<Property[]> {
     try {
-      if (db && !this.fallbackToMemory) {
+      if (isDbConnected() && !this.fallbackToMemory) {
         let query = db.select().from(properties);
-        
+
         const conditions = [];
-        
+
         if (filters) {
           if (filters.type && filters.type !== "All Types") {
             conditions.push(eq(properties.type, filters.type));
@@ -169,7 +168,7 @@ export class DatabaseStorage implements IStorage {
       } else {
         // Fallback to memory storage
         let result = Array.from(this.memoryProperties.values());
-        
+
         if (filters) {
           result = result.filter(property => {
             if (filters.type && filters.type !== "All Types" && property.type !== filters.type) return false;
@@ -180,18 +179,19 @@ export class DatabaseStorage implements IStorage {
             return true;
           });
         }
-        
+
         return result.sort((a, b) => new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime());
       }
     } catch (error) {
       this.fallbackToMemory = true;
+      console.error('❌ Error fetching properties, falling back to memory storage:', error);
       return Array.from(this.memoryProperties.values());
     }
   }
 
   async getProperty(id: string): Promise<Property | undefined> {
     try {
-      if (db && !this.fallbackToMemory) {
+      if (isDbConnected() && !this.fallbackToMemory) {
         const result = await db.select().from(properties).where(eq(properties.id, id)).limit(1);
         return result[0];
       } else {
@@ -199,6 +199,7 @@ export class DatabaseStorage implements IStorage {
       }
     } catch (error) {
       this.fallbackToMemory = true;
+      console.error('❌ Error fetching property, falling back to memory storage:', error);
       return this.memoryProperties.get(id);
     }
   }
@@ -211,19 +212,22 @@ export class DatabaseStorage implements IStorage {
       createdAt: new Date(),
       updatedAt: new Date(),
     };
-    
+
     try {
-      if (db) {
+      if (isDbConnected()) {
         await db.insert(properties).values(newProperty);
+        console.log('✅ Property saved to database:', newProperty.title);
       } else {
         this.fallbackToMemory = true;
         this.memoryProperties.set(id, newProperty as Property);
+        console.log('✅ Property saved to memory storage:', newProperty.title);
       }
       return newProperty as Property;
     } catch (error) {
-      console.log("Database insert failed, using memory storage");
+      console.error('❌ Database error, falling back to memory storage:', error);
       this.fallbackToMemory = true;
       this.memoryProperties.set(id, newProperty as Property);
+      console.log('✅ Property saved to memory storage:', newProperty.title);
       return newProperty as Property;
     }
   }
@@ -233,10 +237,11 @@ export class DatabaseStorage implements IStorage {
       ...property,
       updatedAt: new Date(),
     };
-    
+
     try {
-      if (db && !this.fallbackToMemory) {
+      if (isDbConnected() && !this.fallbackToMemory) {
         await db.update(properties).set(updateData).where(eq(properties.id, id));
+        console.log('✅ Property updated in database:', id);
         return this.getProperty(id);
       } else {
         // Fallback to memory storage
@@ -244,17 +249,19 @@ export class DatabaseStorage implements IStorage {
         if (existing) {
           const updated = { ...existing, ...updateData };
           this.memoryProperties.set(id, updated);
+          console.log('✅ Property updated in memory storage:', id);
           return updated;
         }
         return undefined;
       }
     } catch (error) {
-      console.log("Database update failed, using memory storage");
+      console.error('❌ Database error, falling back to memory storage:', error);
       this.fallbackToMemory = true;
       const existing = this.memoryProperties.get(id);
       if (existing) {
         const updated = { ...existing, ...updateData };
         this.memoryProperties.set(id, updated);
+        console.log('✅ Property updated in memory storage:', id);
         return updated;
       }
       return undefined;
@@ -262,13 +269,42 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteProperty(id: string): Promise<boolean> {
-    const result = await db.delete(properties).where(eq(properties.id, id));
-    return result.rowCount !== null && result.rowCount > 0;
+    try {
+      if (isDbConnected() && !this.fallbackToMemory) {
+        const result = await db.delete(properties).where(eq(properties.id, id));
+        console.log('✅ Property deleted from database:', id);
+        return result.rowCount !== null && result.rowCount > 0;
+      } else {
+        const deleted = this.memoryProperties.delete(id);
+        if (deleted) {
+          console.log('✅ Property deleted from memory storage:', id);
+        }
+        return deleted;
+      }
+    } catch (error) {
+      console.error('❌ Database error, falling back to memory storage:', error);
+      this.fallbackToMemory = true;
+      const deleted = this.memoryProperties.delete(id);
+      if (deleted) {
+        console.log('✅ Property deleted from memory storage:', id);
+      }
+      return deleted;
+    }
   }
 
   async getContacts(): Promise<Contact[]> {
-    const result = await db.select().from(contacts).orderBy(sql`${contacts.createdAt} DESC`);
-    return result;
+    try {
+      if (isDbConnected() && !this.fallbackToMemory) {
+        const result = await db.select().from(contacts).orderBy(sql`${contacts.createdAt} DESC`);
+        return result;
+      } else {
+        return Array.from(this.memoryContacts.values()).sort((a, b) => new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime());
+      }
+    } catch (error) {
+      this.fallbackToMemory = true;
+      console.error('❌ Error fetching contacts, falling back to memory storage:', error);
+      return Array.from(this.memoryContacts.values());
+    }
   }
 
   async createContact(contact: InsertContact): Promise<Contact> {
@@ -279,20 +315,49 @@ export class DatabaseStorage implements IStorage {
       status: "new" as const,
       createdAt: new Date(),
     };
-    
-    await db.insert(contacts).values(newContact);
-    return newContact as Contact;
+
+    try {
+      if (isDbConnected() && !this.fallbackToMemory) {
+        await db.insert(contacts).values(newContact);
+        console.log('✅ Contact saved to database:', newContact.name);
+      } else {
+        this.fallbackToMemory = true;
+        this.memoryContacts.set(id, newContact as Contact);
+        console.log('✅ Contact saved to memory storage:', newContact.name);
+      }
+      return newContact as Contact;
+    } catch (error) {
+      console.error('❌ Database error, falling back to memory storage:', error);
+      this.fallbackToMemory = true;
+      this.memoryContacts.set(id, newContact as Contact);
+      console.log('✅ Contact saved to memory storage:', newContact.name);
+      return newContact as Contact;
+    }
   }
 
   async getPropertyInquiries(propertyId?: string): Promise<PropertyInquiry[]> {
-    let query = db.select().from(propertyInquiries);
-    
-    if (propertyId) {
-      query = query.where(eq(propertyInquiries.propertyId, propertyId));
+    try {
+      if (isDbConnected() && !this.fallbackToMemory) {
+        let query = db.select().from(propertyInquiries);
+
+        if (propertyId) {
+          query = query.where(eq(propertyInquiries.propertyId, propertyId));
+        }
+
+        const result = await query.orderBy(sql`${propertyInquiries.createdAt} DESC`);
+        return result;
+      } else {
+        let result = Array.from(this.memoryInquiries.values());
+        if (propertyId) {
+          result = result.filter(inquiry => inquiry.propertyId === propertyId);
+        }
+        return result.sort((a, b) => new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime());
+      }
+    } catch (error) {
+      this.fallbackToMemory = true;
+      console.error('❌ Error fetching property inquiries, falling back to memory storage:', error);
+      return Array.from(this.memoryInquiries.values());
     }
-    
-    const result = await query.orderBy(sql`${propertyInquiries.createdAt} DESC`);
-    return result;
   }
 
   async createPropertyInquiry(inquiry: InsertPropertyInquiry): Promise<PropertyInquiry> {
@@ -302,9 +367,24 @@ export class DatabaseStorage implements IStorage {
       id,
       createdAt: new Date(),
     };
-    
-    await db.insert(propertyInquiries).values(newInquiry);
-    return newInquiry as PropertyInquiry;
+
+    try {
+      if (isDbConnected() && !this.fallbackToMemory) {
+        await db.insert(propertyInquiries).values(newInquiry);
+        console.log('✅ Property inquiry saved to database:', id);
+      } else {
+        this.fallbackToMemory = true;
+        this.memoryInquiries.set(id, newInquiry as PropertyInquiry);
+        console.log('✅ Property inquiry saved to memory storage:', id);
+      }
+      return newInquiry as PropertyInquiry;
+    } catch (error) {
+      console.error('❌ Database error, falling back to memory storage:', error);
+      this.fallbackToMemory = true;
+      this.memoryInquiries.set(id, newInquiry as PropertyInquiry);
+      console.log('✅ Property inquiry saved to memory storage:', id);
+      return newInquiry as PropertyInquiry;
+    }
   }
 }
 

@@ -1,5 +1,4 @@
-
-import { useParams, useNavigate } from "react-router-dom";
+import { useRoute } from 'wouter';
 import { useQuery } from "@tanstack/react-query";
 import { Helmet } from "react-helmet";
 import { ArrowLeft, Heart, Phone, MapPin, Bed, Bath, Car, Calendar, Eye, Share2 } from "lucide-react";
@@ -12,8 +11,8 @@ import PropertyVideoModal from "@/components/PropertyVideoModal";
 import type { Property } from "@shared/schema";
 
 export default function PropertyDetails() {
-  const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
+  const { id } = useRoute<{ id: string }>(`/properties/:id`)[1];
+  const navigate = (path: string) => navigate(path);
   const [showVideoModal, setShowVideoModal] = useState(false);
 
   const { data: property, isLoading, error } = useQuery<Property>({
@@ -173,7 +172,7 @@ export default function PropertyDetails() {
                 </div>
 
                 <h1 className="text-3xl font-bold text-ebutine-dark mb-4">{property.title}</h1>
-                
+
                 <div className="flex items-center text-ebutine-blue mb-6">
                   <MapPin className="h-5 w-5 mr-2" />
                   <span>{property.location}</span>
@@ -250,7 +249,7 @@ export default function PropertyDetails() {
             <Card className="sticky top-6">
               <CardContent className="p-6">
                 <h3 className="text-lg font-bold text-ebutine-dark mb-4">Interested in this property?</h3>
-                
+
                 <div className="space-y-4">
                   <Button 
                     className="w-full bg-ebutine-orange hover:bg-orange-600"
@@ -259,7 +258,7 @@ export default function PropertyDetails() {
                     <Phone className="mr-2 h-4 w-4" />
                     Contact Agent
                   </Button>
-                  
+
                   {property.videos && property.videos.length > 0 && (
                     <Button 
                       variant="outline" 
