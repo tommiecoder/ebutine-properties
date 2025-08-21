@@ -30,6 +30,8 @@ export default function AdminUpload() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isGeneratingAI, setIsGeneratingAI] = useState(false);
+  const [editingProperty, setEditingProperty] = useState<Property | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
   
   // Fetch existing properties for management
   const { data: properties = [], refetch } = useQuery<Property[]>({
@@ -45,10 +47,107 @@ export default function AdminUpload() {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleFileChange = (field: 'images' | 'videos', files: FileList | null) => {
+  const handleFileChange = async (field: 'images' | 'videos', files: FileList | null) => {
     if (files) {
-      setFormData(prev => ({ ...prev, [field]: Array.from(files) }));
+      const fileArray = Array.from(files);
+      if (field === 'images') {
+        const compressedImages = await Promise.all(
+          fileArray.map(file => compressImage(file))
+        );
+        setFormData(prev => ({ ...prev, [field]: compressedImages }));
+      } else if (field === 'videos') {
+        const compressedVideos = await Promise.all(
+          fileArray.map(file => compressVideo(file))
+        );
+        setFormData(prev => ({ ...prev, [field]: compressedVideos }));
+      }
     }
+  };
+
+  const compressImage = (file: File, quality: number = 0.8): Promise<File> => {
+    return new Promise((resolve) => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d')!;
+      const img = new Image();
+      
+      img.onload = () => {
+        const MAX_WIDTH = 1200;
+        const MAX_HEIGHT = 800;
+        
+        let { width, height } = img;
+        
+        if (width > height) {
+          if (width > MAX_WIDTH) {
+            height = (height * MAX_WIDTH) / width;
+            width = MAX_WIDTH;
+          }
+        } else {
+          if (height > MAX_HEIGHT) {
+            width = (width * MAX_HEIGHT) / height;
+            height = MAX_HEIGHT;
+          }
+        }
+        
+        canvas.width = width;
+        canvas.height = height;
+        
+        ctx.drawImage(img, 0, 0, width, height);
+        
+        canvas.toBlob((blob) => {
+          if (blob) {
+            const compressedFile = new File([blob], file.name, {
+              type: 'image/jpeg',
+              lastModified: Date.now(),
+            });
+            resolve(compressedFile);
+          }
+        }, 'image/jpeg', quality);
+      };
+      
+      img.src = URL.createObjectURL(file);
+    });
+  };
+
+  const compressVideo = (file: File): Promise<File> => {
+    // For video compression, we'll reduce the file size by limiting resolution
+    // In a real implementation, you might use ffmpeg.wasm or similar
+    return Promise.resolve(file); // Placeholder - actual video compression would need additional libraries
+  };
+
+  const startEdit = (property: Property) => {
+    setEditingProperty(property);
+    setIsEditing(true);
+    setFormData({
+      title: property.title,
+      description: property.description || "",
+      price: property.price,
+      location: property.location,
+      type: property.type,
+      size: property.size || "",
+      bedrooms: property.bedrooms || "",
+      bathrooms: property.bathrooms || "",
+      features: property.features ? property.features.join(', ') : "",
+      images: [],
+      videos: []
+    });
+  };
+
+  const cancelEdit = () => {
+    setEditingProperty(null);
+    setIsEditing(false);
+    setFormData({
+      title: "",
+      description: "",
+      price: "",
+      location: "",
+      type: "",
+      size: "",
+      bedrooms: "",
+      bathrooms: "",
+      features: "",
+      images: [],
+      videos: []
+    });
   };
 
   const generateAIDescription = async () => {
@@ -162,48 +261,47 @@ export default function AdminUpload() {
         }
       });
 
-      // Add files
-      formData.images.forEach(file => {
-        formDataToSend.append('images', file);
-      });
+      // Add files only if new files are selected
+      if (formData.images.length > 0) {
+        formData.images.forEach(file => {
+          formDataToSend.append('images', file);
+        });
+      }
       
-      formData.videos.forEach(file => {
-        formDataToSend.append('videos', file);
-      });
+      if (formData.videos.length > 0) {
+        formData.videos.forEach(file => {
+          formDataToSend.append('videos', file);
+        });
+      }
 
-      const response = await fetch('/api/admin/properties', {
-        method: 'POST',
+      const url = isEditing && editingProperty 
+        ? `/api/admin/properties/${editingProperty.id}` 
+        : '/api/admin/properties';
+      
+      const method = isEditing ? 'PUT' : 'POST';
+
+      const response = await fetch(url, {
+        method: method,
         body: formDataToSend,
       });
 
       if (!response.ok) {
-        throw new Error('Failed to upload property');
+        throw new Error(`Failed to ${isEditing ? 'update' : 'upload'} property`);
       }
 
       toast({
         title: "Success",
-        description: "Property uploaded successfully!",
+        description: `Property ${isEditing ? 'updated' : 'uploaded'} successfully!`,
       });
 
       // Reset form
-      setFormData({
-        title: "",
-        description: "",
-        price: "",
-        location: "",
-        type: "",
-        size: "",
-        bedrooms: "",
-        bathrooms: "",
-        features: "",
-        images: [],
-        videos: []
-      });
+      cancelEdit();
+      refetch();
 
     } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to upload property. Please try again.",
+        description: `Failed to ${isEditing ? 'update' : 'upload'} property. Please try again.`,
         variant: "destructive",
       });
     } finally {
@@ -222,7 +320,14 @@ export default function AdminUpload() {
         <TabsContent value="upload">
           <Card>
             <CardHeader>
-              <CardTitle>Upload New Property</CardTitle>
+              <CardTitle>
+                {isEditing ? `Edit Property: ${editingProperty?.title}` : 'Upload New Property'}
+              </CardTitle>
+              {isEditing && (
+                <Button variant="outline" onClick={cancelEdit} className="w-fit">
+                  Cancel Edit
+                </Button>
+              )}
             </CardHeader>
             <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -340,7 +445,8 @@ export default function AdminUpload() {
             </div>
 
             <div>
-              <Label htmlFor="images">Property Images</Label>
+              <Label htmlFor="images">Property Images {isEditing && "(Leave empty to keep existing images)"}</Label>
+              <p className="text-sm text-gray-600 mb-2">Images will be automatically compressed for faster loading</p>
               <Input
                 id="images"
                 type="file"
@@ -351,7 +457,8 @@ export default function AdminUpload() {
             </div>
 
             <div>
-              <Label htmlFor="videos">Property Videos</Label>
+              <Label htmlFor="videos">Property Videos {isEditing && "(Leave empty to keep existing videos)"}</Label>
+              <p className="text-sm text-gray-600 mb-2">First frame will be used as thumbnail</p>
               <Input
                 id="videos"
                 type="file"
@@ -362,7 +469,7 @@ export default function AdminUpload() {
             </div>
 
             <Button type="submit" disabled={isSubmitting} className="w-full">
-              {isSubmitting ? "Uploading..." : "Upload Property"}
+              {isSubmitting ? (isEditing ? "Updating..." : "Uploading...") : (isEditing ? "Update Property" : "Upload Property")}
             </Button>
           </form>
         </CardContent>
@@ -396,6 +503,13 @@ export default function AdminUpload() {
                     </div>
                   </div>
                   <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => startEdit(property)}
+                    >
+                      <Edit className="h-4 w-4" />
+                    </Button>
                     {property.status !== 'sold' && (
                       <Button
                         variant="outline"

@@ -242,6 +242,51 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update property endpoint
+  app.put("/api/admin/properties/:id", upload.fields([
+    { name: 'images', maxCount: 10 },
+    { name: 'videos', maxCount: 5 }
+  ]), async (req, res) => {
+    try {
+      const files = req.files as { [fieldname: string]: Express.Multer.File[] };
+      
+      // Get existing property to preserve current media if no new files uploaded
+      const existingProperty = await storage.getProperty(req.params.id);
+      if (!existingProperty) {
+        return res.status(404).json({ message: "Property not found" });
+      }
+      
+      // Process uploaded files or keep existing ones
+      const imageUrls = files.images 
+        ? files.images.map(file => `/uploads/images/${file.filename}`) 
+        : existingProperty.images;
+      const videoUrls = files.videos 
+        ? files.videos.map(file => `/uploads/videos/${file.filename}`) 
+        : existingProperty.videos;
+      
+      const propertyData = {
+        ...req.body,
+        price: req.body.price.toString(),
+        size: req.body.size || null,
+        bedrooms: req.body.bedrooms || null,
+        bathrooms: req.body.bathrooms || null,
+        images: imageUrls,
+        videos: videoUrls,
+        features: req.body.features ? req.body.features.split(',').map((f: string) => f.trim()) : [],
+      };
+
+      const property = await storage.updateProperty(req.params.id, propertyData);
+      if (!property) {
+        return res.status(404).json({ message: "Property not found" });
+      }
+      
+      res.json(property);
+    } catch (error) {
+      console.error('Property update error:', error);
+      res.status(400).json({ message: "Invalid property data", error });
+    }
+  });
+
   // Mark property as sold endpoint
   app.patch("/api/admin/properties/:id/sold", async (req, res) => {
     try {

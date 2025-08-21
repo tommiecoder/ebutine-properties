@@ -2,9 +2,72 @@ import { Heart, Bed, Bath, Car, MapPin, Phone, Play } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import PropertyVideoModal from "./PropertyVideoModal";
 import type { Property } from "@shared/schema";
+
+function PropertyThumbnail({ property }: { property: Property }) {
+  const [thumbnailSrc, setThumbnailSrc] = useState<string>("");
+
+  useEffect(() => {
+    const generateThumbnail = async () => {
+      // If property has videos, extract thumbnail from first video
+      if (property.videos && property.videos.length > 0) {
+        try {
+          const video = document.createElement('video');
+          video.crossOrigin = 'anonymous';
+          video.muted = true;
+          
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+          
+          video.onloadeddata = () => {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            
+            // Seek to 1 second or 10% of video duration for better thumbnail
+            video.currentTime = Math.min(1, video.duration * 0.1);
+          };
+          
+          video.onseeked = () => {
+            if (ctx) {
+              ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+              const thumbnail = canvas.toDataURL('image/jpeg', 0.8);
+              setThumbnailSrc(thumbnail);
+            }
+          };
+          
+          video.onerror = () => {
+            // Fallback to first image or default
+            const fallback = property.images?.[0] || "https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3";
+            setThumbnailSrc(fallback);
+          };
+          
+          video.src = property.videos[0];
+        } catch (error) {
+          // Fallback to first image or default
+          const fallback = property.images?.[0] || "https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3";
+          setThumbnailSrc(fallback);
+        }
+      } else {
+        // Use first image or default
+        const fallback = property.images?.[0] || "https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3";
+        setThumbnailSrc(fallback);
+      }
+    };
+
+    generateThumbnail();
+  }, [property.videos, property.images]);
+
+  return (
+    <img 
+      src={thumbnailSrc || "https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3"} 
+      alt={property.title}
+      className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-500"
+      loading="lazy"
+    />
+  );
+}
 
 interface PropertyCardProps {
   property: Property;
@@ -33,11 +96,7 @@ export default function PropertyCard({ property, onViewDetails, onInquire }: Pro
   return (
     <Card className="card-enhanced overflow-hidden group" data-testid={`property-card-${property.id}`}>
       <div className="relative overflow-hidden">
-        <img 
-          src={property.images?.[0] || "https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3"} 
-          alt={property.title}
-          className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-500"
-        />
+        <PropertyThumbnail property={property} />
         <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
         <div className="absolute top-4 left-4">
           {getStatusBadge(property.status, property.featured || false)}
