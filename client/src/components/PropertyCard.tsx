@@ -18,45 +18,66 @@ function PropertyThumbnail({ property }: { property: Property }) {
           video.crossOrigin = 'anonymous';
           video.muted = true;
           video.preload = 'metadata';
+          video.playsInline = true;
           
           const canvas = document.createElement('canvas');
           const ctx = canvas.getContext('2d');
           
-          video.onloadedmetadata = () => {
-            canvas.width = video.videoWidth || 640;
-            canvas.height = video.videoHeight || 480;
+          let thumbnailGenerated = false;
+          
+          const generateFromFrame = () => {
+            if (thumbnailGenerated || !ctx || !video.videoWidth || !video.videoHeight) return;
             
-            // Seek to 1 second or 10% of video duration for better thumbnail
-            const seekTime = Math.min(1, video.duration * 0.1) || 1;
-            video.currentTime = seekTime;
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            const thumbnail = canvas.toDataURL('image/jpeg', 0.8);
+            setThumbnailSrc(thumbnail);
+            thumbnailGenerated = true;
+          };
+          
+          video.onloadeddata = () => {
+            // Set to first frame (0 seconds)
+            video.currentTime = 0;
           };
           
           video.onseeked = () => {
-            if (ctx && canvas.width > 0 && canvas.height > 0) {
-              ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-              const thumbnail = canvas.toDataURL('image/jpeg', 0.8);
-              setThumbnailSrc(thumbnail);
+            generateFromFrame();
+          };
+          
+          video.onloadedmetadata = () => {
+            if (video.duration > 0) {
+              video.currentTime = 0; // Ensure we get the first frame
             }
           };
           
-          video.onerror = () => {
-            console.warn('Video thumbnail generation failed, using fallback');
+          video.oncanplay = () => {
+            // Fallback if onseeked doesn't fire
+            setTimeout(() => {
+              if (!thumbnailGenerated) {
+                generateFromFrame();
+              }
+            }, 100);
+          };
+          
+          video.onerror = (e) => {
+            console.warn('Video thumbnail generation failed:', e);
             // Fallback to first image or default
             const fallback = property.images?.[0] || "https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3";
             setThumbnailSrc(fallback);
           };
-
-          video.oncanplaythrough = () => {
-            // Additional attempt if onseeked doesn't fire
-            if (!thumbnailSrc && ctx && canvas.width > 0) {
-              ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-              const thumbnail = canvas.toDataURL('image/jpeg', 0.8);
-              setThumbnailSrc(thumbnail);
-            }
-          };
           
           video.src = property.videos[0];
           video.load();
+          
+          // Cleanup timeout
+          setTimeout(() => {
+            if (!thumbnailGenerated) {
+              console.warn('Video thumbnail generation timeout, using fallback');
+              const fallback = property.images?.[0] || "https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3";
+              setThumbnailSrc(fallback);
+            }
+          }, 5000);
         } catch (error) {
           console.warn('Video thumbnail generation error:', error);
           // Fallback to first image or default
@@ -71,7 +92,7 @@ function PropertyThumbnail({ property }: { property: Property }) {
     };
 
     generateThumbnail();
-  }, [property.videos, property.images, thumbnailSrc]);
+  }, [property.videos, property.images]);
 
   return (
     <img 

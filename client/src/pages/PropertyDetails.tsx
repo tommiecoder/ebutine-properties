@@ -266,7 +266,7 @@ export default function PropertyDetails() {
                       onClick={() => setShowVideoModal(true)}
                     >
                       <Eye className="mr-2 h-4 w-4" />
-                      Watch Property Tour
+                      Watch Property Tour ({property.videos.length} video{property.videos.length > 1 ? 's' : ''})
                     </Button>
                   )}
                 </div>

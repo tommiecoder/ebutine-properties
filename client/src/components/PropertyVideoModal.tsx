@@ -37,6 +37,10 @@ export default function PropertyVideoModal({
                 controls 
                 className="w-full h-auto max-h-96 rounded-lg"
                 preload="metadata"
+                playsInline
+                muted
+                poster=""
+                style={{ backgroundColor: '#f3f4f6' }}
               >
                 <source src={videoUrl} type="video/mp4" />
                 <source src={videoUrl} type="video/webm" />
@@ -48,6 +52,9 @@ export default function PropertyVideoModal({
                   Video {index + 1} of {videos.length}
                 </p>
               )}
+              <div className="text-xs text-gray-500 mt-1">
+                Loading optimized for your connection...
+              </div>
             </div>
           ))}
         </div>
