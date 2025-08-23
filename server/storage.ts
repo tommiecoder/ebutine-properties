@@ -1,8 +1,17 @@
 import { type User, type InsertUser, type Property, type InsertProperty, type Contact, type InsertContact, type PropertyInquiry, type InsertPropertyInquiry } from "@shared/schema";
 import { randomUUID } from "crypto";
-import { db, isDbConnected } from "./db";
+import { db } from "./db";
 import { users, properties, contacts, propertyInquiries } from "@shared/schema";
 import { eq, and, gte, lte, sql } from "drizzle-orm";
+
+// Add database connection check function
+function isDbConnected(): boolean {
+  try {
+    return !!db;
+  } catch {
+    return false;
+  }
+}
 
 export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
@@ -39,6 +48,45 @@ export class DatabaseStorage implements IStorage {
 
   constructor() {
     this.seedData();
+    this.addChevronProperty();
+  }
+
+  private async addChevronProperty() {
+    // Add the Chevron property to memory storage
+    const chevronProperty = {
+      id: randomUUID(),
+      title: "Premium Investment Opportunity - Don't Miss Chevron Again!",
+      description: "If you missed the opportunity of investing in Chevron, Lekki, Lagos, don't worry - this is another exceptional opportunity to own prime land in this prestigious location! This 650sqm fenced and gated dryland represents a rare chance to secure your foothold in one of Lagos's most sought-after neighborhoods. Located in the heart of Chevron, Lekki, this property offers unparalleled investment potential with Governors Consent title documentation for complete peace of mind. The strategic location provides easy access to major business districts, shopping centers, schools, and recreational facilities. With its excellent infrastructure including tarred roads, reliable electricity, and 24/7 security, this gated estate offers the perfect blend of luxury and security. The property is ideal for building your dream home or as a long-term investment with strong appreciation potential. Don't let this opportunity slip away like the previous Chevron investments - secure your piece of premium Lagos real estate today!",
+      type: "residential_land",
+      price: "170000000",
+      location: "Chevron, Lekki, Lagos",
+      address: "Chevron Estate, Lekki, Lagos",
+      size: "650sqm",
+      bedrooms: null,
+      bathrooms: null,
+      parking: null,
+      features: [
+        "Governors Consent",
+        "Fenced and Gated",
+        "Dryland",
+        "Strategic Location", 
+        "24/7 Security",
+        "Tarred Roads",
+        "Reliable Electricity",
+        "High Investment Potential",
+        "Premium Neighborhood",
+        "Clear Title Documentation"
+      ],
+      images: [],
+      videos: ["/uploads/videos/get.mp4"],
+      status: "available",
+      featured: true,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    this.memoryProperties.set(chevronProperty.id, chevronProperty as Property);
+    console.log('✅ Chevron property added to memory storage:', chevronProperty.title);
   }
 
   private async seedData() {
@@ -230,6 +278,29 @@ export class DatabaseStorage implements IStorage {
       console.log('✅ Property saved to memory storage:', newProperty.title);
       return newProperty as Property;
     }
+  }
+
+  // Add saveProperty method for compatibility with routes
+  async saveProperty(propertyData: any): Promise<Property> {
+    const insertProperty: InsertProperty = {
+      title: propertyData.title,
+      description: propertyData.description,
+      type: propertyData.type,
+      price: propertyData.price.toString(),
+      location: propertyData.location,
+      address: propertyData.address || null,
+      size: propertyData.size || null,
+      bedrooms: propertyData.bedrooms || null,
+      bathrooms: propertyData.bathrooms || null,
+      parking: propertyData.parking || null,
+      features: propertyData.features || [],
+      images: propertyData.images || [],
+      videos: propertyData.videos || [],
+      status: "available",
+      featured: propertyData.featured || false,
+    };
+
+    return this.createProperty(insertProperty);
   }
 
   async updateProperty(id: string, property: Partial<InsertProperty>): Promise<Property | undefined> {
