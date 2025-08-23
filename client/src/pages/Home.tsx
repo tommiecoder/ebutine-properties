@@ -66,10 +66,14 @@ export default function Home() {
 
             <div className="relative">
               <img 
-                src="https://images.unsplash.com/photo-1560472354-b33ff0c44a43?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600" 
-                alt="Ebutine Properties Team" 
-                className="rounded-2xl shadow-2xl"
+                src="/founder-augustine.jpg" 
+                alt="Mr. Augustine Akunechendo - Founder & CEO of Ebutine Properties" 
+                className="rounded-2xl shadow-2xl w-full h-auto"
               />
+              <div className="mt-6 text-center">
+                <h3 className="text-2xl font-bold text-ebutine-dark">Mr. Augustine Akunechendo</h3>
+                <p className="text-lg text-ebutine-orange font-semibold">Founder & CEO</p>
+              </div>
               <div className="absolute -bottom-6 -right-6 bg-ebutine-orange text-white p-6 rounded-2xl shadow-lg">
                 <h3 className="text-2xl font-bold">5000+</h3>
                 <p className="text-sm">Happy Clients</p>
