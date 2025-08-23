@@ -1,4 +1,13 @@
-import { type User, type InsertUser, type Property, type InsertProperty, type Contact, type InsertContact, type PropertyInquiry, type InsertPropertyInquiry } from "@shared/schema";
+import {
+  type User,
+  type InsertUser,
+  type Property,
+  type InsertProperty,
+  type Contact,
+  type InsertContact,
+  type PropertyInquiry,
+  type InsertPropertyInquiry,
+} from "@shared/schema";
 import { randomUUID } from "crypto";
 import { db } from "./db";
 import { users, properties, contacts, propertyInquiries } from "@shared/schema";
@@ -28,7 +37,10 @@ export interface IStorage {
   }): Promise<Property[]>;
   getProperty(id: string): Promise<Property | undefined>;
   createProperty(property: InsertProperty): Promise<Property>;
-  updateProperty(id: string, property: Partial<InsertProperty>): Promise<Property | undefined>;
+  updateProperty(
+    id: string,
+    property: Partial<InsertProperty>,
+  ): Promise<Property | undefined>;
   deleteProperty(id: string): Promise<boolean>;
 
   // Contacts
@@ -37,7 +49,9 @@ export interface IStorage {
 
   // Property Inquiries
   getPropertyInquiries(propertyId?: string): Promise<PropertyInquiry[]>;
-  createPropertyInquiry(inquiry: InsertPropertyInquiry): Promise<PropertyInquiry>;
+  createPropertyInquiry(
+    inquiry: InsertPropertyInquiry,
+  ): Promise<PropertyInquiry>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -56,7 +70,8 @@ export class DatabaseStorage implements IStorage {
       {
         id: randomUUID(),
         title: "Premium Investment Opportunity - Don't Miss Chevron Again!",
-        description: "If you missed the opportunity of investing in Chevron, Lekki, Lagos, don't worry - this is another exceptional opportunity to own prime land in this prestigious location!",
+        description:
+          "If you missed the opportunity of investing in Chevron, Lekki, Lagos, don't worry - this is another exceptional opportunity to own prime land in this prestigious location!",
         type: "residential_land",
         price: "170000000",
         location: "Chevron, Lekki, Lagos",
@@ -65,7 +80,12 @@ export class DatabaseStorage implements IStorage {
         bedrooms: null,
         bathrooms: null,
         parking: null,
-        features: ["Governors Consent", "Fenced and Gated", "Dryland", "Strategic Location"],
+        features: [
+          "Governors Consent",
+          "Fenced and Gated",
+          "Dryland",
+          "Strategic Location",
+        ],
         images: [],
         videos: ["/uploads/videos/get.mp4"],
         status: "available",
@@ -75,42 +95,172 @@ export class DatabaseStorage implements IStorage {
       },
       {
         id: randomUUID(),
-        title: "Luxury 4BR Duplex",
-        description: "Elegant 4-bedroom duplex in gated estate with modern amenities",
-        type: "luxury_home",
-        price: "85000000",
-        location: "Sangotedo, Ajah Lagos",
-        address: "Greenland Estate, Sangotedo",
-        size: "4 bedrooms",
-        bedrooms: "4",
-        bathrooms: "5",
-        parking: "2",
-        features: ["Modern Kitchen", "Swimming Pool", "24/7 Security", "Fitted Wardrobes"],
+        title: "QUICK SALE‼️ 1000sqm Cornerpiece Land - Atlantic View Estate",
+        description:
+          "QUICK SALE ALERT! This exceptional 1000sqm cornerpiece land is currently selling in the prestigious Atlantic View Estate, New Road, Chevron, Lekki, Lagos. This is a rare opportunity that won't stay in the market for long! Located in one of Chevron's most sought-after developments, this cornerpiece plot offers maximum privacy and development potential. The property comes with Global Certificate of Occupancy (CofO) providing absolute security of ownership and investment protection. Atlantic View Estate is renowned for its excellent infrastructure, strategic location, and high-end residential developments. With easy access to major business districts, shopping centers, international schools, and recreational facilities, this property represents an outstanding investment opportunity. The estate features tarred roads, reliable power supply, water infrastructure, and 24/7 security. Don't miss this chance to secure a premium cornerpiece land in Chevron at an attractive price point. Properties of this caliber and location are extremely rare and highly sought after by discerning investors and homeowners alike.",
+        type: "residential_land",
+        price: "280000000",
+        location: "Atlantic View Estate, Chevron, Lekki, Lagos",
+        address: "New Road, Atlantic View Estate, Chevron, Lekki, Lagos",
+        size: "1000sqm",
+        bedrooms: null,
+        bathrooms: null,
+        parking: null,
+        features: [
+          "Global Certificate of Occupancy (CofO)",
+          "Cornerpiece Land",
+          "1000sqm",
+          "Atlantic View Estate",
+          "Quick Sale",
+          "Strategic Location",
+          "Premium Development Area",
+          "24/7 Security",
+          "Tarred Roads",
+          "Reliable Infrastructure",
+          "High Investment Potential",
+          "Chevron, Lekki",
+        ],
         images: [],
-        videos: [],
+        videos: [
+          "/uploads/videos/QUICK SALE‼️1000sqm Cornerpiece Land is currently selling in Atlantic View Estate, New Road, Che.mp4",
+        ],
         status: "available",
         featured: true,
         createdAt: new Date(),
         updatedAt: new Date(),
-      }
+      },
+      {
+        id: randomUUID(),
+        title: "DISTRESS SALE 📌 2 Plots of Dryland - Alashela Estate",
+        description:
+          "URGENT DISTRESS SALE OPPORTUNITY! Two exceptional plots of dryland measuring 1244sqm in total are now available in the prestigious Alashela Estate, Ogombo, Ajah. This is a rare chance to acquire prime real estate at an incredible value due to urgent sale circumstances. Located in one of Ajah's most sought-after residential developments, Alashela Estate offers excellent infrastructure, peaceful environment, and strong investment potential. Each plot is being offered at an unbeatable price of ₦35M net per plot, making this an outstanding opportunity for savvy investors. The property comes with Certificate of Occupancy (CofO), ensuring complete legal documentation and peace of mind for buyers. Alashela Estate is known for its well-planned layout, good road network, and proximity to major landmarks including shopping centers, schools, and business districts. The estate features reliable utilities, security provisions, and a growing community of residents. Don't miss this limited-time opportunity to secure premium land in Ogombo at distress sale prices. Properties like these are extremely rare and won't last long in the market. Perfect for residential development or long-term investment with excellent appreciation potential.",
+        type: "residential_land",
+        price: "35000000",
+        location: "Alashela Estate, Ogombo, Ajah",
+        address: "Alashela Estate, Ogombo, Ajah, Lagos",
+        size: "1244sqm (2 plots)",
+        bedrooms: null,
+        bathrooms: null,
+        parking: null,
+        features: [
+          "Certificate of Occupancy (CofO)",
+          "Dryland",
+          "2 Plots Available",
+          "1244sqm Total",
+          "Distress Sale Price",
+          "Alashela Estate",
+          "Prime Location",
+          "Good Road Network",
+          "Reliable Utilities",
+          "Investment Opportunity",
+          "Legal Documentation",
+          "Ogombo, Ajah",
+        ],
+        images: [],
+        videos: [
+          "/uploads/videos/LAND FOR SALE📌SIZE- 660sqm LOCATION- Ogombo, Ajah Price-N55MTitle-Governors consentFOR ENQUIRIE.mp4",
+        ],
+        status: "available",
+        featured: true,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        id: randomUUID(),
+        title: "LAND FOR SALE📌 660sqm Prime Land - Ogombo, Ajah",
+        description:
+          "EXCEPTIONAL LAND OPPORTUNITY! Prime 660sqm land now available for sale in the highly sought-after Ogombo area of Ajah, Lagos. This strategically located property offers excellent investment potential and is perfect for residential development. Priced at an attractive ₦55M, this land comes with Governors Consent, providing complete legal security and peace of mind for buyers. Ogombo, Ajah is one of Lagos's fastest-growing residential areas, known for its excellent infrastructure development and proximity to major business districts. The location offers easy access to Lekki-Epe Expressway, shopping centers, schools, and recreational facilities. With its prime location and verified documentation, this property represents an outstanding opportunity for both end-users looking to build their dream home and investors seeking high-return real estate assets. The area has seen significant appreciation in property values over recent years, making it an ideal choice for long-term investment. Don't miss this chance to secure prime land in one of Lagos's most promising residential corridors at this competitive price point.",
+        type: "residential_land",
+        price: "55000000",
+        location: "Ogombo, Ajah",
+        address: "Ogombo, Ajah, Lagos",
+        size: "660sqm",
+        bedrooms: null,
+        bathrooms: null,
+        parking: null,
+        features: [
+          "Governors Consent",
+          "660sqm",
+          "Prime Location",
+          "Ogombo, Ajah",
+          "Residential Development",
+          "Investment Opportunity",
+          "Legal Documentation",
+          "Strategic Location",
+          "High Growth Area",
+          "Easy Access to Lekki-Epe Expressway",
+          "Proximity to Amenities",
+          "Competitive Price",
+        ],
+        images: [],
+        videos: [
+          "/uploads/videos/LAND FOR SALE📌SIZE- 660sqm LOCATION- Ogombo, Ajah Price-N55MTitle-Governors consentFOR ENQUIRIE.mp4",
+        ],
+        status: "available",
+        featured: true,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        id: randomUUID(),
+        title: "URGENT SALE‼️ 660sqm Land - Greenland Estate, Ogombo, Ajah",
+        description:
+          "URGENT SALE OPPORTUNITY! Prime 660sqm land is now available for immediate sale in the prestigious Greenland Estate, Ogombo, Ajah, Lagos. This urgent sale presents an exceptional opportunity to acquire prime real estate at a competitive price point due to the seller's urgent circumstances. Located in one of Ajah's most sought-after gated communities, Greenland Estate offers excellent infrastructure, peaceful residential environment, and strong investment potential. The property comes with Governor's Consent, providing complete legal documentation and absolute security of ownership. Greenland Estate is renowned for its well-planned layout, excellent road network, reliable utilities, and 24/7 security services. The estate's strategic location provides easy access to major business districts, shopping centers, schools, and recreational facilities along the Lekki-Epe corridor. With its proximity to key landmarks and ongoing infrastructure development in the area, this property offers excellent potential for both residential development and long-term investment appreciation. Don't miss this time-sensitive opportunity to secure premium land in one of Lagos's fastest-growing residential corridors at an urgent sale price.",
+        type: "residential_land",
+        price: "55000000",
+        location: "Greenland Estate, Ogombo, Ajah",
+        address: "Greenland Estate, Ogombo, Ajah, Lagos",
+        size: "660sqm",
+        bedrooms: null,
+        bathrooms: null,
+        parking: null,
+        features: [
+          "Governor's Consent",
+          "660sqm",
+          "Urgent Sale",
+          "Greenland Estate",
+          "Gated Community",
+          "Prime Location",
+          "Ogombo, Ajah",
+          "Investment Opportunity",
+          "Legal Documentation",
+          "24/7 Security",
+          "Good Road Network",
+          "Reliable Utilities",
+          "Strategic Location",
+          "Competitive Price",
+        ],
+        images: [],
+        videos: [
+          "/uploads/videos/URGENT SALE‼️Land for Sale- 660sqmLocation- Greenland Estate Ogombo, AjahPrice- N55MTitle- Gover.mp4",
+        ],
+        status: "available",
+        featured: true,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
     ];
 
-    sampleProperties.forEach(property => {
+    sampleProperties.forEach((property) => {
       this.memoryProperties.set(property.id, property as Property);
     });
 
-    console.log('✅ Sample properties loaded to memory storage');
+    console.log("✅ Sample properties loaded to memory storage");
   }
 
   async getUser(id: string): Promise<User | undefined> {
     try {
       if (isDbConnected() && !this.fallbackToMemory) {
-        const result = await db.select().from(users).where(eq(users.id, id)).limit(1);
+        const result = await db
+          .select()
+          .from(users)
+          .where(eq(users.id, id))
+          .limit(1);
         return result[0];
       }
       return undefined;
     } catch (error) {
-      console.error('Error fetching user:', error);
+      console.error("Error fetching user:", error);
       return undefined;
     }
   }
@@ -118,12 +268,16 @@ export class DatabaseStorage implements IStorage {
   async getUserByUsername(username: string): Promise<User | undefined> {
     try {
       if (isDbConnected() && !this.fallbackToMemory) {
-        const result = await db.select().from(users).where(eq(users.username, username)).limit(1);
+        const result = await db
+          .select()
+          .from(users)
+          .where(eq(users.username, username))
+          .limit(1);
         return result[0];
       }
       return undefined;
     } catch (error) {
-      console.error('Error fetching user by username:', error);
+      console.error("Error fetching user by username:", error);
       return undefined;
     }
   }
@@ -131,15 +285,15 @@ export class DatabaseStorage implements IStorage {
   async createUser(insertUser: InsertUser): Promise<User> {
     const id = randomUUID();
     const user: User = { ...insertUser, id };
-    
+
     try {
       if (isDbConnected() && !this.fallbackToMemory) {
         await db.insert(users).values(user);
       }
     } catch (error) {
-      console.error('Error creating user:', error);
+      console.error("Error creating user:", error);
     }
-    
+
     return user;
   }
 
@@ -160,16 +314,22 @@ export class DatabaseStorage implements IStorage {
             conditions.push(eq(properties.type, filters.type));
           }
           if (filters.location && filters.location !== "All Locations") {
-            conditions.push(sql`${properties.location} ILIKE ${`%${filters.location}%`}`);
+            conditions.push(
+              sql`${properties.location} ILIKE ${`%${filters.location}%`}`,
+            );
           }
           if (filters.featured !== undefined) {
             conditions.push(eq(properties.featured, filters.featured));
           }
           if (filters.minPrice) {
-            conditions.push(gte(sql`CAST(${properties.price} AS DECIMAL)`, filters.minPrice));
+            conditions.push(
+              gte(sql`CAST(${properties.price} AS DECIMAL)`, filters.minPrice),
+            );
           }
           if (filters.maxPrice) {
-            conditions.push(lte(sql`CAST(${properties.price} AS DECIMAL)`, filters.maxPrice));
+            conditions.push(
+              lte(sql`CAST(${properties.price} AS DECIMAL)`, filters.maxPrice),
+            );
           }
         }
 
@@ -184,21 +344,51 @@ export class DatabaseStorage implements IStorage {
         let result = Array.from(this.memoryProperties.values());
 
         if (filters) {
-          result = result.filter(property => {
-            if (filters.type && filters.type !== "All Types" && property.type !== filters.type) return false;
-            if (filters.location && filters.location !== "All Locations" && !property.location.toLowerCase().includes(filters.location.toLowerCase())) return false;
-            if (filters.featured !== undefined && property.featured !== filters.featured) return false;
-            if (filters.minPrice && parseFloat(property.price) < filters.minPrice) return false;
-            if (filters.maxPrice && parseFloat(property.price) > filters.maxPrice) return false;
+          result = result.filter((property) => {
+            if (
+              filters.type &&
+              filters.type !== "All Types" &&
+              property.type !== filters.type
+            )
+              return false;
+            if (
+              filters.location &&
+              filters.location !== "All Locations" &&
+              !property.location
+                .toLowerCase()
+                .includes(filters.location.toLowerCase())
+            )
+              return false;
+            if (
+              filters.featured !== undefined &&
+              property.featured !== filters.featured
+            )
+              return false;
+            if (
+              filters.minPrice &&
+              parseFloat(property.price) < filters.minPrice
+            )
+              return false;
+            if (
+              filters.maxPrice &&
+              parseFloat(property.price) > filters.maxPrice
+            )
+              return false;
             return true;
           });
         }
 
-        return result.sort((a, b) => new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime());
+        return result.sort(
+          (a, b) =>
+            new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime(),
+        );
       }
     } catch (error) {
       this.fallbackToMemory = true;
-      console.error('❌ Error fetching properties, falling back to memory storage:', error);
+      console.error(
+        "❌ Error fetching properties, falling back to memory storage:",
+        error,
+      );
       return Array.from(this.memoryProperties.values());
     }
   }
@@ -206,14 +396,21 @@ export class DatabaseStorage implements IStorage {
   async getProperty(id: string): Promise<Property | undefined> {
     try {
       if (isDbConnected() && !this.fallbackToMemory) {
-        const result = await db.select().from(properties).where(eq(properties.id, id)).limit(1);
+        const result = await db
+          .select()
+          .from(properties)
+          .where(eq(properties.id, id))
+          .limit(1);
         return result[0];
       } else {
         return this.memoryProperties.get(id);
       }
     } catch (error) {
       this.fallbackToMemory = true;
-      console.error('❌ Error fetching property, falling back to memory storage:', error);
+      console.error(
+        "❌ Error fetching property, falling back to memory storage:",
+        error,
+      );
       return this.memoryProperties.get(id);
     }
   }
@@ -230,23 +427,29 @@ export class DatabaseStorage implements IStorage {
     try {
       if (isDbConnected() && !this.fallbackToMemory) {
         await db.insert(properties).values(newProperty);
-        console.log('✅ Property saved to database:', newProperty.title);
+        console.log("✅ Property saved to database:", newProperty.title);
       } else {
         this.fallbackToMemory = true;
         this.memoryProperties.set(id, newProperty as Property);
-        console.log('✅ Property saved to memory storage:', newProperty.title);
+        console.log("✅ Property saved to memory storage:", newProperty.title);
       }
       return newProperty as Property;
     } catch (error) {
-      console.error('❌ Database error, falling back to memory storage:', error);
+      console.error(
+        "❌ Database error, falling back to memory storage:",
+        error,
+      );
       this.fallbackToMemory = true;
       this.memoryProperties.set(id, newProperty as Property);
-      console.log('✅ Property saved to memory storage:', newProperty.title);
+      console.log("✅ Property saved to memory storage:", newProperty.title);
       return newProperty as Property;
     }
   }
 
-  async updateProperty(id: string, property: Partial<InsertProperty>): Promise<Property | undefined> {
+  async updateProperty(
+    id: string,
+    property: Partial<InsertProperty>,
+  ): Promise<Property | undefined> {
     const updateData = {
       ...property,
       updatedAt: new Date(),
@@ -254,27 +457,33 @@ export class DatabaseStorage implements IStorage {
 
     try {
       if (isDbConnected() && !this.fallbackToMemory) {
-        await db.update(properties).set(updateData).where(eq(properties.id, id));
-        console.log('✅ Property updated in database:', id);
+        await db
+          .update(properties)
+          .set(updateData)
+          .where(eq(properties.id, id));
+        console.log("✅ Property updated in database:", id);
         return this.getProperty(id);
       } else {
         const existing = this.memoryProperties.get(id);
         if (existing) {
           const updated = { ...existing, ...updateData };
           this.memoryProperties.set(id, updated);
-          console.log('✅ Property updated in memory storage:', id);
+          console.log("✅ Property updated in memory storage:", id);
           return updated;
         }
         return undefined;
       }
     } catch (error) {
-      console.error('❌ Database error, falling back to memory storage:', error);
+      console.error(
+        "❌ Database error, falling back to memory storage:",
+        error,
+      );
       this.fallbackToMemory = true;
       const existing = this.memoryProperties.get(id);
       if (existing) {
         const updated = { ...existing, ...updateData };
         this.memoryProperties.set(id, updated);
-        console.log('✅ Property updated in memory storage:', id);
+        console.log("✅ Property updated in memory storage:", id);
         return updated;
       }
       return undefined;
@@ -285,21 +494,24 @@ export class DatabaseStorage implements IStorage {
     try {
       if (isDbConnected() && !this.fallbackToMemory) {
         const result = await db.delete(properties).where(eq(properties.id, id));
-        console.log('✅ Property deleted from database:', id);
+        console.log("✅ Property deleted from database:", id);
         return result.rowCount !== null && result.rowCount > 0;
       } else {
         const deleted = this.memoryProperties.delete(id);
         if (deleted) {
-          console.log('✅ Property deleted from memory storage:', id);
+          console.log("✅ Property deleted from memory storage:", id);
         }
         return deleted;
       }
     } catch (error) {
-      console.error('❌ Database error, falling back to memory storage:', error);
+      console.error(
+        "❌ Database error, falling back to memory storage:",
+        error,
+      );
       this.fallbackToMemory = true;
       const deleted = this.memoryProperties.delete(id);
       if (deleted) {
-        console.log('✅ Property deleted from memory storage:', id);
+        console.log("✅ Property deleted from memory storage:", id);
       }
       return deleted;
     }
@@ -308,13 +520,19 @@ export class DatabaseStorage implements IStorage {
   async getContacts(): Promise<Contact[]> {
     try {
       if (isDbConnected() && !this.fallbackToMemory) {
-        const result = await db.select().from(contacts).orderBy(sql`${contacts.createdAt} DESC`);
+        const result = await db
+          .select()
+          .from(contacts)
+          .orderBy(sql`${contacts.createdAt} DESC`);
         return result;
       } else {
         return Array.from(this.memoryContacts.values());
       }
     } catch (error) {
-      console.error('❌ Error fetching contacts, falling back to memory storage:', error);
+      console.error(
+        "❌ Error fetching contacts, falling back to memory storage:",
+        error,
+      );
       this.fallbackToMemory = true;
       return Array.from(this.memoryContacts.values());
     }
@@ -332,18 +550,21 @@ export class DatabaseStorage implements IStorage {
     try {
       if (isDbConnected() && !this.fallbackToMemory) {
         await db.insert(contacts).values(newContact);
-        console.log('✅ Contact saved to database');
+        console.log("✅ Contact saved to database");
       } else {
         this.fallbackToMemory = true;
         this.memoryContacts.set(id, newContact as Contact);
-        console.log('✅ Contact saved to memory storage');
+        console.log("✅ Contact saved to memory storage");
       }
       return newContact as Contact;
     } catch (error) {
-      console.error('❌ Database error, falling back to memory storage:', error);
+      console.error(
+        "❌ Database error, falling back to memory storage:",
+        error,
+      );
       this.fallbackToMemory = true;
       this.memoryContacts.set(id, newContact as Contact);
-      console.log('✅ Contact saved to memory storage');
+      console.log("✅ Contact saved to memory storage");
       return newContact as Contact;
     }
   }
@@ -352,32 +573,47 @@ export class DatabaseStorage implements IStorage {
     try {
       if (isDbConnected() && !this.fallbackToMemory) {
         let query = db.select().from(propertyInquiries);
-        
+
         if (propertyId) {
           query = query.where(eq(propertyInquiries.propertyId, propertyId));
         }
-        
-        const result = await query.orderBy(sql`${propertyInquiries.createdAt} DESC`);
+
+        const result = await query.orderBy(
+          sql`${propertyInquiries.createdAt} DESC`,
+        );
         return result;
       } else {
         let result = Array.from(this.memoryInquiries.values());
         if (propertyId) {
-          result = result.filter(inquiry => inquiry.propertyId === propertyId);
+          result = result.filter(
+            (inquiry) => inquiry.propertyId === propertyId,
+          );
         }
-        return result.sort((a, b) => new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime());
+        return result.sort(
+          (a, b) =>
+            new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime(),
+        );
       }
     } catch (error) {
-      console.error('❌ Error fetching inquiries, falling back to memory storage:', error);
+      console.error(
+        "❌ Error fetching inquiries, falling back to memory storage:",
+        error,
+      );
       this.fallbackToMemory = true;
       let result = Array.from(this.memoryInquiries.values());
       if (propertyId) {
-        result = result.filter(inquiry => inquiry.propertyId === propertyId);
+        result = result.filter((inquiry) => inquiry.propertyId === propertyId);
       }
-      return result.sort((a, b) => new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime());
+      return result.sort(
+        (a, b) =>
+          new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime(),
+      );
     }
   }
 
-  async createPropertyInquiry(inquiry: InsertPropertyInquiry): Promise<PropertyInquiry> {
+  async createPropertyInquiry(
+    inquiry: InsertPropertyInquiry,
+  ): Promise<PropertyInquiry> {
     const id = randomUUID();
     const newInquiry = {
       ...inquiry,
@@ -389,18 +625,21 @@ export class DatabaseStorage implements IStorage {
     try {
       if (isDbConnected() && !this.fallbackToMemory) {
         await db.insert(propertyInquiries).values(newInquiry);
-        console.log('✅ Property inquiry saved to database');
+        console.log("✅ Property inquiry saved to database");
       } else {
         this.fallbackToMemory = true;
         this.memoryInquiries.set(id, newInquiry as PropertyInquiry);
-        console.log('✅ Property inquiry saved to memory storage');
+        console.log("✅ Property inquiry saved to memory storage");
       }
       return newInquiry as PropertyInquiry;
     } catch (error) {
-      console.error('❌ Database error, falling back to memory storage:', error);
+      console.error(
+        "❌ Database error, falling back to memory storage:",
+        error,
+      );
       this.fallbackToMemory = true;
       this.memoryInquiries.set(id, newInquiry as PropertyInquiry);
-      console.log('✅ Property inquiry saved to memory storage');
+      console.log("✅ Property inquiry saved to memory storage");
       return newInquiry as PropertyInquiry;
     }
   }
