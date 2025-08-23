@@ -450,10 +450,34 @@ export class DatabaseStorage implements IStorage {
     id: string,
     property: Partial<InsertProperty>,
   ): Promise<Property | undefined> {
-    const updateData = {
-      ...property,
+    // Create properly typed update data with explicit type handling
+    const updateData: Partial<Property> & { updatedAt: Date } = {
       updatedAt: new Date(),
     };
+
+    // Copy all primitive properties
+    Object.keys(property).forEach(key => {
+      if (key !== 'features' && key !== 'images' && key !== 'videos') {
+        (updateData as any)[key] = (property as any)[key];
+      }
+    });
+
+    // Handle array properties with explicit typing
+    if (property.features !== undefined) {
+      updateData.features = Array.isArray(property.features) 
+        ? property.features.map(String) 
+        : [];
+    }
+    if (property.images !== undefined) {
+      updateData.images = Array.isArray(property.images) 
+        ? property.images.map(String) 
+        : [];
+    }
+    if (property.videos !== undefined) {
+      updateData.videos = Array.isArray(property.videos) 
+        ? property.videos.map(String) 
+        : [];
+    }
 
     try {
       if (isDbConnected() && !this.fallbackToMemory) {
@@ -543,8 +567,8 @@ export class DatabaseStorage implements IStorage {
     const newContact = {
       ...contact,
       id,
+      status: "new",
       createdAt: new Date(),
-      updatedAt: new Date(),
     };
 
     try {
@@ -657,9 +681,9 @@ export class DatabaseStorage implements IStorage {
       bedrooms: propertyData.bedrooms || null,
       bathrooms: propertyData.bathrooms || null,
       parking: propertyData.parking || null,
-      features: propertyData.features || [],
-      images: propertyData.images || [],
-      videos: propertyData.videos || [],
+      features: Array.isArray(propertyData.features) ? propertyData.features as string[] : [],
+      images: Array.isArray(propertyData.images) ? propertyData.images as string[] : [],
+      videos: Array.isArray(propertyData.videos) ? propertyData.videos as string[] : [],
       status: "available",
       featured: propertyData.featured || false,
     };
