@@ -10,59 +10,24 @@ export default function Gallery() {
   const galleryImages = [
     {
       id: 1,
-      src: "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
-      title: "Modern Villa in Lekki",
+      src: "/gallery/modern-duplex-1.jpg",
+      title: "Modern Executive Duplex",
       category: "luxury",
       location: "Lekki, Lagos"
     },
     {
       id: 2,
-      src: "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
-      title: "Contemporary Family Home",
-      category: "residential",
-      location: "Ajah, Lagos"
+      src: "/gallery/luxury-villa-2.jpg",
+      title: "Contemporary Luxury Villa",
+      category: "luxury",
+      location: "Victoria Island, Lagos"
     },
     {
       id: 3,
-      src: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
-      title: "Executive Duplex",
-      category: "luxury",
-      location: "Victoria Island, Lagos"
-    },
-    {
-      id: 4,
-      src: "https://images.unsplash.com/photo-1582407947304-fd86f028f716?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
-      title: "Commercial Plaza",
-      category: "commercial",
-      location: "Ikeja, Lagos"
-    },
-    {
-      id: 5,
-      src: "https://images.unsplash.com/photo-1571055107559-3e67626fa8be?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
-      title: "Waterfront Property",
-      category: "luxury",
-      location: "Banana Island, Lagos"
-    },
-    {
-      id: 6,
-      src: "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
-      title: "Residential Estate",
+      src: "/gallery/terrace-homes-3.jpg",
+      title: "Modern Terrace Houses",
       category: "residential",
       location: "Sangotedo, Lagos"
-    },
-    {
-      id: 7,
-      src: "https://images.unsplash.com/photo-1605146769289-440113cc3d00?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
-      title: "Modern Apartment Complex",
-      category: "residential",
-      location: "Ikoyi, Lagos"
-    },
-    {
-      id: 8,
-      src: "https://images.unsplash.com/photo-1613490493576-7fde63acd811?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
-      title: "Office Building",
-      category: "commercial",
-      location: "Victoria Island, Lagos"
     }
   ];
 
@@ -114,27 +79,33 @@ export default function Gallery() {
           </div>
 
           {/* Gallery Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredImages.map((image) => (
               <Card key={image.id} className="group overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
                 <div className="relative">
                   <img
                     src={image.src}
                     alt={image.title}
-                    className="w-full h-64 object-cover transition-transform duration-300 group-hover:scale-110"
+                    className="w-full h-80 object-cover transition-transform duration-300 group-hover:scale-110"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                   <div className="absolute bottom-4 left-4 right-4 transform translate-y-4 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-300">
                     <h3 className="text-white font-semibold text-lg mb-1">{image.title}</h3>
                     <p className="text-gray-200 text-sm">{image.location}</p>
                   </div>
-                  <Badge className="absolute top-4 right-4 bg-ebutine-orange text-white">
+                  <Badge className="absolute top-4 right-4 bg-ebutine-orange text-white capitalize">
                     {image.category}
                   </Badge>
                 </div>
               </Card>
             ))}
           </div>
+
+          {filteredImages.length === 0 && (
+            <div className="text-center py-12">
+              <p className="text-gray-500 text-lg">No properties found in this category.</p>
+            </div>
+          )}
         </div>
       </section>
 
