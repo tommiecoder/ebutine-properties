@@ -40,19 +40,32 @@ export default function PropertyVideoModal({
                 <video 
                   controls 
                   className="w-full h-auto max-h-96 rounded-lg"
-                  preload="none"
+                  preload="metadata"
                   playsInline
                   muted
                   controlsList="nodownload"
                   style={{ backgroundColor: '#f3f4f6' }}
                   onLoadStart={() => console.log('Video loading started:', fullVideoUrl)}
                   onCanPlay={() => console.log('Video can play:', fullVideoUrl)}
-                  onError={(e) => console.error('Video error:', e, fullVideoUrl)}
+                  onLoadedData={() => console.log('Video data loaded:', fullVideoUrl)}
+                  onLoadedMetadata={() => console.log('Video metadata loaded:', fullVideoUrl)}
+                  onError={(e) => {
+                    console.error('Video error:', e, fullVideoUrl);
+                    // Try to reload once
+                    const video = e.target as HTMLVideoElement;
+                    if (!video.dataset.retried) {
+                      video.dataset.retried = 'true';
+                      setTimeout(() => {
+                        video.load();
+                      }, 1000);
+                    }
+                  }}
+                  crossOrigin="anonymous"
                 >
                   <source src={fullVideoUrl} type="video/mp4" />
                   <source src={fullVideoUrl.replace('.mp4', '.webm')} type="video/webm" />
                   <p className="p-4 text-center text-gray-500">
-                    Your browser does not support the video tag. 
+                    Your browser does not support the video tag or the video failed to load. 
                     <a href={fullVideoUrl} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline ml-1">
                       Download video instead
                     </a>

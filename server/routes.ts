@@ -552,12 +552,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use("/uploads", (req, res, next) => {
     // Set proper headers for video files
     if (req.path.match(/\.(mp4|webm|ogg|avi|mov)$/i)) {
+      const ext = path.extname(req.path).toLowerCase();
+      let contentType = 'video/mp4';
+      
+      switch (ext) {
+        case '.webm':
+          contentType = 'video/webm';
+          break;
+        case '.ogg':
+          contentType = 'video/ogg';
+          break;
+        case '.avi':
+          contentType = 'video/x-msvideo';
+          break;
+        case '.mov':
+          contentType = 'video/quicktime';
+          break;
+        default:
+          contentType = 'video/mp4';
+      }
+
       res.set({
-        'Content-Type': 'video/mp4',
+        'Content-Type': contentType,
         'Accept-Ranges': 'bytes',
-        'Cache-Control': 'public, max-age=31536000',
+        'Cache-Control': 'public, max-age=86400', // Reduced cache time
         'Access-Control-Allow-Origin': '*',
-        'Cross-Origin-Resource-Policy': 'cross-origin'
+        'Access-Control-Allow-Methods': 'GET, HEAD, OPTIONS',
+        'Access-Control-Allow-Headers': 'Range',
+        'Cross-Origin-Resource-Policy': 'cross-origin',
+        'Cross-Origin-Embedder-Policy': 'unsafe-none'
+      });
+    } else if (req.path.match(/\.(jpg|jpeg|png|gif|svg)$/i)) {
+      res.set({
+        'Cache-Control': 'public, max-age=86400',
+        'Access-Control-Allow-Origin': '*'
       });
     }
     next();
