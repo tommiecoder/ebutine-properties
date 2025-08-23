@@ -1,9 +1,14 @@
-
 import { useState, useEffect } from "react";
 import { Link } from "wouter";
 import { Search, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function HeroSection() {
   const [searchFilters, setSearchFilters] = useState({
@@ -16,29 +21,37 @@ export default function HeroSection() {
 
   const slides = [
     {
-      image: "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&h=1080",
+      image:
+        "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&h=1080",
       title: "Luxury Living Redefined",
-      subtitle: "Discover premium residential properties in Lagos's most prestigious neighborhoods",
-      highlight: "Luxury Homes"
+      subtitle:
+        "Discover premium residential properties in Lagos's most prestigious neighborhoods",
+      highlight: "Luxury Homes",
     },
     {
-      image: "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&h=1080",
+      image:
+        "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&h=1080",
       title: "Your Dream Home Awaits",
-      subtitle: "Beautiful residential lands with verified documentation and clear titles",
-      highlight: "Residential Land"
+      subtitle:
+        "Beautiful residential lands with verified documentation and clear titles",
+      highlight: "Residential Land",
     },
     {
-      image: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&h=1080",
+      image:
+        "https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&h=1080",
       title: "Investment Opportunities",
-      subtitle: "Strategic commercial properties in high-growth areas across Lagos",
-      highlight: "Commercial Land"
+      subtitle:
+        "Strategic commercial properties in high-growth areas across Lagos",
+      highlight: "Commercial Land",
     },
     {
-      image: "https://images.unsplash.com/photo-1582407947304-fd86f028f716?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&h=1080",
+      image:
+        "https://images.unsplash.com/photo-1582407947304-fd86f028f716?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&h=1080",
       title: "Verified Properties Only",
-      subtitle: "Every property undergoes rigorous verification for your peace of mind",
-      highlight: "100% Verified"
-    }
+      subtitle:
+        "Every property undergoes rigorous verification for your peace of mind",
+      highlight: "100% Verified",
+    },
   ];
 
   useEffect(() => {
@@ -58,10 +71,11 @@ export default function HeroSection() {
 
   const handleSearch = () => {
     const params = new URLSearchParams();
-    if (searchFilters.propertyType) params.set("type", searchFilters.propertyType);
+    if (searchFilters.propertyType)
+      params.set("type", searchFilters.propertyType);
     if (searchFilters.location) params.set("location", searchFilters.location);
     if (searchFilters.budget) params.set("budget", searchFilters.budget);
-    
+
     window.location.href = `/properties?${params.toString()}`;
   };
 
@@ -73,9 +87,9 @@ export default function HeroSection() {
           <div
             key={index}
             className={`absolute inset-0 transition-all duration-1000 ease-in-out transform ${
-              index === currentSlide 
-                ? 'opacity-100 scale-100' 
-                : 'opacity-0 scale-110'
+              index === currentSlide
+                ? "opacity-100 scale-100"
+                : "opacity-0 scale-110"
             }`}
           >
             <div
@@ -83,7 +97,7 @@ export default function HeroSection() {
                 backgroundImage: `url('${slide.image}')`,
                 backgroundSize: "cover",
                 backgroundPosition: "center",
-                backgroundAttachment: "fixed"
+                backgroundAttachment: "fixed",
               }}
               className="absolute inset-0"
             ></div>
@@ -102,20 +116,26 @@ export default function HeroSection() {
             </div>
           </div>
         </div>
-        
-        <div className="absolute top-1/3 right-16 opacity-20 animate-float" style={{animationDelay: '2s'}}>
+
+        <div
+          className="absolute top-1/3 right-16 opacity-20 animate-float"
+          style={{ animationDelay: "2s" }}
+        >
           <div className="bg-white/20 rounded-2xl p-6 backdrop-blur-sm transform -rotate-12">
             <div className="w-16 h-16 bg-ebutine-blue rounded-2xl flex items-center justify-center shadow-xl">
               <i className="fas fa-building text-white text-2xl"></i>
             </div>
           </div>
         </div>
-        
+
         <div className="absolute bottom-32 left-1/4 opacity-15 animate-float-delayed">
           <div className="bg-gradient-to-br from-ebutine-orange/30 to-ebutine-blue/30 w-32 h-32 rounded-full backdrop-blur-sm"></div>
         </div>
 
-        <div className="absolute top-1/2 left-10 opacity-10 animate-float-slow" style={{animationDelay: '3s'}}>
+        <div
+          className="absolute top-1/2 left-10 opacity-10 animate-float-slow"
+          style={{ animationDelay: "3s" }}
+        >
           <div className="bg-gradient-to-br from-white/20 to-ebutine-orange/20 w-24 h-24 rounded-full backdrop-blur-sm"></div>
         </div>
       </div>
@@ -127,7 +147,7 @@ export default function HeroSection() {
       >
         <ChevronLeft className="h-6 w-6 text-white" />
       </button>
-      
+
       <button
         onClick={nextSlide}
         className="absolute right-6 top-1/2 transform -translate-y-1/2 z-20 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full p-3 transition-all duration-300 hover:scale-110"
@@ -142,9 +162,9 @@ export default function HeroSection() {
             key={index}
             onClick={() => setCurrentSlide(index)}
             className={`w-3 h-3 rounded-full transition-all duration-300 ${
-              index === currentSlide 
-                ? 'bg-ebutine-orange scale-125 shadow-lg' 
-                : 'bg-white/50 hover:bg-white/70'
+              index === currentSlide
+                ? "bg-ebutine-orange scale-125 shadow-lg"
+                : "bg-white/50 hover:bg-white/70"
             }`}
           />
         ))}
@@ -160,11 +180,11 @@ export default function HeroSection() {
                 {slides[currentSlide].highlight}
               </span>
             </div>
-            
+
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-bold text-white mb-6 md:mb-8 leading-tight drop-shadow-2xl text-shadow-strong px-2">
               {slides[currentSlide].title}
             </h1>
-            
+
             <p className="text-lg sm:text-xl md:text-2xl text-white mb-12 md:mb-16 max-w-4xl mx-auto leading-relaxed drop-shadow-lg font-medium px-4">
               {slides[currentSlide].subtitle}
             </p>
@@ -174,84 +194,113 @@ export default function HeroSection() {
           <div className="max-w-6xl mx-auto mb-12 md:mb-16 px-4">
             <div className="bg-white/95 backdrop-blur-lg rounded-2xl md:rounded-3xl p-4 md:p-8 shadow-2xl border border-white/50">
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6"></div>
-                <div>
-                  <label className="block text-sm font-bold text-ebutine-dark mb-3">Property Type</label>
-                  <Select value={searchFilters.propertyType} onValueChange={(value) => setSearchFilters(prev => ({...prev, propertyType: value}))}>
-                    <SelectTrigger className="bg-gray-50 border-gray-200 text-ebutine-dark font-medium">
-                      <SelectValue placeholder="All Types" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="residential_land">Residential Land</SelectItem>
-                      <SelectItem value="commercial_land">Commercial Land</SelectItem>
-                      <SelectItem value="luxury_home">Luxury Homes</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-bold text-ebutine-dark mb-3">Location</label>
-                  <Select value={searchFilters.location} onValueChange={(value) => setSearchFilters(prev => ({...prev, location: value}))}>
-                    <SelectTrigger className="bg-gray-50 border-gray-200 text-ebutine-dark font-medium">
-                      <SelectValue placeholder="Lagos" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Ajah">Ajah</SelectItem>
-                      <SelectItem value="Sangotedo">Sangotedo</SelectItem>
-                      <SelectItem value="Ibeju-Lekki">Ibeju-Lekki</SelectItem>
-                      <SelectItem value="Victoria Island">Victoria Island</SelectItem>
-                      <SelectItem value="Lekki">Lekki</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-bold text-ebutine-dark mb-3">Budget Range</label>
-                  <Select value={searchFilters.budget} onValueChange={(value) => setSearchFilters(prev => ({...prev, budget: value}))}>
-                    <SelectTrigger className="bg-gray-50 border-gray-200 text-ebutine-dark font-medium">
-                      <SelectValue placeholder="Any Budget" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="5-10">₦5M - ₦10M</SelectItem>
-                      <SelectItem value="10-25">₦10M - ₦25M</SelectItem>
-                      <SelectItem value="25-50">₦25M - ₦50M</SelectItem>
-                      <SelectItem value="50+">₦50M+</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                
-                <div className="flex items-end">
-                  <Button 
-                    onClick={handleSearch}
-                    className="w-full bg-ebutine-orange hover:bg-orange-600 text-white font-bold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
-                  >
-                    <Search className="mr-2 h-5 w-5" />
-                    Search Properties
-                  </Button>
-                </div>
+              <div>
+                <label className="block text-sm font-bold text-ebutine-dark mb-3">
+                  Property Type
+                </label>
+                <Select
+                  value={searchFilters.propertyType}
+                  onValueChange={(value) =>
+                    setSearchFilters((prev) => ({
+                      ...prev,
+                      propertyType: value,
+                    }))
+                  }
+                >
+                  <SelectTrigger className="bg-gray-50 border-gray-200 text-ebutine-dark font-medium">
+                    <SelectValue placeholder="All Types" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="residential_land">
+                      Residential Land
+                    </SelectItem>
+                    <SelectItem value="commercial_land">
+                      Commercial Land
+                    </SelectItem>
+                    <SelectItem value="luxury_home">Luxury Homes</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-bold text-ebutine-dark mb-3">
+                  Location
+                </label>
+                <Select
+                  value={searchFilters.location}
+                  onValueChange={(value) =>
+                    setSearchFilters((prev) => ({ ...prev, location: value }))
+                  }
+                >
+                  <SelectTrigger className="bg-gray-50 border-gray-200 text-ebutine-dark font-medium">
+                    <SelectValue placeholder="Lagos" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Ajah">Ajah</SelectItem>
+                    <SelectItem value="Sangotedo">Sangotedo</SelectItem>
+                    <SelectItem value="Ibeju-Lekki">Ibeju-Lekki</SelectItem>
+                    <SelectItem value="Victoria Island">
+                      Victoria Island
+                    </SelectItem>
+                    <SelectItem value="Lekki">Lekki</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-bold text-ebutine-dark mb-3">
+                  Budget Range
+                </label>
+                <Select
+                  value={searchFilters.budget}
+                  onValueChange={(value) =>
+                    setSearchFilters((prev) => ({ ...prev, budget: value }))
+                  }
+                >
+                  <SelectTrigger className="bg-gray-50 border-gray-200 text-ebutine-dark font-medium">
+                    <SelectValue placeholder="Any Budget" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="5-10">₦5M - ₦10M</SelectItem>
+                    <SelectItem value="10-25">₦10M - ₦25M</SelectItem>
+                    <SelectItem value="25-50">₦25M - ₦50M</SelectItem>
+                    <SelectItem value="50+">₦50M+</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="flex items-end">
+                <Button
+                  onClick={handleSearch}
+                  className="w-full bg-ebutine-orange hover:bg-orange-600 text-white font-bold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                >
+                  <Search className="mr-2 h-5 w-5" />
+                  Search Properties
+                </Button>
               </div>
             </div>
           </div>
+        </div>
 
-          {/* Enhanced CTAs */}
-          <div className="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-6 px-4">
-            <Link href="/contact">
-              <Button className="w-full sm:w-auto bg-ebutine-orange hover:bg-orange-600 text-white font-bold py-3 md:py-4 px-6 md:px-10 text-base md:text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 border-2 border-ebutine-orange">
-                Book Free Consultation
-              </Button>
-            </Link>
-            
-            <a 
-              href="https://wa.me/2349061461411" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="w-full sm:w-auto"
-            >
-              <Button className="w-full sm:w-auto bg-white/20 border-2 border-white text-white hover:bg-white hover:text-ebutine-dark font-bold py-3 md:py-4 px-6 md:px-10 text-base md:text-lg rounded-xl transition-all duration-300 transform hover:scale-105 backdrop-blur-sm">
-                <i className="fab fa-whatsapp mr-2 md:mr-3 text-lg md:text-xl"></i>
-                WhatsApp Us
-              </Button>
-            </a>
-          </div>
+        {/* Enhanced CTAs */}
+        <div className="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-6 px-4">
+          <Link href="/contact">
+            <Button className="w-full sm:w-auto bg-ebutine-orange hover:bg-orange-600 text-white font-bold py-3 md:py-4 px-6 md:px-10 text-base md:text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 border-2 border-ebutine-orange">
+              Book Free Consultation
+            </Button>
+          </Link>
+
+          <a
+            href="https://wa.me/2349061461411"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full sm:w-auto"
+          >
+            <Button className="w-full sm:w-auto bg-white/20 border-2 border-white text-white hover:bg-white hover:text-ebutine-dark font-bold py-3 md:py-4 px-6 md:px-10 text-base md:text-lg rounded-xl transition-all duration-300 transform hover:scale-105 backdrop-blur-sm">
+              <i className="fab fa-whatsapp mr-2 md:mr-3 text-lg md:text-xl"></i>
+              WhatsApp Us
+            </Button>
+          </a>
         </div>
       </div>
     </section>
