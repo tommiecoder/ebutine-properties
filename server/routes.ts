@@ -2,9 +2,15 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import multer from "multer";
 import path from "path";
+import { fileURLToPath } from "url";
+import { dirname } from "path";
 import { storage } from "./storage";
 import { insertContactSchema, insertPropertyInquirySchema, insertPropertySchema } from "@shared/schema";
 import express from 'express';
+
+// Get the current directory (ES module equivalent of __dirname)
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 // Enhanced AI generation helper functions
 async function analyzeMediaAndGenerateProperty(mediaInfo: any): Promise<{
@@ -144,7 +150,7 @@ async function analyzeMediaAndGenerateProperty(mediaInfo: any): Promise<{
   });
 
   // Generate intelligent features
-  const features = await generateIntelligentFeatures(type, detectedLocation, bedrooms, bathrooms);
+  const features = await generateIntelligentFeatures(type, detectedLocation, bedrooms || undefined, bathrooms || undefined);
 
   return {
     title,
