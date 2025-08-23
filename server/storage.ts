@@ -1,8 +1,17 @@
 import { type User, type InsertUser, type Property, type InsertProperty, type Contact, type InsertContact, type PropertyInquiry, type InsertPropertyInquiry } from "@shared/schema";
 import { randomUUID } from "crypto";
-import { db, isDbConnected } from "./db";
+import { db } from "./db";
 import { users, properties, contacts, propertyInquiries } from "@shared/schema";
 import { eq, and, gte, lte, sql } from "drizzle-orm";
+
+// Simple database connection check
+function isDbConnected(): boolean {
+  try {
+    return !!db;
+  } catch {
+    return false;
+  }
+}
 
 export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
@@ -230,6 +239,11 @@ export class DatabaseStorage implements IStorage {
       console.log('✅ Property saved to memory storage:', newProperty.title);
       return newProperty as Property;
     }
+  }
+
+  // Alias method for backward compatibility
+  async saveProperty(property: any): Promise<Property> {
+    return this.createProperty(property);
   }
 
   async updateProperty(id: string, property: Partial<InsertProperty>): Promise<Property | undefined> {

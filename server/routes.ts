@@ -96,11 +96,22 @@ async function analyzeMediaAndGenerateProperty(mediaInfo: any): Promise<{
       }
     }
 
-    size = bedrooms + " bedrooms";
-  } else if (type === "land" || type === "commercial") {
-    // Generate size for land
-    const sizesOptions = ["500 sqm", "650 sqm", "1000 sqm", "1200 sqm", "2000 sqm", "3000 sqm"];
-    size = sizesOptions[Math.floor(Math.random() * sizesOptions.length)];
+    // For houses and apartments, size should describe rooms, not land area
+    size = `${bedrooms} bedrooms, ${bathrooms} bathrooms`;
+  } else if (type === "land") {
+    // Generate realistic land sizes in square meters
+    const landSizes = ["500 sqm", "650 sqm", "800 sqm", "1000 sqm", "1200 sqm", "1500 sqm"];
+    size = landSizes[Math.floor(Math.random() * landSizes.length)];
+  } else if (type === "commercial") {
+    // Commercial can be land or building
+    const isLand = Math.random() > 0.5;
+    if (isLand) {
+      const commercialLandSizes = ["1000 sqm", "1500 sqm", "2000 sqm", "3000 sqm", "5000 sqm"];
+      size = commercialLandSizes[Math.floor(Math.random() * commercialLandSizes.length)];
+    } else {
+      const commercialBuildingSizes = ["200 sqm floor space", "500 sqm floor space", "800 sqm floor space"];
+      size = commercialBuildingSizes[Math.floor(Math.random() * commercialBuildingSizes.length)];
+    }
   }
 
   // Generate intelligent title
@@ -125,16 +136,26 @@ async function analyzeMediaAndGenerateProperty(mediaInfo: any): Promise<{
 
   if (type === "house") {
     const basePrice = parseInt(bedrooms || "3") * 15000000; // 15M per bedroom
-    price = (basePrice * locationMultiplier).toString();
+    price = Math.round(basePrice * locationMultiplier).toString();
   } else if (type === "apartment") {
     const basePrice = parseInt(bedrooms || "2") * 8000000; // 8M per bedroom
-    price = (basePrice * locationMultiplier).toString();
+    price = Math.round(basePrice * locationMultiplier).toString();
   } else if (type === "land") {
-    const sqm = parseInt(size.replace(/[^\d]/g, "")) || 650;
+    // Extract square meters from size string more carefully
+    const sizeMatch = size.match(/(\d+)\s*(?:sq|sqm|square|m)/i);
+    const sqm = sizeMatch ? parseInt(sizeMatch[1]) : 650;
     const pricePerSqm = 25000; // 25k per sqm
-    price = (sqm * pricePerSqm * locationMultiplier).toString();
+    price = Math.round(sqm * pricePerSqm * locationMultiplier).toString();
   } else if (type === "commercial") {
-    price = (50000000 * locationMultiplier).toString(); // Base 50M for commercial
+    // For commercial, base price on size if land, or fixed rate if building
+    if (size.includes("sqm")) {
+      const sizeMatch = size.match(/(\d+)\s*(?:sq|sqm|square|m)/i);
+      const sqm = sizeMatch ? parseInt(sizeMatch[1]) : 1000;
+      const pricePerSqm = 50000; // 50k per sqm for commercial land
+      price = Math.round(sqm * pricePerSqm * locationMultiplier).toString();
+    } else {
+      price = Math.round(50000000 * locationMultiplier).toString(); // Base 50M for commercial building
+    }
   }
 
   // Generate comprehensive description
