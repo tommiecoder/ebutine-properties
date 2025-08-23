@@ -304,6 +304,123 @@ async function generateIntelligentFeatures(type: string, location: string, bedro
   return features;
 }
 
+// Mock AI for fallback
+async function generateWithMockAI(mediaInfo: any): Promise<{
+  title: string;
+  description: string;
+  type: string;
+  location: string;
+  size: string;
+  bedrooms: string | null;
+  bathrooms: string | null;
+  features: string[];
+  price: string;
+}> {
+  const { userInput } = mediaInfo;
+  return {
+    title: userInput.title || "Mock Property Title",
+    description: userInput.description || "Mock property description from mock AI",
+    type: "house",
+    location: "Lagos",
+    size: "3 bedrooms, 2 bathrooms",
+    bedrooms: "3",
+    bathrooms: "2",
+    features: ["Good location", "Spacious"],
+    price: "50,000,000"
+  };
+}
+
+// Grok API integration
+async function generateWithGrok(mediaInfo: any): Promise<{
+  title: string;
+  description: string;
+  type: string;
+  location: string;
+  size: string;
+  bedrooms: string | null;
+  bathrooms: string | null;
+  features: string[];
+  price: string;
+}> {
+  const { hasImages, hasVideos, userInput } = mediaInfo;
+
+  const messages = [
+    {
+      role: "system",
+      content: `You are a Nigerian real estate expert specializing in Lagos properties. Generate comprehensive property details based on user input. 
+
+      IMPORTANT: Return ONLY valid JSON in this exact format:
+      {
+        "title": "Property title",
+        "description": "Detailed property description",
+        "type": "house/apartment/land/commercial",
+        "location": "Specific Lagos area",
+        "size": "Property size description",
+        "bedrooms": "number or null",
+        "bathrooms": "number or null", 
+        "features": ["feature1", "feature2", "feature3"],
+        "price": "price in naira as string"
+      }
+
+      Use realistic Lagos property prices. Make descriptions professional and appealing. Focus on prime areas like Lekki, Victoria Island, Ikoyi, Ajah, etc.`
+    },
+    {
+      role: "user",
+      content: `Generate property details for: "${userInput.title || 'property'}" - ${userInput.description || 'No description provided'}. 
+      Property has ${hasImages ? 'images' : 'no images'} and ${hasVideos ? 'videos' : 'no videos'}.
+
+      Please generate realistic Nigerian real estate details with proper Lagos locations and Naira pricing.`
+    }
+  ];
+
+  const response = await fetch('https://api.x.ai/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${process.env.GROK_API_KEY}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      model: "grok-beta",
+      messages,
+      max_tokens: 1500,
+      temperature: 0.7,
+      stream: false
+    })
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Grok API error: ${response.statusText} - ${errorText}`);
+  }
+
+  const data = await response.json();
+  let aiResponse;
+
+  try {
+    // Try to parse the JSON response
+    const content = data.choices[0].message.content.trim();
+    // Remove any markdown code blocks if present
+    const cleanContent = content.replace(/```json\s?|\s?```/g, '').trim();
+    aiResponse = JSON.parse(cleanContent);
+  } catch (parseError) {
+    console.error('Failed to parse Grok response:', data.choices[0].message.content);
+    throw new Error('Invalid JSON response from Grok API');
+  }
+
+  return {
+    title: aiResponse.title || userInput.title || "Premium Property",
+    description: aiResponse.description || "Beautiful property in prime location",
+    type: aiResponse.type || "house",
+    location: aiResponse.location || "Lagos",
+    size: aiResponse.size || "",
+    bedrooms: aiResponse.bedrooms?.toString() || null,
+    bathrooms: aiResponse.bathrooms?.toString() || null,
+    features: Array.isArray(aiResponse.features) ? aiResponse.features : [],
+    price: aiResponse.price?.toString() || "0"
+  };
+}
+
+
 // Configure multer for file uploads
 const upload = multer({
   storage: multer.diskStorage({
@@ -451,13 +568,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { title, description, hasImages, hasVideos } = req.body;
 
       // Analyze media and user input to generate comprehensive property details
-      const propertyData = await analyzeMediaAndGenerateProperty({
+      const mediaInfo = {
         hasImages: hasImages || false,
         hasVideos: hasVideos || false,
         userInput: { title: title || "", description: description || "" }
-      });
+      };
 
-      res.json(propertyData);
+      // Use real Grok API if available, fallback to mock AI
+      if (process.env.GROK_API_KEY) {
+        try {
+          return await generateWithGrok(mediaInfo);
+        } catch (error) {
+          console.log('Grok failed, using fallback AI:', error);
+          return await generateWithMockAI(mediaInfo);
+        }
+      } else {
+        // If no API key is set, directly use the mock AI
+        console.log('No Grok API key found, using fallback AI.');
+        return await generateWithMockAI(mediaInfo);
+      }
     } catch (error) {
       console.error('AI generation error:', error);
       res.status(500).json({ message: "Failed to generate property details" });
