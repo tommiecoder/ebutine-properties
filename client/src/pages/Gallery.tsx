@@ -10,21 +10,21 @@ export default function Gallery() {
   const galleryImages = [
     {
       id: 1,
-      src: "/client/public/gallery/modern-duplex-1.webp",
+      src: "/gallery/modern-duplex-1.webp",
       title: "Modern Executive Duplex",
       category: "luxury",
       location: "Lekki, Lagos",
     },
     {
       id: 2,
-      src: "/client/public/gallery/luxury-villa-2.webp",
+      src: "/gallery/luxury-villa-2.webp",
       title: "Contemporary Luxury Villa",
       category: "luxury",
       location: "Victoria Island, Lagos",
     },
     {
       id: 3,
-      src: "/client/public/gallery/terrace-homes-3.jpg",
+      src: "/gallery/terrace-homes-3.jpg",
       title: "Modern Terrace Houses",
       category: "residential",
       location: "Sangotedo, Lagos",
