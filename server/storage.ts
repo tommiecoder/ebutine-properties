@@ -155,10 +155,49 @@ export class DatabaseStorage implements IStorage {
       updatedAt: new Date(),
     };
 
-      this.memoryProperties.set(chevronProperty.id, chevronProperty as Property);
-      
-      console.log('✅ Chevron property added to memory storage:', chevronProperty.title);
-      c
+      // Add the new Land for Sale property
+          const landForSaleProperty = {
+            id: randomUUID(),
+            title: "LAND FOR SALE📌 660sqm Prime Land - Ogombo, Ajah",
+            description: "EXCEPTIONAL LAND OPPORTUNITY! Prime 660sqm land now available for sale in the highly sought-after Ogombo area of Ajah, Lagos. This strategically located property offers excellent investment potential and is perfect for residential development. Priced at an attractive ₦55M, this land comes with Governors Consent, providing complete legal security and peace of mind for buyers. Ogombo, Ajah is one of Lagos's fastest-growing residential areas, known for its excellent infrastructure development and proximity to major business districts. The location offers easy access to Lekki-Epe Expressway, shopping centers, schools, and recreational facilities. With its prime location and verified documentation, this property represents an outstanding opportunity for both end-users looking to build their dream home and investors seeking high-return real estate assets. The area has seen significant appreciation in property values over recent years, making it an ideal choice for long-term investment. Don't miss this chance to secure prime land in one of Lagos's most promising residential corridors at this competitive price point.",
+            type: "residential_land",
+            price: "55000000",
+            location: "Ogombo, Ajah",
+            address: "Ogombo, Ajah, Lagos",
+            size: "660sqm",
+            bedrooms: null,
+            bathrooms: null,
+            parking: null,
+            features: [
+              "Governors Consent",
+              "660sqm",
+              "Prime Location",
+              "Ogombo, Ajah",
+              "Residential Development",
+              "Investment Opportunity",
+              "Legal Documentation",
+              "Strategic Location",
+              "High Growth Area",
+              "Easy Access to Lekki-Epe Expressway",
+              "Proximity to Amenities",
+              "Competitive Price"
+            ],
+            images: [],
+            videos: ["/uploads/videos/LAND FOR SALE📌SIZE- 660sqm LOCATION- Ogombo, Ajah Price-N55MTitle-Governors consentFOR ENQUIRIE.mp4"],
+            status: "available",
+            featured: true,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          };
+
+          this.memoryProperties.set(chevronProperty.id, chevronProperty as Property);
+          this.memoryProperties.set(quickSaleProperty.id, quickSaleProperty as Property);
+          this.memoryProperties.set(distressSaleProperty.id, distressSaleProperty as Property);
+          this.memoryProperties.set(landForSaleProperty.id, landForSaleProperty as Property);
+          console.log('✅ Chevron property added to memory storage:', chevronProperty.title);
+          console.log('✅ Quick Sale property added to memory storage:', quickSaleProperty.title);
+          console.log('✅ Distress Sale property added to memory storage:', distressSaleProperty.title);
+          console.log('✅ Land for Sale property added to memory storage:', landForSaleProperty.title);
     }
   }
 
