@@ -60,7 +60,7 @@ export default function Contact() {
               <div className="space-y-6 mb-8">
                 <div className="flex items-start">
                   <div className="bg-ebutine-orange bg-opacity-10 p-3 rounded-lg mr-4">
-                    <MapPin className="h-6 w-6 text-ebutine-orange" />
+                    <i className="fas fa-building text-2xl text-ebutine-orange"></i>
                   </div>
                   <div>
                     <h4 className="font-semibold text-ebutine-dark mb-1">Office Address</h4>
@@ -74,7 +74,7 @@ export default function Contact() {
 
                 <div className="flex items-start">
                   <div className="bg-ebutine-orange bg-opacity-10 p-3 rounded-lg mr-4">
-                    <Phone className="h-6 w-6 text-ebutine-orange" />
+                    <i className="fas fa-phone text-2xl text-ebutine-orange"></i>
                   </div>
                   <div>
                     <h4 className="font-semibold text-ebutine-dark mb-1">Phone</h4>
@@ -92,7 +92,7 @@ export default function Contact() {
 
                 <div className="flex items-start">
                   <div className="bg-ebutine-orange bg-opacity-10 p-3 rounded-lg mr-4">
-                    <Mail className="h-6 w-6 text-ebutine-orange" />
+                    <i className="fas fa-envelope text-2xl text-ebutine-orange"></i>
                   </div>
                   <div>
                     <h4 className="font-semibold text-ebutine-dark mb-1">Email</h4>
