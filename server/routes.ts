@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import multer from "multer";
 import path from "path";
 import { storage } from "./storage";
-import { insertContactSchema, insertPropertyInquirySchema, insertPropertySchema } from "@shared/schema";
+import { insertContactSchema, insertPropertyInquirySchema } from "@shared/schema";
 
 // Enhanced AI generation helper functions
 async function analyzeMediaAndGenerateProperty(mediaInfo: any): Promise<{
