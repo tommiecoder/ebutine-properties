@@ -11,33 +11,33 @@ export default function Footer() {
           <div>
             <Logo textColor="text-white" />
             <p className="text-gray-300 mb-4 mt-4">
-              Nigeria's trusted real estate partner for diaspora and local investors. 
+              Nigeria's trusted real estate partner for diaspora and local investors.
               Verified properties, transparent dealings, exceptional service.
             </p>
             <div className="flex space-x-4">
-              <a 
-                href="https://www.facebook.com/ebutineproperties" 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                className="text-gray-300 hover:text-blue-500 transition-all duration-300 transform hover:scale-110" 
+              <a
+                href="https://www.facebook.com/ebutineproperties"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-300 hover:text-blue-500 transition-all duration-300 transform hover:scale-110"
                 data-testid="facebook-link"
               >
                 <i className="fab fa-facebook text-2xl"></i>
               </a>
-              <a 
-                href="https://www.instagram.com/ebutineproperties" 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                className="text-gray-300 hover:text-pink-500 transition-all duration-300 transform hover:scale-110" 
+              <a
+                href="https://www.instagram.com/ebutineproperties"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-300 hover:text-pink-500 transition-all duration-300 transform hover:scale-110"
                 data-testid="instagram-link"
               >
                 <i className="fab fa-instagram text-2xl"></i>
               </a>
-              <a 
-                href="https://youtube.com/@ebutineproperties?si=w9B18Aee9vo8snFD" 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                className="text-gray-300 hover:text-red-500 transition-all duration-300 transform hover:scale-110" 
+              <a
+                href="https://youtube.com/@ebutineproperties?si=w9B18Aee9vo8snFD"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-300 hover:text-red-500 transition-all duration-300 transform hover:scale-110"
                 data-testid="youtube-link"
               >
                 <i className="fab fa-youtube text-2xl"></i>
@@ -82,8 +82,8 @@ export default function Footer() {
               </div>
               <div className="flex items-center">
                 <Phone className="h-5 w-5 text-ebutine-orange mr-3" />
-                <a 
-                  href="tel:+2349061461411" 
+                <a
+                  href="tel:+2349061461411"
                   className="text-gray-300 hover:text-ebutine-orange transition-colors"
                   data-testid="footer-phone-link"
                 >
@@ -92,8 +92,8 @@ export default function Footer() {
               </div>
               <div className="flex items-center">
                 <Mail className="h-5 w-5 text-ebutine-orange mr-3" />
-                <a 
-                  href="mailto:ebutinepropertieslimited@gmail.com" 
+                <a
+                  href="mailto:ebutinepropertieslimited@gmail.com"
                   className="text-gray-300 hover:text-ebutine-orange transition-colors"
                   data-testid="footer-email-link"
                 >
@@ -102,9 +102,9 @@ export default function Footer() {
               </div>
               <div className="flex items-center">
                 <i className="fab fa-whatsapp text-green-500 mr-3 text-lg animate-pulse"></i>
-                <a 
-                  href="https://wa.me/2349061461411" 
-                  target="_blank" 
+                <a
+                  href="https://wa.me/2349061461411"
+                  target="_blank"
                   rel="noopener noreferrer"
                   className="text-green-400 hover:text-green-300 transition-colors font-semibold"
                   data-testid="footer-whatsapp-link"

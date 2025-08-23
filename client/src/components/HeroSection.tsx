@@ -143,16 +143,16 @@ export default function HeroSection() {
       {/* Navigation Arrows */}
       <button
         onClick={prevSlide}
-        className="absolute left-6 top-1/2 transform -translate-y-1/2 z-20 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full p-3 transition-all duration-300 hover:scale-110"
+        className="absolute left-2 md:left-6 top-1/2 transform -translate-y-1/2 z-20 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full p-2 md:p-3 transition-all duration-300 hover:scale-110"
       >
-        <ChevronLeft className="h-6 w-6 text-white" />
+        <ChevronLeft className="h-4 w-4 md:h-6 md:w-6 text-white" />
       </button>
 
       <button
         onClick={nextSlide}
-        className="absolute right-6 top-1/2 transform -translate-y-1/2 z-20 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full p-3 transition-all duration-300 hover:scale-110"
+        className="absolute right-2 md:right-6 top-1/2 transform -translate-y-1/2 z-20 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full p-2 md:p-3 transition-all duration-300 hover:scale-110"
       >
-        <ChevronRight className="h-6 w-6 text-white" />
+        <ChevronRight className="h-4 w-4 md:h-6 md:w-6 text-white" />
       </button>
 
       {/* Slide Indicators */}
@@ -193,115 +193,116 @@ export default function HeroSection() {
           {/* Enhanced Search Bar */}
           <div className="max-w-6xl mx-auto mb-12 md:mb-16 px-4">
             <div className="bg-white/95 backdrop-blur-lg rounded-2xl md:rounded-3xl p-4 md:p-8 shadow-2xl border border-white/50">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6"></div>
-              <div>
-                <label className="block text-sm font-bold text-ebutine-dark mb-3">
-                  Property Type
-                </label>
-                <Select
-                  value={searchFilters.propertyType}
-                  onValueChange={(value) =>
-                    setSearchFilters((prev) => ({
-                      ...prev,
-                      propertyType: value,
-                    }))
-                  }
-                >
-                  <SelectTrigger className="bg-gray-50 border-gray-200 text-ebutine-dark font-medium">
-                    <SelectValue placeholder="All Types" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="residential_land">
-                      Residential Land
-                    </SelectItem>
-                    <SelectItem value="commercial_land">
-                      Commercial Land
-                    </SelectItem>
-                    <SelectItem value="luxury_home">Luxury Homes</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+                <div>
+                  <label className="block text-sm font-bold text-ebutine-dark mb-3">
+                    Property Type
+                  </label>
+                  <Select
+                    value={searchFilters.propertyType}
+                    onValueChange={(value) =>
+                      setSearchFilters((prev) => ({
+                        ...prev,
+                        propertyType: value,
+                      }))
+                    }
+                  >
+                    <SelectTrigger className="bg-gray-50 border-gray-200 text-ebutine-dark font-medium">
+                      <SelectValue placeholder="All Types" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="residential_land">
+                        Residential Land
+                      </SelectItem>
+                      <SelectItem value="commercial_land">
+                        Commercial Land
+                      </SelectItem>
+                      <SelectItem value="luxury_home">Luxury Homes</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
 
-              <div>
-                <label className="block text-sm font-bold text-ebutine-dark mb-3">
-                  Location
-                </label>
-                <Select
-                  value={searchFilters.location}
-                  onValueChange={(value) =>
-                    setSearchFilters((prev) => ({ ...prev, location: value }))
-                  }
-                >
-                  <SelectTrigger className="bg-gray-50 border-gray-200 text-ebutine-dark font-medium">
-                    <SelectValue placeholder="Lagos" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Ajah">Ajah</SelectItem>
-                    <SelectItem value="Sangotedo">Sangotedo</SelectItem>
-                    <SelectItem value="Ibeju-Lekki">Ibeju-Lekki</SelectItem>
-                    <SelectItem value="Victoria Island">
-                      Victoria Island
-                    </SelectItem>
-                    <SelectItem value="Lekki">Lekki</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+                <div>
+                  <label className="block text-sm font-bold text-ebutine-dark mb-3">
+                    Location
+                  </label>
+                  <Select
+                    value={searchFilters.location}
+                    onValueChange={(value) =>
+                      setSearchFilters((prev) => ({ ...prev, location: value }))
+                    }
+                  >
+                    <SelectTrigger className="bg-gray-50 border-gray-200 text-ebutine-dark font-medium">
+                      <SelectValue placeholder="Lagos" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Ajah">Ajah</SelectItem>
+                      <SelectItem value="Sangotedo">Sangotedo</SelectItem>
+                      <SelectItem value="Ibeju-Lekki">Ibeju-Lekki</SelectItem>
+                      <SelectItem value="Victoria Island">
+                        Victoria Island
+                      </SelectItem>
+                      <SelectItem value="Lekki">Lekki</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
 
-              <div>
-                <label className="block text-sm font-bold text-ebutine-dark mb-3">
-                  Budget Range
-                </label>
-                <Select
-                  value={searchFilters.budget}
-                  onValueChange={(value) =>
-                    setSearchFilters((prev) => ({ ...prev, budget: value }))
-                  }
-                >
-                  <SelectTrigger className="bg-gray-50 border-gray-200 text-ebutine-dark font-medium">
-                    <SelectValue placeholder="Any Budget" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="5-10">₦5M - ₦10M</SelectItem>
-                    <SelectItem value="10-25">₦10M - ₦25M</SelectItem>
-                    <SelectItem value="25-50">₦25M - ₦50M</SelectItem>
-                    <SelectItem value="50+">₦50M+</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+                <div>
+                  <label className="block text-sm font-bold text-ebutine-dark mb-3">
+                    Budget Range
+                  </label>
+                  <Select
+                    value={searchFilters.budget}
+                    onValueChange={(value) =>
+                      setSearchFilters((prev) => ({ ...prev, budget: value }))
+                    }
+                  >
+                    <SelectTrigger className="bg-gray-50 border-gray-200 text-ebutine-dark font-medium">
+                      <SelectValue placeholder="Any Budget" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="5-10">₦5M - ₦10M</SelectItem>
+                      <SelectItem value="10-25">₦10M - ₦25M</SelectItem>
+                      <SelectItem value="25-50">₦25M - ₦50M</SelectItem>
+                      <SelectItem value="50+">₦50M+</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
 
-              <div className="flex items-end">
-                <Button
-                  onClick={handleSearch}
-                  className="w-full bg-ebutine-orange hover:bg-orange-600 text-white font-bold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
-                >
-                  <Search className="mr-2 h-5 w-5" />
-                  Search Properties
-                </Button>
+                <div className="flex items-end">
+                  <Button
+                    onClick={handleSearch}
+                    className="w-full bg-ebutine-orange hover:bg-orange-600 text-white font-bold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                  >
+                    <Search className="mr-2 h-5 w-5" />
+                    Search Properties
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
         {/* Enhanced CTAs */}
-        <div className="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-6 px-4">
-          <Link href="/contact">
-            <Button className="w-full sm:w-auto bg-ebutine-orange hover:bg-orange-600 text-white font-bold py-3 md:py-4 px-6 md:px-10 text-base md:text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 border-2 border-ebutine-orange">
-              Book Free Consultation
-            </Button>
-          </Link>
+          <div className="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-6 px-4">
+            <Link href="/contact">
+              <Button className="w-full sm:w-auto bg-ebutine-orange hover:bg-orange-600 text-white font-bold py-3 md:py-4 px-6 md:px-10 text-base md:text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 border-2 border-ebutine-orange">
+                Book Free Consultation
+              </Button>
+            </Link>
 
-          <a
-            href="https://wa.me/2349061461411"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="w-full sm:w-auto"
-          >
-            <Button className="w-full sm:w-auto bg-white/20 border-2 border-white text-white hover:bg-white hover:text-ebutine-dark font-bold py-3 md:py-4 px-6 md:px-10 text-base md:text-lg rounded-xl transition-all duration-300 transform hover:scale-105 backdrop-blur-sm">
-              <i className="fab fa-whatsapp mr-2 md:mr-3 text-lg md:text-xl"></i>
-              WhatsApp Us
-            </Button>
-          </a>
-        </div>
+            <a
+              href="https://wa.me/2349061461411"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full sm:w-auto"
+            >
+              <Button className="w-full sm:w-auto bg-white/20 border-2 border-white text-white hover:bg-white hover:text-ebutine-dark font-bold py-3 md:py-4 px-6 md:px-10 text-base md:text-lg rounded-xl transition-all duration-300 transform hover:scale-105 backdrop-blur-sm">
+                <i className="fab fa-whatsapp mr-2 md:mr-3 text-lg md:text-xl"></i>
+                WhatsApp Us
+              </Button>
+            </a>
+          </div>
       </div>
     </section>
   );
