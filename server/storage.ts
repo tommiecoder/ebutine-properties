@@ -190,14 +190,51 @@ export class DatabaseStorage implements IStorage {
             updatedAt: new Date(),
           };
 
+          // Add the new Urgent Sale property
+          const urgentSaleProperty = {
+            id: randomUUID(),
+            title: "URGENT SALE‼️ 660sqm Land - Greenland Estate, Ogombo, Ajah",
+            description: "URGENT SALE OPPORTUNITY! Prime 660sqm land is now available for immediate sale in the prestigious Greenland Estate, Ogombo, Ajah, Lagos. This urgent sale presents an exceptional opportunity to acquire prime real estate at a competitive price point due to the seller's urgent circumstances. Located in one of Ajah's most sought-after gated communities, Greenland Estate offers excellent infrastructure, peaceful residential environment, and strong investment potential. The property comes with Governor's Consent, providing complete legal documentation and absolute security of ownership. Greenland Estate is renowned for its well-planned layout, excellent road network, reliable utilities, and 24/7 security services. The estate's strategic location provides easy access to major business districts, shopping centers, schools, and recreational facilities along the Lekki-Epe corridor. With its proximity to key landmarks and ongoing infrastructure development in the area, this property offers excellent potential for both residential development and long-term investment appreciation. Don't miss this time-sensitive opportunity to secure premium land in one of Lagos's fastest-growing residential corridors at an urgent sale price.",
+            type: "residential_land",
+            price: "55000000",
+            location: "Greenland Estate, Ogombo, Ajah",
+            address: "Greenland Estate, Ogombo, Ajah, Lagos",
+            size: "660sqm",
+            bedrooms: null,
+            bathrooms: null,
+            parking: null,
+            features: [
+              "Governor's Consent",
+              "660sqm",
+              "Urgent Sale",
+              "Greenland Estate",
+              "Gated Community",
+              "Prime Location",
+              "Ogombo, Ajah",
+              "Investment Opportunity",
+              "Legal Documentation",
+              "24/7 Security",
+              "Good Road Network",
+              "Reliable Utilities",
+              "Strategic Location",
+              "Competitive Price"
+            ],
+            images: [],
+            videos: ["/uploads/videos/URGENT SALE‼️Land for Sale- 660sqmLocation- Greenland Estate Ogombo, AjahPrice- N55MTitle- Gover.mp4"],
+            status: "available",
+            featured: true,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          };
+
           this.memoryProperties.set(chevronProperty.id, chevronProperty as Property);
           this.memoryProperties.set(quickSaleProperty.id, quickSaleProperty as Property);
           this.memoryProperties.set(distressSaleProperty.id, distressSaleProperty as Property);
-          this.memoryProperties.set(landForSaleProperty.id, landForSaleProperty as Property);
+
+    
           console.log('✅ Chevron property added to memory storage:', chevronProperty.title);
           console.log('✅ Quick Sale property added to memory storage:', quickSaleProperty.title);
           console.log('✅ Distress Sale property added to memory storage:', distressSaleProperty.title);
-          console.log('✅ Land for Sale property added to memory storage:', landForSaleProperty.title);
     }
   }
 
