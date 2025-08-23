@@ -19,15 +19,15 @@ function PropertyThumbnail({ property }: { property: Property }) {
           video.muted = true;
           video.preload = 'metadata';
           video.playsInline = true;
-          
+
           const canvas = document.createElement('canvas');
           const ctx = canvas.getContext('2d');
-          
+
           let thumbnailGenerated = false;
-          
+
           const generateFromFrame = () => {
             if (thumbnailGenerated || !ctx || !video.videoWidth || !video.videoHeight) return;
-            
+
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
             ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
@@ -35,22 +35,22 @@ function PropertyThumbnail({ property }: { property: Property }) {
             setThumbnailSrc(thumbnail);
             thumbnailGenerated = true;
           };
-          
+
           video.onloadeddata = () => {
             // Set to first frame (0 seconds)
             video.currentTime = 0;
           };
-          
+
           video.onseeked = () => {
             generateFromFrame();
           };
-          
+
           video.onloadedmetadata = () => {
             if (video.duration > 0) {
               video.currentTime = 0; // Ensure we get the first frame
             }
           };
-          
+
           video.oncanplay = () => {
             // Fallback if onseeked doesn't fire
             setTimeout(() => {
@@ -59,17 +59,17 @@ function PropertyThumbnail({ property }: { property: Property }) {
               }
             }, 100);
           };
-          
+
           video.onerror = (e) => {
             console.warn('Video thumbnail generation failed:', e);
             // Fallback to first image or default
             const fallback = property.images?.[0] || "https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3";
             setThumbnailSrc(fallback);
           };
-          
+
           video.src = property.videos[0];
           video.load();
-          
+
           // Cleanup timeout
           setTimeout(() => {
             if (!thumbnailGenerated) {
@@ -112,7 +112,7 @@ interface PropertyCardProps {
 
 export default function PropertyCard({ property, onViewDetails, onInquire }: PropertyCardProps) {
   const [showVideoModal, setShowVideoModal] = useState(false);
-  
+
   const formatPrice = (price: string) => {
     const num = parseFloat(price);
     if (num >= 1000000) {
@@ -126,6 +126,11 @@ export default function PropertyCard({ property, onViewDetails, onInquire }: Pro
     if (status === "available") return <Badge className="bg-green-500 text-white">Available</Badge>;
     if (status === "sold") return <Badge className="bg-red-500 text-white">Sold</Badge>;
     return <Badge className="bg-blue-500 text-white">New</Badge>;
+  };
+
+  const handleInquire = () => {
+    const message = `Hi, I'm interested in "${property.title}" located in ${property.location}, priced at ${formatPrice(property.price)}. Can you provide more details?`;
+    window.open(`https://wa.me/2349061461411?text=${encodeURIComponent(message)}`, '_blank');
   };
 
   return (
@@ -214,14 +219,14 @@ export default function PropertyCard({ property, onViewDetails, onInquire }: Pro
           </Button>
           <Button 
             className="btn-secondary px-4"
-            onClick={() => onInquire?.(property.id)}
+            onClick={handleInquire}
             data-testid={`inquire-button-${property.id}`}
           >
             <Phone className="h-4 w-4" />
           </Button>
         </div>
       </CardContent>
-      
+
       <PropertyVideoModal
         isOpen={showVideoModal}
         onClose={() => setShowVideoModal(false)}

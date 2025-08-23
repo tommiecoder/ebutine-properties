@@ -66,7 +66,7 @@ export default function PropertyDetails() {
   };
 
   const handleInquire = () => {
-    const message = `Hi, I'm interested in ${property.title} (${property.location}) priced at ${formatPrice(property.price)}. Can you provide more details?`;
+    const message = `Hi, I'm interested in "${property.title}" located in ${property.location}, priced at ${formatPrice(property.price)}. Can you provide more details?`;
     window.open(`https://wa.me/2349061461411?text=${encodeURIComponent(message)}`, '_blank');
   };
 
