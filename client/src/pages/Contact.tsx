@@ -65,8 +65,6 @@ export default function Contact() {
                   <div>
                     <h4 className="font-semibold text-ebutine-dark mb-1">Office Address</h4>
                     <p className="text-ebutine-blue">
-                      House No 2, Road 4,<br />
-                      Greenland Estate, Olokonla<br />
                       Sangotedo Ajah, Lagos, Nigeria
                     </p>
                   </div>
