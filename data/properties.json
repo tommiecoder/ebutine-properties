@@ -1,0 +1,85 @@
+[
+  {
+    "id": "0eec8698-12f2-4759-b332-fa4b162b4c70",
+    "title": "Luxury 4BR Duplex",
+    "description": "Elegant 4-bedroom duplex in gated estate with modern amenities",
+    "type": "luxury_home",
+    "price": "85000000",
+    "location": "Sangotedo, Ajah Lagos",
+    "address": "Greenland Estate, Sangotedo",
+    "size": "4 bedrooms",
+    "bedrooms": "4",
+    "bathrooms": "5",
+    "parking": "2",
+    "features": [
+      "Modern Kitchen",
+      "Swimming Pool",
+      "24/7 Security",
+      "Fitted Wardrobes"
+    ],
+    "images": [
+      "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?ixlib=rb-4.0.3"
+    ],
+    "videos": [
+      "https://example.com/property1-tour.mp4"
+    ],
+    "status": "available",
+    "featured": true,
+    "createdAt": "2025-08-23T01:43:28.734Z",
+    "updatedAt": "2025-08-23T01:43:28.734Z"
+  },
+  {
+    "id": "c78780fa-72b6-4a63-9a85-34e4a2f4bc3d",
+    "title": "Commercial Land",
+    "description": "Strategic commercial property in high-traffic area",
+    "type": "commercial_land",
+    "price": "35000000",
+    "location": "Ibeju-Lekki, Lagos",
+    "address": "Ibeju-Lekki Free Trade Zone",
+    "size": "2,000 sqm",
+    "bedrooms": null,
+    "bathrooms": null,
+    "parking": null,
+    "features": [
+      "C of O",
+      "Tarred Road",
+      "High ROI Potential"
+    ],
+    "images": [
+      "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-4.0.3"
+    ],
+    "videos": [
+      "https://example.com/commercial-land-overview.mp4"
+    ],
+    "status": "available",
+    "featured": true,
+    "createdAt": "2025-08-23T01:43:28.734Z",
+    "updatedAt": "2025-08-23T01:43:28.734Z"
+  },
+  {
+    "id": "94451ad0-d5dd-49ef-9f89-e840e852e143",
+    "title": "Residential Land",
+    "description": "Prime residential land with infrastructure",
+    "type": "residential_land",
+    "price": "12500000",
+    "location": "Greenland Estate, Sangotedo",
+    "address": "Greenland Estate, Road 4",
+    "size": "650 sqm",
+    "bedrooms": null,
+    "bathrooms": null,
+    "parking": null,
+    "features": [
+      "Verified Title",
+      "All Utilities",
+      "Gated Estate"
+    ],
+    "images": [
+      "https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3"
+    ],
+    "videos": null,
+    "status": "available",
+    "featured": false,
+    "createdAt": "2025-08-23T01:43:28.734Z",
+    "updatedAt": "2025-08-23T01:43:28.734Z"
+  }
+]
