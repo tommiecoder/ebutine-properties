@@ -120,10 +120,45 @@ export class DatabaseStorage implements IStorage {
         updatedAt: new Date(),
       };
 
+    // Add the new Distress Sale property
+    const distressSaleProperty = {
+      id: randomUUID(),
+      title: "DISTRESS SALE 📌 2 Plots of Dryland - Alashela Estate",
+      description: "URGENT DISTRESS SALE OPPORTUNITY! Two exceptional plots of dryland measuring 1244sqm in total are now available in the prestigious Alashela Estate, Ogombo, Ajah. This is a rare chance to acquire prime real estate at an incredible value due to urgent sale circumstances. Located in one of Ajah's most sought-after residential developments, Alashela Estate offers excellent infrastructure, peaceful environment, and strong investment potential. Each plot is being offered at an unbeatable price of ₦35M net per plot, making this an outstanding opportunity for savvy investors. The property comes with Certificate of Occupancy (CofO), ensuring complete legal documentation and peace of mind for buyers. Alashela Estate is known for its well-planned layout, good road network, and proximity to major landmarks including shopping centers, schools, and business districts. The estate features reliable utilities, security provisions, and a growing community of residents. Don't miss this limited-time opportunity to secure premium land in Ogombo at distress sale prices. Properties like these are extremely rare and won't last long in the market. Perfect for residential development or long-term investment with excellent appreciation potential.",
+      type: "residential_land",
+      price: "35000000",
+      location: "Alashela Estate, Ogombo, Ajah",
+      address: "Alashela Estate, Ogombo, Ajah, Lagos",
+      size: "1244sqm (2 plots)",
+      bedrooms: null,
+      bathrooms: null,
+      parking: null,
+      features: [
+        "Certificate of Occupancy (CofO)",
+        "Dryland",
+        "2 Plots Available",
+        "1244sqm Total",
+        "Distress Sale Price",
+        "Alashela Estate",
+        "Prime Location",
+        "Good Road Network",
+        "Reliable Utilities",
+        "Investment Opportunity",
+        "Legal Documentation",
+        "Ogombo, Ajah"
+      ],
+      images: [],
+      videos: ["/uploads/videos/LAND FOR SALE📌SIZE- 660sqm LOCATION- Ogombo, Ajah Price-N55MTitle-Governors consentFOR ENQUIRIE.mp4"],
+      status: "available",
+      featured: true,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
       this.memoryProperties.set(chevronProperty.id, chevronProperty as Property);
-      this.memoryProperties.set(quickSaleProperty.id, quickSaleProperty as Property);
+      
       console.log('✅ Chevron property added to memory storage:', chevronProperty.title);
-      console.log('✅ Quick Sale property added to memory storage:', quickSaleProperty.title);
+      c
     }
   }
 
