@@ -15,7 +15,6 @@ function PropertyThumbnail({ property }: { property: Property }) {
       if (property.videos && property.videos.length > 0) {
         try {
           const video = document.createElement('video');
-          video.crossOrigin = 'anonymous';
           video.muted = true;
           video.preload = 'metadata';
           video.playsInline = true;
@@ -24,62 +23,80 @@ function PropertyThumbnail({ property }: { property: Property }) {
           const ctx = canvas.getContext('2d');
 
           let thumbnailGenerated = false;
+          let timeoutId: NodeJS.Timeout;
 
           const generateFromFrame = () => {
             if (thumbnailGenerated || !ctx || !video.videoWidth || !video.videoHeight) return;
 
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-            const thumbnail = canvas.toDataURL('image/jpeg', 0.8);
-            setThumbnailSrc(thumbnail);
-            thumbnailGenerated = true;
+            try {
+              canvas.width = video.videoWidth;
+              canvas.height = video.videoHeight;
+              ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+              const thumbnail = canvas.toDataURL('image/jpeg', 0.7);
+              setThumbnailSrc(thumbnail);
+              thumbnailGenerated = true;
+              console.log('Video thumbnail generated successfully');
+              if (timeoutId) clearTimeout(timeoutId);
+            } catch (err) {
+              console.warn('Error generating thumbnail from video frame:', err);
+              useFallback();
+            }
           };
 
-          video.onloadeddata = () => {
-            // Set to first frame (0 seconds)
-            video.currentTime = 0;
+          const useFallback = () => {
+            if (!thumbnailGenerated) {
+              const fallback = property.images?.[0] || "https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3";
+              setThumbnailSrc(fallback);
+              thumbnailGenerated = true;
+            }
+          };
+
+          video.onloadedmetadata = () => {
+            if (video.duration > 0) {
+              video.currentTime = 0.1; // Small offset to ensure frame is available
+            } else {
+              useFallback();
+            }
           };
 
           video.onseeked = () => {
             generateFromFrame();
           };
 
-          video.onloadedmetadata = () => {
-            if (video.duration > 0) {
-              video.currentTime = 0; // Ensure we get the first frame
-            }
-          };
-
           video.oncanplay = () => {
-            // Fallback if onseeked doesn't fire
+            // Additional attempt if onseeked doesn't fire
             setTimeout(() => {
-              if (!thumbnailGenerated) {
+              if (!thumbnailGenerated && video.videoWidth > 0) {
                 generateFromFrame();
               }
-            }, 100);
+            }, 200);
           };
 
           video.onerror = (e) => {
-            console.warn('Video thumbnail generation failed:', e);
-            // Fallback to first image or default
-            const fallback = property.images?.[0] || "https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3";
-            setThumbnailSrc(fallback);
+            console.warn('Video loading failed for thumbnail generation:', e);
+            useFallback();
           };
 
-          video.src = property.videos[0];
-          video.load();
+          // Set video source with proper URL formatting
+          const videoUrl = property.videos[0];
+          const fullVideoUrl = videoUrl.startsWith('http') ? videoUrl : `${window.location.origin}${videoUrl}`;
+          
+          video.src = fullVideoUrl;
+          console.log('Loading video for thumbnail:', fullVideoUrl);
 
-          // Cleanup timeout
-          setTimeout(() => {
+          // Reduced timeout for faster fallback
+          timeoutId = setTimeout(() => {
             if (!thumbnailGenerated) {
               console.warn('Video thumbnail generation timeout, using fallback');
-              const fallback = property.images?.[0] || "https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3";
-              setThumbnailSrc(fallback);
+              useFallback();
             }
-          }, 5000);
+          }, 3000);
+
+          // Start loading
+          video.load();
+
         } catch (error) {
-          console.warn('Video thumbnail generation error:', error);
+          console.warn('Video thumbnail generation setup error:', error);
           // Fallback to first image or default
           const fallback = property.images?.[0] || "https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3";
           setThumbnailSrc(fallback);

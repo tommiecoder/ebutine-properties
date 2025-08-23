@@ -4,6 +4,7 @@ import multer from "multer";
 import path from "path";
 import { storage } from "./storage";
 import { insertContactSchema, insertPropertyInquirySchema, insertPropertySchema } from "@shared/schema";
+import express from 'express';
 
 // Enhanced AI generation helper functions
 async function analyzeMediaAndGenerateProperty(mediaInfo: any): Promise<{
@@ -540,6 +541,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to update property" });
     }
   });
+
+  // Serve uploaded files with proper headers
+  app.use("/uploads", (req, res, next) => {
+    // Set proper headers for video files
+    if (req.path.match(/\.(mp4|webm|ogg|avi|mov)$/i)) {
+      res.set({
+        'Content-Type': 'video/mp4',
+        'Accept-Ranges': 'bytes',
+        'Cache-Control': 'public, max-age=31536000',
+        'Access-Control-Allow-Origin': '*',
+        'Cross-Origin-Resource-Policy': 'cross-origin'
+      });
+    }
+    next();
+  }, express.static(path.join(__dirname, "../uploads")));
 
   const httpServer = createServer(app);
   return httpServer;
