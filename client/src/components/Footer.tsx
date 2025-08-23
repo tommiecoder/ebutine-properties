@@ -33,6 +33,15 @@ export default function Footer() {
               >
                 <i className="fab fa-instagram text-2xl"></i>
               </a>
+              <a 
+                href="https://youtube.com/@ebutineproperties?si=w9B18Aee9vo8snFD" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="text-gray-300 hover:text-red-500 transition-all duration-300 transform hover:scale-110" 
+                data-testid="youtube-link"
+              >
+                <i className="fab fa-youtube text-2xl"></i>
+              </a>
             </div>
           </div>
 
@@ -84,11 +93,11 @@ export default function Footer() {
               <div className="flex items-center">
                 <Mail className="h-5 w-5 text-ebutine-orange mr-3" />
                 <a 
-                  href="mailto:ebutineproperties@gmail.com" 
+                  href="mailto:ebutinepropertieslimited@gmail.com" 
                   className="text-gray-300 hover:text-ebutine-orange transition-colors"
                   data-testid="footer-email-link"
                 >
-                  ebutineproperties@gmail.com
+                  ebutinepropertieslimited@gmail.com
                 </a>
               </div>
               <div className="flex items-center">

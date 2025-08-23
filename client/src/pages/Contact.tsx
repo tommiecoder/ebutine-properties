@@ -31,7 +31,7 @@ export default function Contact() {
               "longitude": "3.5074"
             },
             "telephone": "+2349061461411",
-            "email": "ebutineproperties@gmail.com",
+            "email": "ebutinepropertieslimited@gmail.com",
             "openingHours": ["Mo-Fr 08:00-18:00", "Sa 09:00-16:00"],
             "areaServed": "Lagos, Nigeria"
           })}
@@ -98,11 +98,11 @@ export default function Contact() {
                     <h4 className="font-semibold text-ebutine-dark mb-1">Email</h4>
                     <p className="text-ebutine-blue">
                       <a 
-                        href="mailto:ebutineproperties@gmail.com" 
+                        href="mailto:ebutinepropertieslimited@gmail.com" 
                         className="hover:text-ebutine-orange transition-colors"
                         data-testid="contact-email-link"
                       >
-                        ebutineproperties@gmail.com
+                        ebutinepropertieslimited@gmail.com
                       </a>
                     </p>
                   </div>

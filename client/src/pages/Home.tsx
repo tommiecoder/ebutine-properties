@@ -156,7 +156,7 @@ export default function Home() {
             <div className="flex flex-col items-center">
               <Mail className="h-12 w-12 text-ebutine-orange mb-4" />
               <h3 className="text-lg font-semibold mb-2 text-ebutine-dark">Email Us</h3>
-              <a href="mailto:ebutineproperties@gmail.com" className="text-ebutine-blue hover:text-ebutine-orange">ebutineproperties@gmail.com</a>
+              <a href="mailto:ebutinepropertieslimited@gmail.com" className="text-ebutine-blue hover:text-ebutine-orange">ebutinepropertieslimited@gmail.com</a>
             </div>
             <div className="flex flex-col items-center">
               <MapPin className="h-12 w-12 text-ebutine-orange mb-4" />

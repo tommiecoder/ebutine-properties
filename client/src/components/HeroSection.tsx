@@ -161,19 +161,19 @@ export default function HeroSection() {
               </span>
             </div>
             
-            <h1 className="text-5xl md:text-7xl font-bold text-white mb-8 leading-tight drop-shadow-2xl text-shadow-strong">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-bold text-white mb-6 md:mb-8 leading-tight drop-shadow-2xl text-shadow-strong px-2">
               {slides[currentSlide].title}
             </h1>
             
-            <p className="text-xl md:text-2xl text-white mb-16 max-w-4xl mx-auto leading-relaxed drop-shadow-lg font-medium">
+            <p className="text-lg sm:text-xl md:text-2xl text-white mb-12 md:mb-16 max-w-4xl mx-auto leading-relaxed drop-shadow-lg font-medium px-4">
               {slides[currentSlide].subtitle}
             </p>
           </div>
 
           {/* Enhanced Search Bar */}
-          <div className="max-w-6xl mx-auto mb-16">
-            <div className="bg-white/95 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border border-white/50">
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <div className="max-w-6xl mx-auto mb-12 md:mb-16 px-4">
+            <div className="bg-white/95 backdrop-blur-lg rounded-2xl md:rounded-3xl p-4 md:p-8 shadow-2xl border border-white/50">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6"></div>
                 <div>
                   <label className="block text-sm font-bold text-ebutine-dark mb-3">Property Type</label>
                   <Select value={searchFilters.propertyType} onValueChange={(value) => setSearchFilters(prev => ({...prev, propertyType: value}))}>
@@ -233,9 +233,9 @@ export default function HeroSection() {
           </div>
 
           {/* Enhanced CTAs */}
-          <div className="flex flex-col sm:flex-row justify-center items-center space-y-6 sm:space-y-0 sm:space-x-8">
+          <div className="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-6 px-4">
             <Link href="/contact">
-              <Button className="bg-ebutine-orange hover:bg-orange-600 text-white font-bold py-4 px-10 text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 border-2 border-ebutine-orange">
+              <Button className="w-full sm:w-auto bg-ebutine-orange hover:bg-orange-600 text-white font-bold py-3 md:py-4 px-6 md:px-10 text-base md:text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 border-2 border-ebutine-orange">
                 Book Free Consultation
               </Button>
             </Link>
@@ -244,9 +244,10 @@ export default function HeroSection() {
               href="https://wa.me/2349061461411" 
               target="_blank" 
               rel="noopener noreferrer"
+              className="w-full sm:w-auto"
             >
-              <Button className="bg-white/20 border-2 border-white text-white hover:bg-white hover:text-ebutine-dark font-bold py-4 px-10 text-lg rounded-xl transition-all duration-300 transform hover:scale-105 backdrop-blur-sm">
-                <i className="fab fa-whatsapp mr-3 text-xl"></i>
+              <Button className="w-full sm:w-auto bg-white/20 border-2 border-white text-white hover:bg-white hover:text-ebutine-dark font-bold py-3 md:py-4 px-6 md:px-10 text-base md:text-lg rounded-xl transition-all duration-300 transform hover:scale-105 backdrop-blur-sm">
+                <i className="fab fa-whatsapp mr-2 md:mr-3 text-lg md:text-xl"></i>
                 WhatsApp Us
               </Button>
             </a>
