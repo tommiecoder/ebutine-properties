@@ -75,7 +75,7 @@ export default function Home() {
                 <p className="text-lg text-ebutine-orange font-semibold">Founder & CEO</p>
               </div>
               <div className="absolute -bottom-6 -right-6 bg-ebutine-orange text-white p-6 rounded-2xl shadow-lg">
-                <h3 className="text-2xl font-bold">5000+</h3>
+                <h3 className="text-2xl font-bold">100+</h3>
                 <p className="text-sm">Happy Clients</p>
               </div>
             </div>
