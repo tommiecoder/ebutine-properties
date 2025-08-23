@@ -85,8 +85,46 @@ export class DatabaseStorage implements IStorage {
       updatedAt: new Date(),
     };
 
-    this.memoryProperties.set(chevronProperty.id, chevronProperty as Property);
-    console.log('✅ Chevron property added to memory storage:', chevronProperty.title);
+    // Add the new Quick Sale Chevron property
+      const quickSaleProperty = {
+        id: randomUUID(),
+        title: "QUICK SALE‼️ 1000sqm Cornerpiece Land - Atlantic View Estate",
+        description: "QUICK SALE ALERT! This exceptional 1000sqm cornerpiece land is currently selling in the prestigious Atlantic View Estate, New Road, Chevron, Lekki, Lagos. This is a rare opportunity that won't stay in the market for long! Located in one of Chevron's most sought-after developments, this cornerpiece plot offers maximum privacy and development potential. The property comes with Global Certificate of Occupancy (CofO) providing absolute security of ownership and investment protection. Atlantic View Estate is renowned for its excellent infrastructure, strategic location, and high-end residential developments. With easy access to major business districts, shopping centers, international schools, and recreational facilities, this property represents an outstanding investment opportunity. The estate features tarred roads, reliable power supply, water infrastructure, and 24/7 security. Don't miss this chance to secure a premium cornerpiece land in Chevron at an attractive price point. Properties of this caliber and location are extremely rare and highly sought after by discerning investors and homeowners alike.",
+        type: "residential_land",
+        price: "280000000",
+        location: "Atlantic View Estate, Chevron, Lekki, Lagos",
+        address: "New Road, Atlantic View Estate, Chevron, Lekki, Lagos",
+        size: "1000sqm",
+        bedrooms: null,
+        bathrooms: null,
+        parking: null,
+        features: [
+          "Global Certificate of Occupancy (CofO)",
+          "Cornerpiece Land",
+          "1000sqm",
+          "Atlantic View Estate",
+          "Quick Sale",
+          "Strategic Location",
+          "Premium Development Area",
+          "24/7 Security",
+          "Tarred Roads",
+          "Reliable Infrastructure",
+          "High Investment Potential",
+          "Chevron, Lekki"
+        ],
+        images: [],
+        videos: ["/uploads/videos/QUICK SALE‼️1000sqm Cornerpiece Land is currently selling in Atlantic View Estate, New Road, Che.mp4"],
+        status: "available",
+        featured: true,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      this.memoryProperties.set(chevronProperty.id, chevronProperty as Property);
+      this.memoryProperties.set(quickSaleProperty.id, quickSaleProperty as Property);
+      console.log('✅ Chevron property added to memory storage:', chevronProperty.title);
+      console.log('✅ Quick Sale property added to memory storage:', quickSaleProperty.title);
+    }
   }
 
   private async seedData() {
