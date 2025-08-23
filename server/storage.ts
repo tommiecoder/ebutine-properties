@@ -1,18 +1,8 @@
 import { type User, type InsertUser, type Property, type InsertProperty, type Contact, type InsertContact, type PropertyInquiry, type InsertPropertyInquiry } from "@shared/schema";
 import { randomUUID } from "crypto";
-import { readFileSync, writeFileSync, existsSync, mkdirSync } from "fs";
-import { join } from "path";
-
-const DATA_DIR = join(process.cwd(), 'data');
-const PROPERTIES_FILE = join(DATA_DIR, 'properties.json');
-const CONTACTS_FILE = join(DATA_DIR, 'contacts.json');
-const INQUIRIES_FILE = join(DATA_DIR, 'inquiries.json');
-const USERS_FILE = join(DATA_DIR, 'users.json');
-
-// Ensure data directory exists
-if (!existsSync(DATA_DIR)) {
-  mkdirSync(DATA_DIR, { recursive: true });
-}
+import { db, isDbConnected } from "./db";
+import { users, properties, contacts, propertyInquiries } from "@shared/schema";
+import { eq, and, gte, lte, sql } from "drizzle-orm";
 
 export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
@@ -41,37 +31,24 @@ export interface IStorage {
   createPropertyInquiry(inquiry: InsertPropertyInquiry): Promise<PropertyInquiry>;
 }
 
-export class FileStorage implements IStorage {
+export class DatabaseStorage implements IStorage {
+  private fallbackToMemory = false;
+  private memoryProperties = new Map<string, Property>();
+  private memoryContacts = new Map<string, Contact>();
+  private memoryInquiries = new Map<string, PropertyInquiry>();
+
   constructor() {
     this.seedData();
   }
 
-  private readFile<T>(filePath: string, defaultData: T[] = []): T[] {
+  private async seedData() {
     try {
-      if (existsSync(filePath)) {
-        const data = readFileSync(filePath, 'utf-8');
-        return JSON.parse(data);
-      }
-      return defaultData;
-    } catch (error) {
-      console.error(`Error reading ${filePath}:`, error);
-      return defaultData;
-    }
-  }
+      // Check if properties already exist
+      const existingProperties = await db.select().from(properties).limit(1);
+      if (existingProperties.length > 0) return;
 
-  private writeFile<T>(filePath: string, data: T[]): void {
-    try {
-      writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf-8');
-    } catch (error) {
-      console.error(`Error writing ${filePath}:`, error);
-    }
-  }
-
-  private seedData() {
-    const properties = this.readFile<Property>(PROPERTIES_FILE);
-
-    if (properties.length === 0) {
-      const sampleProperties: Property[] = [
+      // Seed sample properties
+      const sampleProperties = [
         {
           id: randomUUID(),
           title: "Luxury 4BR Duplex",
@@ -89,8 +66,6 @@ export class FileStorage implements IStorage {
           videos: ["https://example.com/property1-tour.mp4"],
           status: "available",
           featured: true,
-          createdAt: new Date(),
-          updatedAt: new Date(),
         },
         {
           id: randomUUID(),
@@ -109,8 +84,6 @@ export class FileStorage implements IStorage {
           videos: ["https://example.com/commercial-land-overview.mp4"],
           status: "available",
           featured: true,
-          createdAt: new Date(),
-          updatedAt: new Date(),
         },
         {
           id: randomUUID(),
@@ -129,32 +102,29 @@ export class FileStorage implements IStorage {
           videos: null,
           status: "available",
           featured: false,
-          createdAt: new Date(),
-          updatedAt: new Date(),
         }
       ];
 
-      this.writeFile(PROPERTIES_FILE, sampleProperties);
-      console.log('✅ Sample properties seeded to file storage');
+      await db.insert(properties).values(sampleProperties);
+    } catch (error) {
+      console.log("Database seeding skipped (tables may not exist yet)");
     }
   }
 
   async getUser(id: string): Promise<User | undefined> {
-    const users = this.readFile<User>(USERS_FILE);
-    return users.find(user => user.id === id);
+    const result = await db.select().from(users).where(eq(users.id, id)).limit(1);
+    return result[0];
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    const users = this.readFile<User>(USERS_FILE);
-    return users.find(user => user.username === username);
+    const result = await db.select().from(users).where(eq(users.username, username)).limit(1);
+    return result[0];
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const users = this.readFile<User>(USERS_FILE);
     const id = randomUUID();
     const user: User = { ...insertUser, id };
-    users.push(user);
-    this.writeFile(USERS_FILE, users);
+    await db.insert(users).values(user);
     return user;
   }
 
@@ -165,122 +135,257 @@ export class FileStorage implements IStorage {
     maxPrice?: number;
     featured?: boolean;
   }): Promise<Property[]> {
-    let properties = this.readFile<Property>(PROPERTIES_FILE);
+    try {
+      if (isDbConnected() && !this.fallbackToMemory) {
+        let query = db.select().from(properties);
 
-    if (filters) {
-      properties = properties.filter(property => {
-        if (filters.type && filters.type !== "All Types" && property.type !== filters.type) return false;
-        if (filters.location && filters.location !== "All Locations" && !property.location.toLowerCase().includes(filters.location.toLowerCase())) return false;
-        if (filters.featured !== undefined && property.featured !== filters.featured) return false;
-        if (filters.minPrice && parseFloat(property.price) < filters.minPrice) return false;
-        if (filters.maxPrice && parseFloat(property.price) > filters.maxPrice) return false;
-        return true;
-      });
+        const conditions = [];
+
+        if (filters) {
+          if (filters.type && filters.type !== "All Types") {
+            conditions.push(eq(properties.type, filters.type));
+          }
+          if (filters.location && filters.location !== "All Locations") {
+            conditions.push(sql`${properties.location} ILIKE ${`%${filters.location}%`}`);
+          }
+          if (filters.featured !== undefined) {
+            conditions.push(eq(properties.featured, filters.featured));
+          }
+          if (filters.minPrice) {
+            conditions.push(gte(sql`CAST(${properties.price} AS DECIMAL)`, filters.minPrice));
+          }
+          if (filters.maxPrice) {
+            conditions.push(lte(sql`CAST(${properties.price} AS DECIMAL)`, filters.maxPrice));
+          }
+        }
+
+        if (conditions.length > 0) {
+          query = query.where(and(...conditions));
+        }
+
+        const result = await query.orderBy(sql`${properties.createdAt} DESC`);
+        return result;
+      } else {
+        // Fallback to memory storage
+        let result = Array.from(this.memoryProperties.values());
+
+        if (filters) {
+          result = result.filter(property => {
+            if (filters.type && filters.type !== "All Types" && property.type !== filters.type) return false;
+            if (filters.location && filters.location !== "All Locations" && !property.location.toLowerCase().includes(filters.location.toLowerCase())) return false;
+            if (filters.featured !== undefined && property.featured !== filters.featured) return false;
+            if (filters.minPrice && parseFloat(property.price) < filters.minPrice) return false;
+            if (filters.maxPrice && parseFloat(property.price) > filters.maxPrice) return false;
+            return true;
+          });
+        }
+
+        return result.sort((a, b) => new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime());
+      }
+    } catch (error) {
+      this.fallbackToMemory = true;
+      console.error('❌ Error fetching properties, falling back to memory storage:', error);
+      return Array.from(this.memoryProperties.values());
     }
-
-    return properties.sort((a, b) => new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime());
   }
 
   async getProperty(id: string): Promise<Property | undefined> {
-    const properties = this.readFile<Property>(PROPERTIES_FILE);
-    return properties.find(property => property.id === id);
+    try {
+      if (isDbConnected() && !this.fallbackToMemory) {
+        const result = await db.select().from(properties).where(eq(properties.id, id)).limit(1);
+        return result[0];
+      } else {
+        return this.memoryProperties.get(id);
+      }
+    } catch (error) {
+      this.fallbackToMemory = true;
+      console.error('❌ Error fetching property, falling back to memory storage:', error);
+      return this.memoryProperties.get(id);
+    }
   }
 
   async createProperty(property: InsertProperty): Promise<Property> {
-    const properties = this.readFile<Property>(PROPERTIES_FILE);
     const id = randomUUID();
-    const newProperty: Property = {
+    const newProperty = {
       ...property,
       id,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
 
-    properties.push(newProperty);
-    this.writeFile(PROPERTIES_FILE, properties);
-    console.log('✅ Property saved to file storage:', newProperty.title);
-    return newProperty;
+    try {
+      if (isDbConnected()) {
+        await db.insert(properties).values(newProperty);
+        console.log('✅ Property saved to database:', newProperty.title);
+      } else {
+        this.fallbackToMemory = true;
+        this.memoryProperties.set(id, newProperty as Property);
+        console.log('✅ Property saved to memory storage:', newProperty.title);
+      }
+      return newProperty as Property;
+    } catch (error) {
+      console.error('❌ Database error, falling back to memory storage:', error);
+      this.fallbackToMemory = true;
+      this.memoryProperties.set(id, newProperty as Property);
+      console.log('✅ Property saved to memory storage:', newProperty.title);
+      return newProperty as Property;
+    }
   }
 
-  // Alias method for backward compatibility
-  async saveProperty(property: any): Promise<Property> {
-    return this.createProperty(property);
-  }
-
-  async updateProperty(id: string, propertyUpdate: Partial<InsertProperty>): Promise<Property | undefined> {
-    const properties = this.readFile<Property>(PROPERTIES_FILE);
-    const index = properties.findIndex(property => property.id === id);
-
-    if (index === -1) return undefined;
-
+  async updateProperty(id: string, property: Partial<InsertProperty>): Promise<Property | undefined> {
     const updateData = {
-      ...propertyUpdate,
+      ...property,
       updatedAt: new Date(),
     };
 
-    properties[index] = { ...properties[index], ...updateData };
-    this.writeFile(PROPERTIES_FILE, properties);
-    console.log('✅ Property updated in file storage:', id);
-    return properties[index];
+    try {
+      if (isDbConnected() && !this.fallbackToMemory) {
+        await db.update(properties).set(updateData).where(eq(properties.id, id));
+        console.log('✅ Property updated in database:', id);
+        return this.getProperty(id);
+      } else {
+        // Fallback to memory storage
+        const existing = this.memoryProperties.get(id);
+        if (existing) {
+          const updated = { ...existing, ...updateData };
+          this.memoryProperties.set(id, updated);
+          console.log('✅ Property updated in memory storage:', id);
+          return updated;
+        }
+        return undefined;
+      }
+    } catch (error) {
+      console.error('❌ Database error, falling back to memory storage:', error);
+      this.fallbackToMemory = true;
+      const existing = this.memoryProperties.get(id);
+      if (existing) {
+        const updated = { ...existing, ...updateData };
+        this.memoryProperties.set(id, updated);
+        console.log('✅ Property updated in memory storage:', id);
+        return updated;
+      }
+      return undefined;
+    }
   }
 
   async deleteProperty(id: string): Promise<boolean> {
-    const properties = this.readFile<Property>(PROPERTIES_FILE);
-    const index = properties.findIndex(property => property.id === id);
-
-    if (index === -1) return false;
-
-    properties.splice(index, 1);
-    this.writeFile(PROPERTIES_FILE, properties);
-    console.log('✅ Property deleted from file storage:', id);
-    return true;
+    try {
+      if (isDbConnected() && !this.fallbackToMemory) {
+        const result = await db.delete(properties).where(eq(properties.id, id));
+        console.log('✅ Property deleted from database:', id);
+        return result.rowCount !== null && result.rowCount > 0;
+      } else {
+        const deleted = this.memoryProperties.delete(id);
+        if (deleted) {
+          console.log('✅ Property deleted from memory storage:', id);
+        }
+        return deleted;
+      }
+    } catch (error) {
+      console.error('❌ Database error, falling back to memory storage:', error);
+      this.fallbackToMemory = true;
+      const deleted = this.memoryProperties.delete(id);
+      if (deleted) {
+        console.log('✅ Property deleted from memory storage:', id);
+      }
+      return deleted;
+    }
   }
 
   async getContacts(): Promise<Contact[]> {
-    const contacts = this.readFile<Contact>(CONTACTS_FILE);
-    return contacts.sort((a, b) => new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime());
+    try {
+      if (isDbConnected() && !this.fallbackToMemory) {
+        const result = await db.select().from(contacts).orderBy(sql`${contacts.createdAt} DESC`);
+        return result;
+      } else {
+        return Array.from(this.memoryContacts.values()).sort((a, b) => new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime());
+      }
+    } catch (error) {
+      this.fallbackToMemory = true;
+      console.error('❌ Error fetching contacts, falling back to memory storage:', error);
+      return Array.from(this.memoryContacts.values());
+    }
   }
 
   async createContact(contact: InsertContact): Promise<Contact> {
-    const contacts = this.readFile<Contact>(CONTACTS_FILE);
     const id = randomUUID();
-    const newContact: Contact = {
+    const newContact = {
       ...contact,
       id,
       status: "new" as const,
       createdAt: new Date(),
     };
 
-    contacts.push(newContact);
-    this.writeFile(CONTACTS_FILE, contacts);
-    console.log('✅ Contact saved to file storage:', newContact.fullName);
-    return newContact;
+    try {
+      if (isDbConnected() && !this.fallbackToMemory) {
+        await db.insert(contacts).values(newContact);
+        console.log('✅ Contact saved to database:', newContact.name);
+      } else {
+        this.fallbackToMemory = true;
+        this.memoryContacts.set(id, newContact as Contact);
+        console.log('✅ Contact saved to memory storage:', newContact.name);
+      }
+      return newContact as Contact;
+    } catch (error) {
+      console.error('❌ Database error, falling back to memory storage:', error);
+      this.fallbackToMemory = true;
+      this.memoryContacts.set(id, newContact as Contact);
+      console.log('✅ Contact saved to memory storage:', newContact.name);
+      return newContact as Contact;
+    }
   }
 
   async getPropertyInquiries(propertyId?: string): Promise<PropertyInquiry[]> {
-    let inquiries = this.readFile<PropertyInquiry>(INQUIRIES_FILE);
+    try {
+      if (isDbConnected() && !this.fallbackToMemory) {
+        let query = db.select().from(propertyInquiries);
 
-    if (propertyId) {
-      inquiries = inquiries.filter(inquiry => inquiry.propertyId === propertyId);
+        if (propertyId) {
+          query = query.where(eq(propertyInquiries.propertyId, propertyId));
+        }
+
+        const result = await query.orderBy(sql`${propertyInquiries.createdAt} DESC`);
+        return result;
+      } else {
+        let result = Array.from(this.memoryInquiries.values());
+        if (propertyId) {
+          result = result.filter(inquiry => inquiry.propertyId === propertyId);
+        }
+        return result.sort((a, b) => new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime());
+      }
+    } catch (error) {
+      this.fallbackToMemory = true;
+      console.error('❌ Error fetching property inquiries, falling back to memory storage:', error);
+      return Array.from(this.memoryInquiries.values());
     }
-
-    return inquiries.sort((a, b) => new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime());
   }
 
   async createPropertyInquiry(inquiry: InsertPropertyInquiry): Promise<PropertyInquiry> {
-    const inquiries = this.readFile<PropertyInquiry>(INQUIRIES_FILE);
     const id = randomUUID();
-    const newInquiry: PropertyInquiry = {
+    const newInquiry = {
       ...inquiry,
       id,
       createdAt: new Date(),
     };
 
-    inquiries.push(newInquiry);
-    this.writeFile(INQUIRIES_FILE, inquiries);
-    console.log('✅ Property inquiry saved to file storage:', id);
-    return newInquiry;
+    try {
+      if (isDbConnected() && !this.fallbackToMemory) {
+        await db.insert(propertyInquiries).values(newInquiry);
+        console.log('✅ Property inquiry saved to database:', id);
+      } else {
+        this.fallbackToMemory = true;
+        this.memoryInquiries.set(id, newInquiry as PropertyInquiry);
+        console.log('✅ Property inquiry saved to memory storage:', id);
+      }
+      return newInquiry as PropertyInquiry;
+    } catch (error) {
+      console.error('❌ Database error, falling back to memory storage:', error);
+      this.fallbackToMemory = true;
+      this.memoryInquiries.set(id, newInquiry as PropertyInquiry);
+      console.log('✅ Property inquiry saved to memory storage:', id);
+      return newInquiry as PropertyInquiry;
+    }
   }
 }
 
-export const storage = new FileStorage();
+export const storage = new DatabaseStorage();

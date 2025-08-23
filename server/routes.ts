@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import multer from "multer";
 import path from "path";
 import { storage } from "./storage";
-import { insertContactSchema, insertPropertyInquirySchema } from "@shared/schema";
+import { insertContactSchema, insertPropertyInquirySchema, insertPropertySchema } from "@shared/schema";
 
 // Enhanced AI generation helper functions
 async function analyzeMediaAndGenerateProperty(mediaInfo: any): Promise<{
@@ -96,22 +96,11 @@ async function analyzeMediaAndGenerateProperty(mediaInfo: any): Promise<{
       }
     }
 
-    // For houses and apartments, size should describe rooms, not land area
-    size = `${bedrooms} bedrooms, ${bathrooms} bathrooms`;
-  } else if (type === "land") {
-    // Generate realistic land sizes in square meters
-    const landSizes = ["500 sqm", "650 sqm", "800 sqm", "1000 sqm", "1200 sqm", "1500 sqm"];
-    size = landSizes[Math.floor(Math.random() * landSizes.length)];
-  } else if (type === "commercial") {
-    // Commercial can be land or building
-    const isLand = Math.random() > 0.5;
-    if (isLand) {
-      const commercialLandSizes = ["1000 sqm", "1500 sqm", "2000 sqm", "3000 sqm", "5000 sqm"];
-      size = commercialLandSizes[Math.floor(Math.random() * commercialLandSizes.length)];
-    } else {
-      const commercialBuildingSizes = ["200 sqm floor space", "500 sqm floor space", "800 sqm floor space"];
-      size = commercialBuildingSizes[Math.floor(Math.random() * commercialBuildingSizes.length)];
-    }
+    size = bedrooms + " bedrooms";
+  } else if (type === "land" || type === "commercial") {
+    // Generate size for land
+    const sizesOptions = ["500 sqm", "650 sqm", "1000 sqm", "1200 sqm", "2000 sqm", "3000 sqm"];
+    size = sizesOptions[Math.floor(Math.random() * sizesOptions.length)];
   }
 
   // Generate intelligent title
@@ -136,26 +125,16 @@ async function analyzeMediaAndGenerateProperty(mediaInfo: any): Promise<{
 
   if (type === "house") {
     const basePrice = parseInt(bedrooms || "3") * 15000000; // 15M per bedroom
-    price = Math.round(basePrice * locationMultiplier).toString();
+    price = (basePrice * locationMultiplier).toString();
   } else if (type === "apartment") {
     const basePrice = parseInt(bedrooms || "2") * 8000000; // 8M per bedroom
-    price = Math.round(basePrice * locationMultiplier).toString();
+    price = (basePrice * locationMultiplier).toString();
   } else if (type === "land") {
-    // Extract square meters from size string more carefully
-    const sizeMatch = size.match(/(\d+)\s*(?:sq|sqm|square|m)/i);
-    const sqm = sizeMatch ? parseInt(sizeMatch[1]) : 650;
+    const sqm = parseInt(size.replace(/[^\d]/g, "")) || 650;
     const pricePerSqm = 25000; // 25k per sqm
-    price = Math.round(sqm * pricePerSqm * locationMultiplier).toString();
+    price = (sqm * pricePerSqm * locationMultiplier).toString();
   } else if (type === "commercial") {
-    // For commercial, base price on size if land, or fixed rate if building
-    if (size.includes("sqm")) {
-      const sizeMatch = size.match(/(\d+)\s*(?:sq|sqm|square|m)/i);
-      const sqm = sizeMatch ? parseInt(sizeMatch[1]) : 1000;
-      const pricePerSqm = 50000; // 50k per sqm for commercial land
-      price = Math.round(sqm * pricePerSqm * locationMultiplier).toString();
-    } else {
-      price = Math.round(50000000 * locationMultiplier).toString(); // Base 50M for commercial building
-    }
+    price = (50000000 * locationMultiplier).toString(); // Base 50M for commercial
   }
 
   // Generate comprehensive description
@@ -304,123 +283,6 @@ async function generateIntelligentFeatures(type: string, location: string, bedro
   return features;
 }
 
-// Mock AI for fallback
-async function generateWithMockAI(mediaInfo: any): Promise<{
-  title: string;
-  description: string;
-  type: string;
-  location: string;
-  size: string;
-  bedrooms: string | null;
-  bathrooms: string | null;
-  features: string[];
-  price: string;
-}> {
-  const { userInput } = mediaInfo;
-  return {
-    title: userInput.title || "Mock Property Title",
-    description: userInput.description || "Mock property description from mock AI",
-    type: "house",
-    location: "Lagos",
-    size: "3 bedrooms, 2 bathrooms",
-    bedrooms: "3",
-    bathrooms: "2",
-    features: ["Good location", "Spacious"],
-    price: "50,000,000"
-  };
-}
-
-// Grok API integration
-async function generateWithGrok(mediaInfo: any): Promise<{
-  title: string;
-  description: string;
-  type: string;
-  location: string;
-  size: string;
-  bedrooms: string | null;
-  bathrooms: string | null;
-  features: string[];
-  price: string;
-}> {
-  const { hasImages, hasVideos, userInput } = mediaInfo;
-
-  const messages = [
-    {
-      role: "system",
-      content: `You are a Nigerian real estate expert specializing in Lagos properties. Generate comprehensive property details based on user input. 
-
-      IMPORTANT: Return ONLY valid JSON in this exact format:
-      {
-        "title": "Property title",
-        "description": "Detailed property description",
-        "type": "house/apartment/land/commercial",
-        "location": "Specific Lagos area",
-        "size": "Property size description",
-        "bedrooms": "number or null",
-        "bathrooms": "number or null", 
-        "features": ["feature1", "feature2", "feature3"],
-        "price": "price in naira as string"
-      }
-
-      Use realistic Lagos property prices. Make descriptions professional and appealing. Focus on prime areas like Lekki, Victoria Island, Ikoyi, Ajah, etc.`
-    },
-    {
-      role: "user",
-      content: `Generate property details for: "${userInput.title || 'property'}" - ${userInput.description || 'No description provided'}. 
-      Property has ${hasImages ? 'images' : 'no images'} and ${hasVideos ? 'videos' : 'no videos'}.
-
-      Please generate realistic Nigerian real estate details with proper Lagos locations and Naira pricing.`
-    }
-  ];
-
-  const response = await fetch('https://api.x.ai/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${process.env.GROK_API_KEY}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      model: "grok-beta",
-      messages,
-      max_tokens: 1500,
-      temperature: 0.7,
-      stream: false
-    })
-  });
-
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`Grok API error: ${response.statusText} - ${errorText}`);
-  }
-
-  const data = await response.json();
-  let aiResponse;
-
-  try {
-    // Try to parse the JSON response
-    const content = data.choices[0].message.content.trim();
-    // Remove any markdown code blocks if present
-    const cleanContent = content.replace(/```json\s?|\s?```/g, '').trim();
-    aiResponse = JSON.parse(cleanContent);
-  } catch (parseError) {
-    console.error('Failed to parse Grok response:', data.choices[0].message.content);
-    throw new Error('Invalid JSON response from Grok API');
-  }
-
-  return {
-    title: aiResponse.title || userInput.title || "Premium Property",
-    description: aiResponse.description || "Beautiful property in prime location",
-    type: aiResponse.type || "house",
-    location: aiResponse.location || "Lagos",
-    size: aiResponse.size || "",
-    bedrooms: aiResponse.bedrooms?.toString() || null,
-    bathrooms: aiResponse.bathrooms?.toString() || null,
-    features: Array.isArray(aiResponse.features) ? aiResponse.features : [],
-    price: aiResponse.price?.toString() || "0"
-  };
-}
-
-
 // Configure multer for file uploads
 const upload = multer({
   storage: multer.diskStorage({
@@ -568,25 +430,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { title, description, hasImages, hasVideos } = req.body;
 
       // Analyze media and user input to generate comprehensive property details
-      const mediaInfo = {
+      const propertyData = await analyzeMediaAndGenerateProperty({
         hasImages: hasImages || false,
         hasVideos: hasVideos || false,
         userInput: { title: title || "", description: description || "" }
-      };
+      });
 
-      // Use real Grok API if available, fallback to mock AI
-      if (process.env.GROK_API_KEY) {
-        try {
-          return await generateWithGrok(mediaInfo);
-        } catch (error) {
-          console.log('Grok failed, using fallback AI:', error);
-          return await generateWithMockAI(mediaInfo);
-        }
-      } else {
-        // If no API key is set, directly use the mock AI
-        console.log('No Grok API key found, using fallback AI.');
-        return await generateWithMockAI(mediaInfo);
-      }
+      res.json(propertyData);
     } catch (error) {
       console.error('AI generation error:', error);
       res.status(500).json({ message: "Failed to generate property details" });
