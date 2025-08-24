@@ -5,7 +5,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
 import { storage } from "./storage.js";
-import { insertContactSchema, insertPropertyInquirySchema, insertPropertySchema } from "@shared/schema";
+import { insertContactSchema, insertPropertyInquirySchema, insertPropertySchema } from "../shared/schema.js";
 import express from 'express';
 
 // Get the current directory (ES module equivalent of __dirname)

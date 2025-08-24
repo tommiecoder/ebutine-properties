@@ -7,10 +7,10 @@ import {
   type InsertContact,
   type PropertyInquiry,
   type InsertPropertyInquiry,
-} from "@shared/schema";
+} from "../shared/schema.js";
 import { randomUUID } from "crypto";
 import { db } from "./db.js";
-import { users, properties, contacts, propertyInquiries } from "@shared/schema";
+import { users, properties, contacts, propertyInquiries } from "../shared/schema.js";
 import { eq, and, gte, lte, sql } from "drizzle-orm";
 
 // Add database connection check function
