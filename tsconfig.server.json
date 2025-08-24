@@ -5,11 +5,13 @@
     "noEmit": false,
     "module": "ESNext",
     "target": "ES2022",
-    "moduleResolution": "bundler",
+    "moduleResolution": "node",
     "allowImportingTsExtensions": false,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
-    "verbatimModuleSyntax": true
+    "verbatimModuleSyntax": true,
+    "declaration": false,
+    "sourceMap": false
   },
   "include": ["server/**/*", "shared/**/*"],
   "exclude": ["node_modules", "client/**/*", "**/*.test.ts"]
