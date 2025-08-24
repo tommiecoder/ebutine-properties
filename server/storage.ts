@@ -9,7 +9,7 @@ import {
   type InsertPropertyInquiry,
 } from "@shared/schema";
 import { randomUUID } from "crypto";
-import { db } from "./db";
+import { db } from "./db.js";
 import { users, properties, contacts, propertyInquiries } from "@shared/schema";
 import { eq, and, gte, lte, sql } from "drizzle-orm";
 

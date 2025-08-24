@@ -4,7 +4,7 @@ import multer from "multer";
 import path from "path";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
-import { storage } from "./storage";
+import { storage } from "./storage.js";
 import { insertContactSchema, insertPropertyInquirySchema, insertPropertySchema } from "@shared/schema";
 import express from 'express';
 
