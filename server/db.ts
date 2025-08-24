@@ -1,6 +1,6 @@
 import { drizzle } from "drizzle-orm/neon-serverless";
 import { Pool } from "@neondatabase/serverless";
-import { users, properties, contacts, propertyInquiries } from '@shared/schema';
+import { users, properties, contacts, propertyInquiries } from '../shared/schema.js';
 
 let db: any;
 let isDbConnected = false;

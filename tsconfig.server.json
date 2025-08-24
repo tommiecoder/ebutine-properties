@@ -5,13 +5,17 @@
     "noEmit": false,
     "module": "ESNext",
     "target": "ES2022",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "allowImportingTsExtensions": false,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "verbatimModuleSyntax": false,
     "declaration": false,
-    "sourceMap": false
+    "sourceMap": false,
+    "baseUrl": ".",
+    "paths": {
+      "@shared/*": ["./shared/*"]
+    }
   },
   "include": ["server/**/*", "shared/**/*", "vite.config.ts"],
   "exclude": ["node_modules", "client/**/*", "**/*.test.ts"]
