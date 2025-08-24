@@ -3,7 +3,11 @@ import fs from "fs";
 import path from "path";
 import { createServer as createViteServer, createLogger } from "vite";
 import { type Server } from "http";
-import viteConfig from "../vite.config";
+// Use dynamic import to handle missing config gracefully
+const viteConfig =
+  process.env.NODE_ENV === "production"
+    ? {}
+    : (await import("../vite.config.js")).default;
 import { nanoid } from "nanoid";
 
 const viteLogger = createLogger();

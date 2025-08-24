@@ -9,10 +9,10 @@
     "allowImportingTsExtensions": false,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
-    "verbatimModuleSyntax": true,
+    "verbatimModuleSyntax": false,
     "declaration": false,
     "sourceMap": false
   },
-  "include": ["server/**/*", "shared/**/*"],
+  "include": ["server/**/*", "shared/**/*", "vite.config.ts"],
   "exclude": ["node_modules", "client/**/*", "**/*.test.ts"]
 }
