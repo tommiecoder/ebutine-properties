@@ -63,11 +63,7 @@ app.use((req, res, next) => {
   // It is the only port that is not firewalled.
   const port = parseInt(process.env.PORT || "5000", 10);
 
-  server.listen(port, "0.0.0.0", (err) => {
-    if (err) {
-      console.error('❌ Failed to start server:', err);
-      process.exit(1);
-    }
+  server.listen(port, "0.0.0.0", () => {
     log(`🚀 Server running on port ${port} in ${process.env.NODE_ENV || 'development'} mode`);
   });
 
