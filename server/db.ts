@@ -15,13 +15,19 @@ try {
       connectionString = connectionString.replace('.us-east-2', '-pooler.us-east-2');
     }
 
-    const pool = new Pool({ 
-      connectionString: connectionString + (isProduction ? '?sslmode=require' : ''),
+    const poolConfig = { 
+      connectionString,
       max: isProduction ? 3 : 10,
       connectionTimeoutMillis: 15000,
       idleTimeoutMillis: 30000,
-      ssl: isProduction ? { rejectUnauthorized: false } : false
-    });
+    };
+
+    // Add SSL only for production
+    if (isProduction) {
+      poolConfig.ssl = { rejectUnauthorized: false };
+    }
+
+    const pool = new Pool(poolConfig);
 
     db = drizzle(pool, { 
       schema: { users, properties, contacts, propertyInquiries } 

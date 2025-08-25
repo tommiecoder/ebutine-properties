@@ -12,9 +12,12 @@
     "allowSyntheticDefaultImports": true,
     "verbatimModuleSyntax": false,
     "declaration": false,
-    "sourceMap": false,
+    "sourceMap": true,
     "skipLibCheck": true,
     "strict": false,
+    "resolveJsonModule": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "baseUrl": ".",
     "paths": {
       "@shared/*": ["./shared/*"]

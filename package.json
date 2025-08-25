@@ -5,7 +5,7 @@
   "license": "MIT",
   "scripts": {
     "dev": "tsx server/index.ts",
-    "build": "npm run build:client && npx tsx --build server/index.ts --outdir dist/server",
+    "build": "npm run build:client && node build.js",
     "build:client": "npx vite build",
     "start": "NODE_ENV=production node dist/server/index.js",
     "db:generate": "drizzle-kit generate",
