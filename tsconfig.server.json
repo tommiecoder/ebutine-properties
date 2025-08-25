@@ -5,18 +5,19 @@
     "noEmit": false,
     "module": "ES2022",
     "target": "ES2022",
-    "moduleResolution": "bundler",
+    "moduleResolution": "node",
     "allowImportingTsExtensions": false,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "verbatimModuleSyntax": false,
     "declaration": false,
     "sourceMap": false,
+    "skipLibCheck": true,
     "baseUrl": ".",
     "paths": {
       "@shared/*": ["./shared/*"]
     }
   },
-  "include": ["server/**/*", "shared/**/*", "vite.config.ts"],
-  "exclude": ["node_modules", "client/**/*", "**/*.test.ts"]
+  "include": ["server/**/*", "shared/**/*"],
+  "exclude": ["node_modules", "client/**/*", "**/*.test.ts", "vite.config.ts"]
 }
