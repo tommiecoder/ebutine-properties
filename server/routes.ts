@@ -392,12 +392,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const imageUrls = files.images ? files.images.map(file => `/uploads/images/${file.filename}`) : [];
       const videoUrls = files.videos ? files.videos.map(file => `/uploads/videos/${file.filename}`) : [];
 
+      // Process external videos
+      let externalVideos = [];
+      if (req.body.externalVideos) {
+        try {
+          externalVideos = JSON.parse(req.body.externalVideos);
+        } catch (e) {
+          console.warn('Failed to parse externalVideos:', e);
+        }
+      }
+
       // This block is updated to include better error handling and logging
       try {
         console.log('📝 Creating property with data:', {
           title: req.body.title,
           images: imageUrls.length,
-          videos: videoUrls.length
+          videos: videoUrls.length,
+          externalVideos: externalVideos.length
         });
 
         const property = await storage.saveProperty({
@@ -410,6 +421,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           features: req.body.features ? req.body.features.split(',').map((f: string) => f.trim()) : [],
           images: imageUrls,
           videos: videoUrls,
+          externalVideos: externalVideos,
           thumbnail: imageUrls[0] || videoUrls[0] || '',
           featured: req.body.featured === 'true',
           createdAt: new Date()

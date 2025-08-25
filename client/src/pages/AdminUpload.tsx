@@ -25,7 +25,8 @@ export default function AdminUpload() {
     bathrooms: "",
     features: "",
     images: [] as File[],
-    videos: [] as File[]
+    videos: [] as File[],
+    externalVideos: ""
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isGeneratingAI, setIsGeneratingAI] = useState(false);
@@ -193,7 +194,8 @@ export default function AdminUpload() {
       bathrooms: property.bathrooms || "",
       features: property.features ? property.features.join(', ') : "",
       images: [], // Reset images on edit start
-      videos: []  // Reset videos on edit start
+      videos: [], // Reset videos on edit start
+      externalVideos: property.externalVideos ? property.externalVideos.map(v => `${v.url}|${v.platform}|${v.title || ''}`).join('\n') : ""
     });
     // Assuming thumbnail is stored with the property or needs to be fetched/generated again
     // For simplicity, we'll clear it here if editing, and it can be regenerated if new files are uploaded.
@@ -214,7 +216,8 @@ export default function AdminUpload() {
       bathrooms: "",
       features: "",
       images: [],
-      videos: []
+      videos: [],
+      externalVideos: ""
     });
     setThumbnail('');
   };
@@ -380,10 +383,26 @@ export default function AdminUpload() {
 
       // Add text fields
       Object.entries(formData).forEach(([key, value]) => {
-        if (key !== 'images' && key !== 'videos') {
+        if (key !== 'images' && key !== 'videos' && key !== 'externalVideos') {
           formDataToSend.append(key, value as string);
         }
       });
+
+      // Process external videos
+      if (formData.externalVideos) {
+        const externalVideosArray = formData.externalVideos
+          .split('\n')
+          .filter(line => line.trim())
+          .map(line => {
+            const parts = line.split('|');
+            const url = parts[0].trim();
+            const platform = parts[1]?.trim() || 'other';
+            const title = parts[2]?.trim() || '';
+            return { url, platform, title };
+          });
+        
+        formDataToSend.append('externalVideos', JSON.stringify(externalVideosArray));
+      }
 
       // Add files only if new files are selected
       if (formData.images.length > 0) {
@@ -614,7 +633,7 @@ export default function AdminUpload() {
 
             <div>
               <Label htmlFor="videos">Property Videos {isEditing && "(Leave empty to keep existing videos)"}</Label>
-              <p className="text-sm text-gray-600 mb-2">First frame will be used as thumbnail</p>
+              <p className="text-sm text-gray-600 mb-2">Upload local videos or add external video URLs below</p>
               <Input
                 id="videos"
                 type="file"
@@ -628,6 +647,18 @@ export default function AdminUpload() {
                   <img src={thumbnail} alt="Generated Thumbnail" className="w-32 h-32 object-cover rounded" />
                 </div>
               )}
+            </div>
+
+            <div>
+              <Label htmlFor="externalVideos">External Video URLs (YouTube, Instagram, etc.)</Label>
+              <p className="text-sm text-gray-600 mb-2">Add one URL per line. Format: URL|Platform|Title (Platform and Title are optional)</p>
+              <Textarea
+                id="externalVideos"
+                value={formData.externalVideos || ""}
+                onChange={(e) => handleInputChange('externalVideos', e.target.value)}
+                placeholder="https://www.instagram.com/reel/DNOvEZvsqYv/|instagram|Premium Investment in Lekki&#10;https://www.youtube.com/watch?v=example|youtube|Property Tour"
+                rows={3}
+              />
             </div>
 
             <Button type="submit" disabled={isSubmitting} className="w-full">
