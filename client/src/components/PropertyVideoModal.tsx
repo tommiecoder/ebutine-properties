@@ -37,12 +37,12 @@ export default function PropertyVideoModal({
 
   const getYouTubeEmbedUrl = (url: string) => {
     const videoId = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/)?.[1];
-    return videoId ? `https://www.youtube.com/embed/${videoId}` : null;
+    return videoId ? `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}` : null;
   };
 
   const getVimeoEmbedUrl = (url: string) => {
     const videoId = url.match(/vimeo\.com\/(\d+)/)?.[1];
-    return videoId ? `https://player.vimeo.com/video/${videoId}` : null;
+    return videoId ? `https://player.vimeo.com/video/${videoId}?autoplay=1&muted=1&loop=1` : null;
   };
 
   const renderEmbedCode = (embed: EmbedCode, index: number) => {
@@ -81,7 +81,7 @@ export default function PropertyVideoModal({
                 src={youtubeEmbedUrl}
                 className="w-full h-64 md:h-80 rounded-lg"
                 frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 allowFullScreen
               />
             </div>
@@ -219,10 +219,12 @@ export default function PropertyVideoModal({
                 <h4 className="font-medium mb-2">Local Video {index + 1}</h4>
                 <video 
                   controls 
+                  autoPlay
                   className="w-full h-auto max-h-96 rounded-lg"
                   preload="metadata"
                   playsInline
                   muted
+                  loop
                   controlsList="nodownload"
                   style={{ backgroundColor: '#f3f4f6' }}
                   onError={(e) => {
