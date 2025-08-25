@@ -109,15 +109,35 @@ export default function PropertyVideoModal({
                 <ExternalLink className="h-4 w-4" />
               </a>
             </div>
-            <div className="bg-gray-100 p-4 rounded-lg text-center">
-              <p className="text-gray-600 mb-4">Click to view Instagram content</p>
-              <Button 
-                onClick={() => window.open(video.url, '_blank')}
-                className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
-              >
-                View on Instagram
-              </Button>
-            </div>
+            {/* Check if we have embed code in the URL field or render the embed */}
+            {video.url.includes('blockquote') ? (
+              <div 
+                className="instagram-embed-container"
+                dangerouslySetInnerHTML={{ __html: video.url }}
+              />
+            ) : (
+              <>
+                <div className="bg-gray-100 p-4 rounded-lg text-center">
+                  <p className="text-gray-600 mb-4">Click to view Instagram content</p>
+                  <Button 
+                    onClick={() => window.open(video.url, '_blank')}
+                    className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+                  >
+                    View on Instagram
+                  </Button>
+                </div>
+                {/* Try to render as embedded iframe for regular Instagram URLs */}
+                <div className="mt-4">
+                  <iframe
+                    src={`${video.url}embed/`}
+                    className="w-full h-96 rounded-lg border-0"
+                    frameBorder="0"
+                    scrolling="no"
+                    allowTransparency={true}
+                  />
+                </div>
+              </>
+            )}
           </div>
         );
 
