@@ -1,4 +1,3 @@
-
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { X, ExternalLink } from "lucide-react";
@@ -189,7 +188,7 @@ export default function PropertyVideoModal({
           </div>
         );
     }
-    
+
     return null; // Return null if no case matches
   };
 
@@ -204,7 +203,7 @@ export default function PropertyVideoModal({
             </Button>
           </DialogTitle>
         </DialogHeader>
-        
+
         <div className="space-y-6 max-h-[70vh] overflow-y-auto">
           {/* Embed Codes */}
           {embedCodes.map((embed, index) => (
@@ -218,7 +217,7 @@ export default function PropertyVideoModal({
               />
             </div>
           ))}
-          
+
           {/* External Videos */}
           {externalVideos.map((video, index) => {
             const content = renderExternalVideo(video, index);
@@ -228,11 +227,11 @@ export default function PropertyVideoModal({
               </div>
             );
           })}
-          
+
           {/* Local Videos */}
           {videos.map((videoUrl, index) => {
             const fullVideoUrl = videoUrl.startsWith('http') ? videoUrl : `${window.location.origin}${videoUrl}`;
-            
+
             return (
               <div key={`local-${index}`} className="w-full flex flex-col items-center">
                 <h4 className="font-medium mb-2 text-center">Local Video {index + 1}</h4>

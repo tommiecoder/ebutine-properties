@@ -7,10 +7,22 @@ import { dirname } from "path";
 import { storage } from "./storage.js";
 import { insertContactSchema, insertPropertyInquirySchema, insertPropertySchema } from "../shared/schema.js";
 import express from 'express';
+import fs from "fs";
 
 // Get the current directory (ES module equivalent of __dirname)
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
+
+// Ensure uploads directories exist
+const uploadsDir = path.join(process.cwd(), 'uploads');
+const imagesDir = path.join(uploadsDir, 'images');
+const videosDir = path.join(uploadsDir, 'videos');
+
+[uploadsDir, imagesDir, videosDir].forEach(dir => {
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+  }
+});
 
 // Enhanced AI generation helper functions
 async function analyzeMediaAndGenerateProperty(mediaInfo: any): Promise<{

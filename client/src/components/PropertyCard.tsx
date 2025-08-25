@@ -2,12 +2,14 @@ import { Heart, Bed, Bath, Car, MapPin, Phone, Play } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import PropertyVideoModal from "./PropertyVideoModal";
 import type { Property } from "@shared/schema";
 
 function PropertyThumbnail({ property }: { property: Property }) {
   const [thumbnailSrc, setThumbnailSrc] = useState<string>("");
+  const [videoLoaded, setVideoLoaded] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   const getYouTubeThumbnail = (url: string) => {
     const videoId = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/)?.[1];
@@ -37,12 +39,12 @@ function PropertyThumbnail({ property }: { property: Property }) {
       // Priority 2: Check for external videos with thumbnails
       if (property.externalVideos && property.externalVideos.length > 0) {
         const firstVideo = property.externalVideos[0];
-        
+
         if (firstVideo.thumbnail) {
           setThumbnailSrc(firstVideo.thumbnail);
           return;
         }
-        
+
         // Generate thumbnail based on platform
         if (firstVideo.platform === 'youtube') {
           const ytThumbnail = getYouTubeThumbnail(firstVideo.url);
@@ -51,7 +53,7 @@ function PropertyThumbnail({ property }: { property: Property }) {
             return;
           }
         }
-        
+
         if (firstVideo.platform === 'instagram') {
           const igThumbnail = getInstagramThumbnail(firstVideo.url);
           if (igThumbnail) {
@@ -136,7 +138,7 @@ function PropertyThumbnail({ property }: { property: Property }) {
           // Set video source with proper URL formatting
           const videoUrl = property.videos[0];
           const fullVideoUrl = videoUrl.startsWith('http') ? videoUrl : `${window.location.origin}${videoUrl}`;
-          
+
           video.src = fullVideoUrl;
           console.log('Loading video for thumbnail:', fullVideoUrl);
 
