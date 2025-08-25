@@ -1,7 +1,6 @@
 {
   "name": "rest-expressS",
   "version": "1.0.0",
-  "type": "module",
   "license": "MIT",
   "scripts": {
     "clean": "node clean.js",

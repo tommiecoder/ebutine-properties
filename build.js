@@ -1,22 +1,30 @@
 #!/usr/bin/env node
 
-import { build } from 'esbuild';
-import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
-import { readFileSync, mkdirSync, existsSync } from 'fs';
+import { build } from "esbuild";
+import { fileURLToPath } from "url";
+import { dirname, join } from "path";
+import { readFileSync, mkdirSync, existsSync } from "fs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 // Read package.json to get dependencies that should stay external
 const packageJson = JSON.parse(readFileSync("package.json", "utf8"));
+
+// Build server with CommonJS format
+await build({
+  entryPoints: ["server/index.ts"],
+  bundle: true,
+  outfile: "dist/server/index.js",
+  platform: "node",
+  format: "cjs",
+  target: "node20",
+  external: Object.keys(packageJson.dependencies || {}),
+});
 const externals = [
   // Keep these as external since they're platform-specific
   "bufferutil",
   "utf-8-validate",
-  // Add these to prevent bundling issues
-  "lightningcss",
-  "esbuild",
 ];
 
 async function buildServer() {
@@ -24,10 +32,10 @@ async function buildServer() {
     console.log("🔧 Building server...");
 
     // Ensure dist directory exists
-    const distDir = join(__dirname, 'dist', 'server');
+    const distDir = join(__dirname, "dist", "server");
     if (!existsSync(distDir)) {
       mkdirSync(distDir, { recursive: true });
-      console.log('📁 Created dist directory');
+      console.log("📁 Created dist directory");
     }
 
     await build({
