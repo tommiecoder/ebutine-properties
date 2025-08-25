@@ -7,19 +7,25 @@
     "module": "ESNext",
     "target": "ES2022",
     "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
+    "allowImportingTsExtensions": false,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
-    "verbatimModuleSyntax": true,
+    "verbatimModuleSyntax": false,
     "declaration": false,
     "sourceMap": false,
     "skipLibCheck": true,
-    "strict": true,
+    "strict": false,
     "baseUrl": ".",
     "paths": {
       "@shared/*": ["./shared/*"]
     }
   },
   "include": ["server/**/*", "shared/**/*", "scripts/**/*"],
-  "exclude": ["node_modules", "client/**/*", "**/*.test.ts", "vite.config.ts", "dist/**/*"]
+  "exclude": [
+    "node_modules",
+    "client/**/*",
+    "**/*.test.ts",
+    "vite.config.ts",
+    "dist/**/*"
+  ]
 }

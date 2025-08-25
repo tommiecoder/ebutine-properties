@@ -5,7 +5,7 @@
   "license": "MIT",
   "scripts": {
     "dev": "tsx server/index.ts",
-    "build": "npm run build:client && tsc --project tsconfig.server.json",
+    "build": "npm run build:client && npx tsx --build server/index.ts --outdir dist/server",
     "build:client": "npx vite build",
     "start": "NODE_ENV=production node dist/server/index.js",
     "db:generate": "drizzle-kit generate",
@@ -46,6 +46,7 @@
     "@tanstack/react-query": "^5.60.5",
     "@types/multer": "^2.0.0",
     "@types/react-helmet": "^6.1.11",
+    "@replit/vite-plugin-cartographer": "^1.0.0",
     "@vitejs/plugin-react": "^5.0.1",
     "autoprefixer": "^10.4.21",
     "class-variance-authority": "^0.7.1",

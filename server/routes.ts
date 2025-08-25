@@ -5,20 +5,23 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
 import { storage } from "./storage.js";
-import { insertContactSchema, insertPropertyInquirySchema, insertPropertySchema } from "../shared/schema.js";
-import express from 'express';
+import {
+  insertContactSchema,
+  insertPropertyInquirySchema,
+  insertPropertySchema,
+} from "../shared/schema.js";
+import express from "express";
 import fs from "fs";
 
 // Get the current directory (ES module equivalent of __dirname)
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+const __dirname = process.cwd();
 
 // Ensure uploads directories exist
-const uploadsDir = path.join(process.cwd(), 'uploads');
-const imagesDir = path.join(uploadsDir, 'images');
-const videosDir = path.join(uploadsDir, 'videos');
+const uploadsDir = path.join(process.cwd(), "uploads");
+const imagesDir = path.join(uploadsDir, "images");
+const videosDir = path.join(uploadsDir, "videos");
 
-[uploadsDir, imagesDir, videosDir].forEach(dir => {
+[uploadsDir, imagesDir, videosDir].forEach((dir) => {
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir, { recursive: true });
   }
@@ -42,7 +45,11 @@ async function analyzeMediaAndGenerateProperty(mediaInfo: any): Promise<{
   const { hasImages, hasVideos, userInput } = mediaInfo;
 
   // Analyze user input for clues
-  const inputLower = (userInput.title + " " + (userInput.description || "")).toLowerCase();
+  const inputLower = (
+    userInput.title +
+    " " +
+    (userInput.description || "")
+  ).toLowerCase();
 
   // Detect property type from input
   let type = "house";
@@ -50,17 +57,42 @@ async function analyzeMediaAndGenerateProperty(mediaInfo: any): Promise<{
     type = inputLower.includes("commercial") ? "commercial" : "land";
   } else if (inputLower.includes("apartment") || inputLower.includes("flat")) {
     type = "apartment";
-  } else if (inputLower.includes("luxury") || inputLower.includes("duplex") || inputLower.includes("mansion")) {
+  } else if (
+    inputLower.includes("luxury") ||
+    inputLower.includes("duplex") ||
+    inputLower.includes("mansion")
+  ) {
     type = "house";
-  } else if (inputLower.includes("office") || inputLower.includes("shop") || inputLower.includes("store")) {
+  } else if (
+    inputLower.includes("office") ||
+    inputLower.includes("shop") ||
+    inputLower.includes("store")
+  ) {
     type = "commercial";
   }
 
   // Generate intelligent location suggestions based on popular Lagos areas
   const lagosAreas = [
-    "Lekki", "Victoria Island", "Ikoyi", "Ajah", "Sangotedo", "Chevron", "Ibeju-Lekki",
-    "Banana Island", "Parkview Estate", "Ikeja", "Maryland", "Gbagada", "Surulere",
-    "Yaba", "Lagos Island", "Festac", "Magodo", "Ojota", "Ketu", "Mile 2"
+    "Lekki",
+    "Victoria Island",
+    "Ikoyi",
+    "Ajah",
+    "Sangotedo",
+    "Chevron",
+    "Ibeju-Lekki",
+    "Banana Island",
+    "Parkview Estate",
+    "Ikeja",
+    "Maryland",
+    "Gbagada",
+    "Surulere",
+    "Yaba",
+    "Lagos Island",
+    "Festac",
+    "Magodo",
+    "Ojota",
+    "Ketu",
+    "Mile 2",
   ];
 
   let detectedLocation = "Lagos";
@@ -118,7 +150,14 @@ async function analyzeMediaAndGenerateProperty(mediaInfo: any): Promise<{
     size = bedrooms + " bedrooms";
   } else if (type === "land" || type === "commercial") {
     // Generate size for land
-    const sizesOptions = ["500 sqm", "650 sqm", "1000 sqm", "1200 sqm", "2000 sqm", "3000 sqm"];
+    const sizesOptions = [
+      "500 sqm",
+      "650 sqm",
+      "1000 sqm",
+      "1200 sqm",
+      "2000 sqm",
+      "3000 sqm",
+    ];
     size = sizesOptions[Math.floor(Math.random() * sizesOptions.length)];
   }
 
@@ -126,7 +165,8 @@ async function analyzeMediaAndGenerateProperty(mediaInfo: any): Promise<{
   let title = "";
   if (type === "house") {
     const houseTypes = ["Modern", "Luxury", "Elegant", "Spacious", "Beautiful"];
-    const houseStyle = houseTypes[Math.floor(Math.random() * houseTypes.length)];
+    const houseStyle =
+      houseTypes[Math.floor(Math.random() * houseTypes.length)];
     title = `${houseStyle} ${bedrooms}BR ${type === "house" ? "House" : "Apartment"}`;
   } else if (type === "land") {
     title = `Prime Residential Land - ${size}`;
@@ -138,9 +178,15 @@ async function analyzeMediaAndGenerateProperty(mediaInfo: any): Promise<{
 
   // Generate price based on type and location
   let price = "0";
-  const locationMultiplier = detectedLocation.includes("Victoria Island") || detectedLocation.includes("Ikoyi") ? 1.8 :
-                           detectedLocation.includes("Lekki") ? 1.4 :
-                           detectedLocation.includes("Ajah") ? 1.1 : 1.0;
+  const locationMultiplier =
+    detectedLocation.includes("Victoria Island") ||
+    detectedLocation.includes("Ikoyi")
+      ? 1.8
+      : detectedLocation.includes("Lekki")
+        ? 1.4
+        : detectedLocation.includes("Ajah")
+          ? 1.1
+          : 1.0;
 
   if (type === "house") {
     const basePrice = parseInt(bedrooms || "3") * 15000000; // 15M per bedroom
@@ -158,11 +204,22 @@ async function analyzeMediaAndGenerateProperty(mediaInfo: any): Promise<{
 
   // Generate comprehensive description
   const description = await generateEnhancedDescription({
-    title, type, location: detectedLocation, price, size, bedrooms, bathrooms
+    title,
+    type,
+    location: detectedLocation,
+    price,
+    size,
+    bedrooms,
+    bathrooms,
   });
 
   // Generate intelligent features
-  const features = await generateIntelligentFeatures(type, detectedLocation, bedrooms || undefined, bathrooms || undefined);
+  const features = await generateIntelligentFeatures(
+    type,
+    detectedLocation,
+    bedrooms || undefined,
+    bathrooms || undefined,
+  );
 
   return {
     title,
@@ -173,12 +230,13 @@ async function analyzeMediaAndGenerateProperty(mediaInfo: any): Promise<{
     bedrooms,
     bathrooms,
     features,
-    price
+    price,
   };
 }
 
 async function generateEnhancedDescription(propertyData: any): Promise<string> {
-  const { title, type, location, price, size, bedrooms, bathrooms } = propertyData;
+  const { title, type, location, price, size, bedrooms, bathrooms } =
+    propertyData;
 
   const priceFormatted = price ? `₦${parseFloat(price).toLocaleString()}` : "";
 
@@ -219,13 +277,18 @@ async function generateEnhancedDescription(propertyData: any): Promise<string> {
   return description;
 }
 
-async function generateIntelligentFeatures(type: string, location: string, bedrooms?: string, bathrooms?: string): Promise<string[]> {
+async function generateIntelligentFeatures(
+  type: string,
+  location: string,
+  bedrooms?: string,
+  bathrooms?: string,
+): Promise<string[]> {
   const baseFeatures = [
     "24/7 Security",
     "Gated Community",
     "Tarred Roads",
     "Reliable Electricity",
-    "Borehole Water Supply"
+    "Borehole Water Supply",
   ];
 
   const houseFeatures = [
@@ -238,7 +301,7 @@ async function generateIntelligentFeatures(type: string, location: string, bedro
     "Air Conditioning Ready",
     "Balconies",
     "Family Lounge",
-    "Dining Area"
+    "Dining Area",
   ];
 
   const apartmentFeatures = [
@@ -250,7 +313,7 @@ async function generateIntelligentFeatures(type: string, location: string, bedro
     "Parking Space",
     "CCTV Surveillance",
     "Generator Backup",
-    "Intercom System"
+    "Intercom System",
   ];
 
   const landFeatures = [
@@ -261,7 +324,7 @@ async function generateIntelligentFeatures(type: string, location: string, bedro
     "High ROI Potential",
     "All Utilities Available",
     "Drainage System",
-    "Estate Development"
+    "Estate Development",
   ];
 
   const commercialFeatures = [
@@ -272,16 +335,28 @@ async function generateIntelligentFeatures(type: string, location: string, bedro
     "High Foot Traffic",
     "Investment Grade",
     "Flexible Space Design",
-    "Prime Business District"
+    "Prime Business District",
   ];
 
   // Add location-specific features
   const locationFeatures = [];
-  if (location.includes("Lekki") || location.includes("Victoria Island") || location.includes("Ikoyi")) {
-    locationFeatures.push("Premium Neighborhood", "Close to Business District", "Waterfront Access");
+  if (
+    location.includes("Lekki") ||
+    location.includes("Victoria Island") ||
+    location.includes("Ikoyi")
+  ) {
+    locationFeatures.push(
+      "Premium Neighborhood",
+      "Close to Business District",
+      "Waterfront Access",
+    );
   }
   if (location.includes("Ibeju-Lekki")) {
-    locationFeatures.push("Free Trade Zone Proximity", "Airport Access", "Future Growth Area");
+    locationFeatures.push(
+      "Free Trade Zone Proximity",
+      "Airport Access",
+      "Future Growth Area",
+    );
   }
 
   let features = [...baseFeatures];
@@ -306,17 +381,22 @@ async function generateIntelligentFeatures(type: string, location: string, bedro
 const upload = multer({
   storage: multer.diskStorage({
     destination: (req, file, cb) => {
-      const uploadDir = file.mimetype.startsWith('video/') ? 'uploads/videos' : 'uploads/images';
+      const uploadDir = file.mimetype.startsWith("video/")
+        ? "uploads/videos"
+        : "uploads/images";
       cb(null, uploadDir);
     },
     filename: (req, file, cb) => {
-      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-      cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
-    }
+      const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+      cb(
+        null,
+        file.fieldname + "-" + uniqueSuffix + path.extname(file.originalname),
+      );
+    },
   }),
   limits: {
-    fileSize: 100 * 1024 * 1024 // 100MB limit
-  }
+    fileSize: 100 * 1024 * 1024, // 100MB limit
+  },
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -385,7 +465,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/property-inquiries", async (req, res) => {
     try {
       const { propertyId } = req.query;
-      const inquiries = await storage.getPropertyInquiries(propertyId as string);
+      const inquiries = await storage.getPropertyInquiries(
+        propertyId as string,
+      );
       res.json(inquiries);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch inquiries" });
@@ -393,79 +475,103 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Admin property upload route
-  app.post("/api/admin/properties", upload.fields([
-    { name: 'images', maxCount: 10 },
-    { name: 'videos', maxCount: 5 }
-  ]), async (req, res) => {
-    try {
-      const files = req.files as { [fieldname: string]: Express.Multer.File[] };
-
-      // Process uploaded files
-      const imageUrls = files.images ? files.images.map(file => `/uploads/images/${file.filename}`) : [];
-      const videoUrls = files.videos ? files.videos.map(file => `/uploads/videos/${file.filename}`) : [];
-
-      // Parse external videos if provided
-      let externalVideos = [];
-      if (req.body.externalVideos) {
-        const lines = req.body.externalVideos.split('\n').filter((line: string) => line.trim());
-        externalVideos = lines.map((line: string) => {
-          const [url, platform = 'other', title = ''] = line.split('|');
-          return { url: url.trim(), platform: platform.trim(), title: title.trim() };
-        });
-      }
-
-      // Parse embed codes if provided
-      let embedCodes = [];
-      if (req.body.embedCodes) {
-        const lines = req.body.embedCodes.split('\n').filter((line: string) => line.trim());
-        embedCodes = lines.map((line: string) => {
-          const [embedCode, title = '', platform = ''] = line.split('|');
-          return { embedCode: embedCode.trim(), title: title.trim(), platform: platform.trim() };
-        });
-      }
-
-      // This block is updated to include better error handling and logging
+  app.post(
+    "/api/admin/properties",
+    upload.fields([
+      { name: "images", maxCount: 10 },
+      { name: "videos", maxCount: 5 },
+    ]),
+    async (req, res) => {
       try {
-        console.log('📝 Creating property with data:', {
-          title: req.body.title,
-          images: imageUrls.length,
-          videos: videoUrls.length,
-          externalVideos: externalVideos.length,
-          embedCodes: embedCodes.length
-        });
+        const files = req.files as {
+          [fieldname: string]: Express.Multer.File[];
+        };
 
-        const property = await storage.saveProperty({
-          title: req.body.title,
-          description: req.body.description,
-          price: parseFloat(req.body.price),
-          location: req.body.location,
-          type: req.body.type as 'residential' | 'commercial' | 'land',
-          size: req.body.size,
-          features: req.body.features ? req.body.features.split(',').map((f: string) => f.trim()) : [],
-          images: imageUrls,
-          videos: videoUrls,
-          externalVideos: externalVideos,
-          embedCodes: embedCodes, // Include embedCodes here
-          thumbnail: imageUrls[0] || videoUrls[0] || '',
-          featured: req.body.featured === 'true',
-          createdAt: new Date()
-        });
+        // Process uploaded files
+        const imageUrls = files.images
+          ? files.images.map((file) => `/uploads/images/${file.filename}`)
+          : [];
+        const videoUrls = files.videos
+          ? files.videos.map((file) => `/uploads/videos/${file.filename}`)
+          : [];
 
-        console.log('✅ Property created successfully:', property.id);
-        res.json({ success: true, property });
+        // Parse external videos if provided
+        let externalVideos = [];
+        if (req.body.externalVideos) {
+          const lines = req.body.externalVideos
+            .split("\n")
+            .filter((line: string) => line.trim());
+          externalVideos = lines.map((line: string) => {
+            const [url, platform = "other", title = ""] = line.split("|");
+            return {
+              url: url.trim(),
+              platform: platform.trim(),
+              title: title.trim(),
+            };
+          });
+        }
+
+        // Parse embed codes if provided
+        let embedCodes = [];
+        if (req.body.embedCodes) {
+          const lines = req.body.embedCodes
+            .split("\n")
+            .filter((line: string) => line.trim());
+          embedCodes = lines.map((line: string) => {
+            const [embedCode, title = "", platform = ""] = line.split("|");
+            return {
+              embedCode: embedCode.trim(),
+              title: title.trim(),
+              platform: platform.trim(),
+            };
+          });
+        }
+
+        // This block is updated to include better error handling and logging
+        try {
+          console.log("📝 Creating property with data:", {
+            title: req.body.title,
+            images: imageUrls.length,
+            videos: videoUrls.length,
+            externalVideos: externalVideos.length,
+            embedCodes: embedCodes.length,
+          });
+
+          const property = await storage.saveProperty({
+            title: req.body.title,
+            description: req.body.description,
+            price: parseFloat(req.body.price),
+            location: req.body.location,
+            type: req.body.type as "residential" | "commercial" | "land",
+            size: req.body.size,
+            features: req.body.features
+              ? req.body.features.split(",").map((f: string) => f.trim())
+              : [],
+            images: imageUrls,
+            videos: videoUrls,
+            externalVideos: externalVideos,
+            embedCodes: embedCodes, // Include embedCodes here
+            thumbnail: imageUrls[0] || videoUrls[0] || "",
+            featured: req.body.featured === "true",
+            createdAt: new Date(),
+          });
+
+          console.log("✅ Property created successfully:", property.id);
+          res.json({ success: true, property });
+        } catch (error) {
+          console.error("❌ Error creating property:", error);
+          res.status(500).json({
+            success: false,
+            error: "Failed to create property",
+            details: error instanceof Error ? error.message : "Unknown error",
+          });
+        }
       } catch (error) {
-        console.error('❌ Error creating property:', error);
-        res.status(500).json({
-          success: false,
-          error: 'Failed to create property',
-          details: error instanceof Error ? error.message : 'Unknown error'
-        });
+        console.error("Multer upload error:", error);
+        res.status(400).json({ message: "File upload failed", error });
       }
-    } catch (error) {
-      console.error('Multer upload error:', error);
-      res.status(400).json({ message: "File upload failed", error });
-    }
-  });
+    },
+  );
 
   // Enhanced AI property generation endpoint
   app.post("/api/admin/generate-property", async (req, res) => {
@@ -476,12 +582,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const propertyData = await analyzeMediaAndGenerateProperty({
         hasImages: hasImages || false,
         hasVideos: hasVideos || false,
-        userInput: { title: title || "", description: description || "" }
+        userInput: { title: title || "", description: description || "" },
       });
 
       res.json(propertyData);
     } catch (error) {
-      console.error('AI generation error:', error);
+      console.error("AI generation error:", error);
       res.status(500).json({ message: "Failed to generate property details" });
     }
   });
@@ -489,7 +595,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Legacy AI description generation endpoint (kept for backward compatibility)
   app.post("/api/admin/generate-description", async (req, res) => {
     try {
-      const { title, type, location, price, size, bedrooms, bathrooms } = req.body;
+      const { title, type, location, price, size, bedrooms, bathrooms } =
+        req.body;
 
       // Generate AI description based on property details
       const description = await generateEnhancedDescription({
@@ -499,14 +606,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         price,
         size,
         bedrooms,
-        bathrooms
+        bathrooms,
       });
 
-      const features = await generateIntelligentFeatures(type, location, bedrooms, bathrooms);
+      const features = await generateIntelligentFeatures(
+        type,
+        location,
+        bedrooms,
+        bathrooms,
+      );
 
       res.json({ description, features });
     } catch (error) {
-      console.error('AI generation error:', error);
+      console.error("AI generation error:", error);
       res.status(500).json({ message: "Failed to generate description" });
     }
   });
@@ -520,125 +632,149 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       res.json({ message: "Property deleted successfully" });
     } catch (error) {
-      console.error('Delete property error:', error);
+      console.error("Delete property error:", error);
       res.status(500).json({ message: "Failed to delete property" });
     }
   });
 
   // Update property endpoint
-  app.put("/api/admin/properties/:id", upload.fields([
-    { name: 'images', maxCount: 10 },
-    { name: 'videos', maxCount: 5 }
-  ]), async (req, res) => {
-    try {
-      const files = req.files as { [fieldname: string]: Express.Multer.File[] };
+  app.put(
+    "/api/admin/properties/:id",
+    upload.fields([
+      { name: "images", maxCount: 10 },
+      { name: "videos", maxCount: 5 },
+    ]),
+    async (req, res) => {
+      try {
+        const files = req.files as {
+          [fieldname: string]: Express.Multer.File[];
+        };
 
-      // Get existing property to preserve current media if no new files uploaded
-      const existingProperty = await storage.getProperty(req.params.id);
-      if (!existingProperty) {
-        return res.status(404).json({ message: "Property not found" });
+        // Get existing property to preserve current media if no new files uploaded
+        const existingProperty = await storage.getProperty(req.params.id);
+        if (!existingProperty) {
+          return res.status(404).json({ message: "Property not found" });
+        }
+
+        // Process uploaded files or keep existing ones
+        const imageUrls = files.images
+          ? files.images.map((file) => `/uploads/images/${file.filename}`)
+          : existingProperty.images;
+        const videoUrls = files.videos
+          ? files.videos.map((file) => `/uploads/videos/${file.filename}`)
+          : existingProperty.videos;
+
+        // Parse embed codes if provided for update
+        let embedCodes = existingProperty.embedCodes || [];
+        if (req.body.embedCodes) {
+          const lines = req.body.embedCodes
+            .split("\n")
+            .filter((line: string) => line.trim());
+          embedCodes = lines.map((line: string) => {
+            const [embedCode, title = "", platform = ""] = line.split("|");
+            return {
+              embedCode: embedCode.trim(),
+              title: title.trim(),
+              platform: platform.trim(),
+            };
+          });
+        }
+
+        const propertyData = {
+          ...req.body,
+          price: req.body.price.toString(),
+          size: req.body.size || null,
+          bedrooms: req.body.bedrooms || null,
+          bathrooms: req.body.bathrooms || null,
+          images: imageUrls,
+          videos: videoUrls,
+          externalVideos: existingProperty.externalVideos, // Assuming externalVideos are handled separately or not updated here
+          embedCodes: embedCodes, // Include updated embedCodes
+          features: Array.isArray(req.body.features)
+            ? req.body.features
+            : req.body.features
+              ? req.body.features.split(",").map((f: string) => f.trim())
+              : [],
+        };
+
+        const property = await storage.updateProperty(
+          req.params.id,
+          propertyData,
+        );
+        if (!property) {
+          return res.status(404).json({ message: "Property not found" });
+        }
+
+        res.json(property);
+      } catch (error) {
+        console.error("Property update error:", error);
+        res.status(400).json({ message: "Invalid property data", error });
       }
-
-      // Process uploaded files or keep existing ones
-      const imageUrls = files.images
-        ? files.images.map(file => `/uploads/images/${file.filename}`)
-        : existingProperty.images;
-      const videoUrls = files.videos
-        ? files.videos.map(file => `/uploads/videos/${file.filename}`)
-        : existingProperty.videos;
-
-      // Parse embed codes if provided for update
-      let embedCodes = existingProperty.embedCodes || [];
-      if (req.body.embedCodes) {
-        const lines = req.body.embedCodes.split('\n').filter((line: string) => line.trim());
-        embedCodes = lines.map((line: string) => {
-          const [embedCode, title = '', platform = ''] = line.split('|');
-          return { embedCode: embedCode.trim(), title: title.trim(), platform: platform.trim() };
-        });
-      }
-
-      const propertyData = {
-        ...req.body,
-        price: req.body.price.toString(),
-        size: req.body.size || null,
-        bedrooms: req.body.bedrooms || null,
-        bathrooms: req.body.bathrooms || null,
-        images: imageUrls,
-        videos: videoUrls,
-        externalVideos: existingProperty.externalVideos, // Assuming externalVideos are handled separately or not updated here
-        embedCodes: embedCodes, // Include updated embedCodes
-        features: Array.isArray(req.body.features) ? req.body.features :
-                  (req.body.features ? req.body.features.split(',').map((f: string) => f.trim()) : []),
-      };
-
-      const property = await storage.updateProperty(req.params.id, propertyData);
-      if (!property) {
-        return res.status(404).json({ message: "Property not found" });
-      }
-
-      res.json(property);
-    } catch (error) {
-      console.error('Property update error:', error);
-      res.status(400).json({ message: "Invalid property data", error });
-    }
-  });
+    },
+  );
 
   // Mark property as sold endpoint
   app.patch("/api/admin/properties/:id/sold", async (req, res) => {
     try {
-      const property = await storage.updateProperty(req.params.id, { status: "sold" });
+      const property = await storage.updateProperty(req.params.id, {
+        status: "sold",
+      });
       if (!property) {
         return res.status(404).json({ message: "Property not found" });
       }
       res.json(property);
     } catch (error) {
-      console.error('Update property error:', error);
+      console.error("Update property error:", error);
       res.status(500).json({ message: "Failed to update property" });
     }
   });
 
   // Serve uploaded files with proper headers
-  app.use("/uploads", (req, res, next) => {
-    // Set proper headers for video files
-    if (req.path.match(/\.(mp4|webm|ogg|avi|mov)$/i)) {
-      const ext = path.extname(req.path).toLowerCase();
-      let contentType = 'video/mp4';
+  app.use(
+    "/uploads",
+    (req, res, next) => {
+      // Set proper headers for video files
+      if (req.path.match(/\.(mp4|webm|ogg|avi|mov)$/i)) {
+        const ext = path.extname(req.path).toLowerCase();
+        let contentType = "video/mp4";
 
-      switch (ext) {
-        case '.webm':
-          contentType = 'video/webm';
-          break;
-        case '.ogg':
-          contentType = 'video/ogg';
-          break;
-        case '.avi':
-          contentType = 'video/x-msvideo';
-          break;
-        case '.mov':
-          contentType = 'video/quicktime';
-          break;
-        default:
-          contentType = 'video/mp4';
+        switch (ext) {
+          case ".webm":
+            contentType = "video/webm";
+            break;
+          case ".ogg":
+            contentType = "video/ogg";
+            break;
+          case ".avi":
+            contentType = "video/x-msvideo";
+            break;
+          case ".mov":
+            contentType = "video/quicktime";
+            break;
+          default:
+            contentType = "video/mp4";
+        }
+
+        res.set({
+          "Content-Type": contentType,
+          "Accept-Ranges": "bytes",
+          "Cache-Control": "public, max-age=86400", // Reduced cache time
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "GET, HEAD, OPTIONS",
+          "Access-Control-Allow-Headers": "Range",
+          "Cross-Origin-Resource-Policy": "cross-origin",
+          "Cross-Origin-Embedder-Policy": "unsafe-none",
+        });
+      } else if (req.path.match(/\.(jpg|jpeg|png|gif|svg)$/i)) {
+        res.set({
+          "Cache-Control": "public, max-age=86400",
+          "Access-Control-Allow-Origin": "*",
+        });
       }
-
-      res.set({
-        'Content-Type': contentType,
-        'Accept-Ranges': 'bytes',
-        'Cache-Control': 'public, max-age=86400', // Reduced cache time
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, HEAD, OPTIONS',
-        'Access-Control-Allow-Headers': 'Range',
-        'Cross-Origin-Resource-Policy': 'cross-origin',
-        'Cross-Origin-Embedder-Policy': 'unsafe-none'
-      });
-    } else if (req.path.match(/\.(jpg|jpeg|png|gif|svg)$/i)) {
-      res.set({
-        'Cache-Control': 'public, max-age=86400',
-        'Access-Control-Allow-Origin': '*'
-      });
-    }
-    next();
-  }, express.static(path.join(__dirname, "../uploads")));
+      next();
+    },
+    express.static(path.join(__dirname, "../uploads")),
+  );
 
   const httpServer = createServer(app);
   return httpServer;
