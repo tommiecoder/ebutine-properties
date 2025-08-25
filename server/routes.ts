@@ -407,8 +407,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Parse external videos if provided
       let externalVideos = [];
       if (req.body.externalVideos) {
-        const lines = req.body.externalVideos.split('\n').filter(line => line.trim());
-        externalVideos = lines.map(line => {
+        const lines = req.body.externalVideos.split('\n').filter((line: string) => line.trim());
+        externalVideos = lines.map((line: string) => {
           const [url, platform = 'other', title = ''] = line.split('|');
           return { url: url.trim(), platform: platform.trim(), title: title.trim() };
         });
@@ -417,8 +417,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Parse embed codes if provided
       let embedCodes = [];
       if (req.body.embedCodes) {
-        const lines = req.body.embedCodes.split('\n').filter(line => line.trim());
-        embedCodes = lines.map(line => {
+        const lines = req.body.embedCodes.split('\n').filter((line: string) => line.trim());
+        embedCodes = lines.map((line: string) => {
           const [embedCode, title = '', platform = ''] = line.split('|');
           return { embedCode: embedCode.trim(), title: title.trim(), platform: platform.trim() };
         });
@@ -550,8 +550,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Parse embed codes if provided for update
       let embedCodes = existingProperty.embedCodes || [];
       if (req.body.embedCodes) {
-        const lines = req.body.embedCodes.split('\n').filter(line => line.trim());
-        embedCodes = lines.map(line => {
+        const lines = req.body.embedCodes.split('\n').filter((line: string) => line.trim());
+        embedCodes = lines.map((line: string) => {
           const [embedCode, title = '', platform = ''] = line.split('|');
           return { embedCode: embedCode.trim(), title: title.trim(), platform: platform.trim() };
         });
@@ -568,7 +568,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         externalVideos: existingProperty.externalVideos, // Assuming externalVideos are handled separately or not updated here
         embedCodes: embedCodes, // Include updated embedCodes
         features: Array.isArray(req.body.features) ? req.body.features :
-                  (req.body.features ? req.body.features.split(',').map(f => f.trim()) : []),
+                  (req.body.features ? req.body.features.split(',').map((f: string) => f.trim()) : []),
       };
 
       const property = await storage.updateProperty(req.params.id, propertyData);

@@ -93,6 +93,7 @@ export class DatabaseStorage implements IStorage {
         ],
         images: [],
         videos: [],
+        externalVideos: [],
         embedCodes: [
           {
             embedCode: `<iframe width="356" height="634" src="https://www.youtube.com/embed/PVR4PAI0asE" title="650sqm Dryland for Sale in Chevron Lekki Lagos - fenced, gated, and ready for development" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>`,
@@ -134,6 +135,7 @@ export class DatabaseStorage implements IStorage {
         ],
         images: [],
         videos: [],
+        externalVideos: [],
         embedCodes: [
           {
             embedCode: `<iframe width="356" height="634" src="https://www.youtube.com/embed/FwRwvrvPHJs" title="1000sqm Plots of Land For Sale at Chevron Lekki Lagos - Real Estate Investment Opportunities 2025" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>`,
@@ -175,6 +177,7 @@ export class DatabaseStorage implements IStorage {
         ],
         images: [],
         videos: [],
+        externalVideos: [],
         embedCodes: [
           {
             embedCode: `<iframe width="356" height="634" src="https://www.youtube.com/embed/jmAkC6FeOVI" title="Distress Sale! Two Plots (1244sqm) Dry Land in Ogombo Ajah Lagos - N35M Per Plot" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>`,
@@ -218,6 +221,7 @@ export class DatabaseStorage implements IStorage {
         videos: [
           "/uploads/videos/LAND FOR SALE📌SIZE- 660sqm LOCATION- Ogombo, Ajah Price-N55MTitle-Governors consentFOR ENQUIRIE.mp4",
         ],
+        externalVideos: [],
         embedCodes: [],
         status: "available",
         featured: true,
@@ -255,6 +259,7 @@ export class DatabaseStorage implements IStorage {
         ],
         images: [],
         videos: [],
+        externalVideos: [],
         embedCodes: [],
         status: "available",
         featured: true,

@@ -24,6 +24,17 @@ export const properties = pgTable("properties", {
   features: jsonb("features").$type<string[]>(), // Array of features
   images: jsonb("images").$type<string[]>(), // Array of image URLs
   videos: jsonb("videos").$type<string[]>(), // Array of video URLs
+  externalVideos: jsonb("external_videos").$type<Array<{
+    url: string;
+    platform: string;
+    title?: string;
+    thumbnail?: string;
+  }>>(),
+  embedCodes: jsonb("embed_codes").$type<Array<{
+    embedCode: string;
+    title?: string;
+    platform?: string;
+  }>>(),
   status: text("status").notNull().default("available"), // 'available', 'sold', 'reserved'
   featured: boolean("featured").default(false),
   createdAt: timestamp("created_at").defaultNow(),
