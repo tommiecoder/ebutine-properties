@@ -1,12 +1,20 @@
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { X } from "lucide-react";
+import { X, ExternalLink } from "lucide-react";
+
+interface ExternalVideo {
+  url: string;
+  platform: 'youtube' | 'instagram' | 'vimeo' | 'facebook' | 'tiktok' | 'other';
+  title?: string;
+  thumbnail?: string;
+}
 
 interface PropertyVideoModalProps {
   isOpen: boolean;
   onClose: () => void;
   videos: string[];
+  externalVideos?: ExternalVideo[];
   propertyTitle: string;
 }
 
@@ -14,9 +22,132 @@ export default function PropertyVideoModal({
   isOpen, 
   onClose, 
   videos, 
+  externalVideos = [],
   propertyTitle 
 }: PropertyVideoModalProps) {
-  if (!videos || videos.length === 0) return null;
+  if (!videos?.length && !externalVideos?.length) return null;
+
+  const getYouTubeEmbedUrl = (url: string) => {
+    const videoId = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/)?.[1];
+    return videoId ? `https://www.youtube.com/embed/${videoId}` : null;
+  };
+
+  const getVimeoEmbedUrl = (url: string) => {
+    const videoId = url.match(/vimeo\.com\/(\d+)/)?.[1];
+    return videoId ? `https://player.vimeo.com/video/${videoId}` : null;
+  };
+
+  const renderExternalVideo = (video: ExternalVideo, index: number) => {
+    switch (video.platform) {
+      case 'youtube':
+        const youtubeEmbedUrl = getYouTubeEmbedUrl(video.url);
+        if (youtubeEmbedUrl) {
+          return (
+            <div key={`external-${index}`} className="w-full">
+              <div className="flex justify-between items-center mb-2">
+                <h4 className="font-medium">{video.title || 'YouTube Video'}</h4>
+                <a 
+                  href={video.url} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-blue-500 hover:text-blue-700"
+                >
+                  <ExternalLink className="h-4 w-4" />
+                </a>
+              </div>
+              <iframe
+                src={youtubeEmbedUrl}
+                className="w-full h-64 md:h-80 rounded-lg"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            </div>
+          );
+        }
+        break;
+
+      case 'vimeo':
+        const vimeoEmbedUrl = getVimeoEmbedUrl(video.url);
+        if (vimeoEmbedUrl) {
+          return (
+            <div key={`external-${index}`} className="w-full">
+              <div className="flex justify-between items-center mb-2">
+                <h4 className="font-medium">{video.title || 'Vimeo Video'}</h4>
+                <a 
+                  href={video.url} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-blue-500 hover:text-blue-700"
+                >
+                  <ExternalLink className="h-4 w-4" />
+                </a>
+              </div>
+              <iframe
+                src={vimeoEmbedUrl}
+                className="w-full h-64 md:h-80 rounded-lg"
+                frameBorder="0"
+                allow="autoplay; fullscreen; picture-in-picture"
+                allowFullScreen
+              />
+            </div>
+          );
+        }
+        break;
+
+      case 'instagram':
+        return (
+          <div key={`external-${index}`} className="w-full">
+            <div className="flex justify-between items-center mb-2">
+              <h4 className="font-medium">{video.title || 'Instagram Video'}</h4>
+              <a 
+                href={video.url} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-blue-500 hover:text-blue-700"
+              >
+                <ExternalLink className="h-4 w-4" />
+              </a>
+            </div>
+            <div className="bg-gray-100 p-4 rounded-lg text-center">
+              <p className="text-gray-600 mb-4">Click to view Instagram content</p>
+              <Button 
+                onClick={() => window.open(video.url, '_blank')}
+                className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+              >
+                View on Instagram
+              </Button>
+            </div>
+          </div>
+        );
+
+      default:
+        return (
+          <div key={`external-${index}`} className="w-full">
+            <div className="flex justify-between items-center mb-2">
+              <h4 className="font-medium">{video.title || 'External Video'}</h4>
+              <a 
+                href={video.url} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-blue-500 hover:text-blue-700"
+              >
+                <ExternalLink className="h-4 w-4" />
+              </a>
+            </div>
+            <div className="bg-gray-100 p-4 rounded-lg text-center">
+              <p className="text-gray-600 mb-4">External video content</p>
+              <Button 
+                onClick={() => window.open(video.url, '_blank')}
+                variant="outline"
+              >
+                View External Content
+              </Button>
+            </div>
+          </div>
+        );
+    }
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -30,13 +161,17 @@ export default function PropertyVideoModal({
           </DialogTitle>
         </DialogHeader>
         
-        <div className="space-y-4 max-h-[70vh] overflow-y-auto">
+        <div className="space-y-6 max-h-[70vh] overflow-y-auto">
+          {/* External Videos */}
+          {externalVideos.map((video, index) => renderExternalVideo(video, index))}
+          
+          {/* Local Videos */}
           {videos.map((videoUrl, index) => {
-            // Ensure proper video URL format
             const fullVideoUrl = videoUrl.startsWith('http') ? videoUrl : `${window.location.origin}${videoUrl}`;
             
             return (
-              <div key={index} className="w-full">
+              <div key={`local-${index}`} className="w-full">
+                <h4 className="font-medium mb-2">Local Video {index + 1}</h4>
                 <video 
                   controls 
                   className="w-full h-auto max-h-96 rounded-lg"
@@ -45,48 +180,14 @@ export default function PropertyVideoModal({
                   muted
                   controlsList="nodownload"
                   style={{ backgroundColor: '#f3f4f6' }}
-                  onLoadStart={() => console.log('Video loading started:', fullVideoUrl)}
-                  onCanPlay={() => console.log('Video can play:', fullVideoUrl)}
-                  onLoadedData={() => console.log('Video data loaded:', fullVideoUrl)}
-                  onLoadedMetadata={() => console.log('Video metadata loaded:', fullVideoUrl)}
                   onError={(e) => {
-                    console.error('Video error:', e, fullVideoUrl);
-                    // Try to reload once
-                    const video = e.target as HTMLVideoElement;
-                    if (!video.dataset.retried) {
-                      video.dataset.retried = 'true';
-                      setTimeout(() => {
-                        video.load();
-                      }, 1000);
-                    }
+                    console.error('Video error:', e);
+                    e.currentTarget.style.display = 'none';
                   }}
-                  crossOrigin="anonymous"
                 >
-                  <source src={fullVideoUrl} type="video/mp4" />
-                  <source src={fullVideoUrl.replace('.mp4', '.webm')} type="video/webm" />
-                  <p className="p-4 text-center text-gray-500">
-                    Your browser does not support the video tag or the video failed to load. 
-                    <a href={fullVideoUrl} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline ml-1">
-                      Download video instead
-                    </a>
-                  </p>
+                  <source src={fullVideoUrl} />
+                  Your browser does not support the video tag.
                 </video>
-                {videos.length > 1 && (
-                  <p className="text-sm text-gray-600 mt-2">
-                    Video {index + 1} of {videos.length}
-                  </p>
-                )}
-                <div className="text-xs text-gray-500 mt-1 flex items-center justify-between">
-                  <span>Optimized for fast loading</span>
-                  <a 
-                    href={fullVideoUrl} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="text-blue-500 hover:text-blue-700 underline"
-                  >
-                    Open in new tab
-                  </a>
-                </div>
               </div>
             );
           })}

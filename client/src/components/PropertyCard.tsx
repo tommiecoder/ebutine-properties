@@ -9,9 +9,52 @@ import type { Property } from "@shared/schema";
 function PropertyThumbnail({ property }: { property: Property }) {
   const [thumbnailSrc, setThumbnailSrc] = useState<string>("");
 
+  const getYouTubeThumbnail = (url: string) => {
+    const videoId = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/)?.[1];
+    return videoId ? `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg` : null;
+  };
+
+  const getInstagramThumbnail = (url: string) => {
+    // Instagram doesn't provide direct thumbnail access, but we can try the embed endpoint
+    return url.includes('instagram.com') ? `${url}media/?size=l` : null;
+  };
+
   useEffect(() => {
     const generateThumbnail = async () => {
-      // If property has videos, extract thumbnail from first video
+      // Priority 1: Check for external videos with thumbnails
+      if (property.externalVideos && property.externalVideos.length > 0) {
+        const firstVideo = property.externalVideos[0];
+        
+        if (firstVideo.thumbnail) {
+          setThumbnailSrc(firstVideo.thumbnail);
+          return;
+        }
+        
+        // Generate thumbnail based on platform
+        if (firstVideo.platform === 'youtube') {
+          const ytThumbnail = getYouTubeThumbnail(firstVideo.url);
+          if (ytThumbnail) {
+            setThumbnailSrc(ytThumbnail);
+            return;
+          }
+        }
+        
+        if (firstVideo.platform === 'instagram') {
+          const igThumbnail = getInstagramThumbnail(firstVideo.url);
+          if (igThumbnail) {
+            setThumbnailSrc(igThumbnail);
+            return;
+          }
+        }
+      }
+
+      // Priority 2: External images
+      if (property.externalImages && property.externalImages.length > 0) {
+        setThumbnailSrc(property.externalImages[0]);
+        return;
+      }
+
+      // Priority 3: Local videos - extract thumbnail from first video
       if (property.videos && property.videos.length > 0) {
         try {
           const video = document.createElement('video');
@@ -159,7 +202,7 @@ export default function PropertyCard({ property, onViewDetails, onInquire }: Pro
           {getStatusBadge(property.status, property.featured || false)}
         </div>
         <div className="absolute top-4 right-4 flex space-x-2">
-          {property.videos && property.videos.length > 0 && (
+          {((property.videos && property.videos.length > 0) || (property.externalVideos && property.externalVideos.length > 0)) && (
             <button 
               onClick={() => setShowVideoModal(true)}
               className="glass p-2 rounded-full bg-black/40 hover:bg-black/60 transition-colors"
@@ -248,6 +291,7 @@ export default function PropertyCard({ property, onViewDetails, onInquire }: Pro
         isOpen={showVideoModal}
         onClose={() => setShowVideoModal(false)}
         videos={property.videos || []}
+        externalVideos={property.externalVideos || []}
         propertyTitle={property.title}
       />
     </Card>

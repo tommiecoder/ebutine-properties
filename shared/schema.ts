@@ -60,10 +60,18 @@ export const insertUserSchema = createInsertSchema(users).pick({
   password: true,
 });
 
-export const insertPropertySchema = createInsertSchema(properties).omit({
-  id: true,
-  createdAt: true,
-  updatedAt: true,
+export const insertPropertySchema = createInsertSchema(properties).extend({
+  images: z.array(z.string()).optional(),
+  videos: z.array(z.string()).optional(),
+  features: z.array(z.string()).optional(),
+  // Support for external media URLs
+  externalImages: z.array(z.string().url()).optional(),
+  externalVideos: z.array(z.object({
+    url: z.string().url(),
+    platform: z.enum(['youtube', 'instagram', 'vimeo', 'facebook', 'tiktok', 'other']),
+    title: z.string().optional(),
+    thumbnail: z.string().url().optional()
+  })).optional(),
 });
 
 export const insertContactSchema = createInsertSchema(contacts).omit({
