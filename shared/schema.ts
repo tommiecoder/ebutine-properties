@@ -72,6 +72,12 @@ export const insertPropertySchema = createInsertSchema(properties).extend({
     title: z.string().optional(),
     thumbnail: z.string().url().optional()
   })).optional(),
+  // Support for embed codes
+  embedCodes: z.array(z.object({
+    embedCode: z.string(),
+    title: z.string().optional(),
+    platform: z.string().optional()
+  })).optional(),
 });
 
 export const insertContactSchema = createInsertSchema(contacts).omit({

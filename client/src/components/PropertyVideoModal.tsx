@@ -10,11 +10,18 @@ interface ExternalVideo {
   thumbnail?: string;
 }
 
+interface EmbedCode {
+  embedCode: string;
+  title?: string;
+  platform?: string;
+}
+
 interface PropertyVideoModalProps {
   isOpen: boolean;
   onClose: () => void;
   videos: string[];
   externalVideos?: ExternalVideo[];
+  embedCodes?: EmbedCode[];
   propertyTitle: string;
 }
 
@@ -23,9 +30,10 @@ export default function PropertyVideoModal({
   onClose, 
   videos, 
   externalVideos = [],
+  embedCodes = [],
   propertyTitle 
 }: PropertyVideoModalProps) {
-  if (!videos?.length && !externalVideos?.length) return null;
+  if (!videos?.length && !externalVideos?.length && !embedCodes?.length) return null;
 
   const getYouTubeEmbedUrl = (url: string) => {
     const videoId = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/)?.[1];
@@ -35,6 +43,20 @@ export default function PropertyVideoModal({
   const getVimeoEmbedUrl = (url: string) => {
     const videoId = url.match(/vimeo\.com\/(\d+)/)?.[1];
     return videoId ? `https://player.vimeo.com/video/${videoId}` : null;
+  };
+
+  const renderEmbedCode = (embed: EmbedCode, index: number) => {
+    return (
+      <div key={`embed-${index}`} className="w-full">
+        <h4 className="font-medium mb-2">
+          {embed.title || `${embed.platform || 'Video'} ${index + 1}`}
+        </h4>
+        <div 
+          className="w-full rounded-lg overflow-hidden"
+          dangerouslySetInnerHTML={{ __html: embed.embedCode }}
+        />
+      </div>
+    );
   };
 
   const renderExternalVideo = (video: ExternalVideo, index: number) => {
@@ -182,6 +204,9 @@ export default function PropertyVideoModal({
         </DialogHeader>
         
         <div className="space-y-6 max-h-[70vh] overflow-y-auto">
+          {/* Embed Codes */}
+          {embedCodes.map((embed, index) => renderEmbedCode(embed, index))}
+          
           {/* External Videos */}
           {externalVideos.map((video, index) => renderExternalVideo(video, index))}
           

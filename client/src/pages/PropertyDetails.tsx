@@ -259,14 +259,16 @@ export default function PropertyDetails() {
                     Contact Agent
                   </Button>
 
-                  {property.videos && property.videos.length > 0 && (
+                  {((property.videos && property.videos.length > 0) || 
+                    (property.externalVideos && property.externalVideos.length > 0) ||
+                    (property.embedCodes && property.embedCodes.length > 0)) && (
                     <Button 
                       variant="outline" 
                       className="w-full"
                       onClick={() => setShowVideoModal(true)}
                     >
                       <Eye className="mr-2 h-4 w-4" />
-                      Watch Property Tour ({property.videos.length} video{property.videos.length > 1 ? 's' : ''})
+                      Watch Property Tour
                     </Button>
                   )}
                 </div>
@@ -290,6 +292,8 @@ export default function PropertyDetails() {
         isOpen={showVideoModal}
         onClose={() => setShowVideoModal(false)}
         videos={property.videos || []}
+        externalVideos={property.externalVideos || []}
+        embedCodes={property.embedCodes || []}
         propertyTitle={property.title}
       />
     </div>

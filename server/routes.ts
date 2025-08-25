@@ -392,14 +392,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const imageUrls = files.images ? files.images.map(file => `/uploads/images/${file.filename}`) : [];
       const videoUrls = files.videos ? files.videos.map(file => `/uploads/videos/${file.filename}`) : [];
 
-      // Process external videos
+      // Parse external videos if provided
       let externalVideos = [];
       if (req.body.externalVideos) {
-        try {
-          externalVideos = JSON.parse(req.body.externalVideos);
-        } catch (e) {
-          console.warn('Failed to parse externalVideos:', e);
-        }
+        const lines = req.body.externalVideos.split('\n').filter(line => line.trim());
+        externalVideos = lines.map(line => {
+          const [url, platform = 'other', title = ''] = line.split('|');
+          return { url: url.trim(), platform: platform.trim(), title: title.trim() };
+        });
+      }
+
+      // Parse embed codes if provided
+      let embedCodes = [];
+      if (req.body.embedCodes) {
+        const lines = req.body.embedCodes.split('\n').filter(line => line.trim());
+        embedCodes = lines.map(line => {
+          const [embedCode, title = '', platform = ''] = line.split('|');
+          return { embedCode: embedCode.trim(), title: title.trim(), platform: platform.trim() };
+        });
       }
 
       // This block is updated to include better error handling and logging
@@ -408,7 +418,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           title: req.body.title,
           images: imageUrls.length,
           videos: videoUrls.length,
-          externalVideos: externalVideos.length
+          externalVideos: externalVideos.length,
+          embedCodes: embedCodes.length
         });
 
         const property = await storage.saveProperty({
@@ -422,6 +433,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           images: imageUrls,
           videos: videoUrls,
           externalVideos: externalVideos,
+          embedCodes: embedCodes, // Include embedCodes here
           thumbnail: imageUrls[0] || videoUrls[0] || '',
           featured: req.body.featured === 'true',
           createdAt: new Date()
@@ -523,6 +535,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ? files.videos.map(file => `/uploads/videos/${file.filename}`)
         : existingProperty.videos;
 
+      // Parse embed codes if provided for update
+      let embedCodes = existingProperty.embedCodes || [];
+      if (req.body.embedCodes) {
+        const lines = req.body.embedCodes.split('\n').filter(line => line.trim());
+        embedCodes = lines.map(line => {
+          const [embedCode, title = '', platform = ''] = line.split('|');
+          return { embedCode: embedCode.trim(), title: title.trim(), platform: platform.trim() };
+        });
+      }
+
       const propertyData = {
         ...req.body,
         price: req.body.price.toString(),
@@ -531,7 +553,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         bathrooms: req.body.bathrooms || null,
         images: imageUrls,
         videos: videoUrls,
-        features: req.body.features ? req.body.features.split(',').map((f: string) => f.trim()) : [],
+        externalVideos: existingProperty.externalVideos, // Assuming externalVideos are handled separately or not updated here
+        embedCodes: embedCodes, // Include updated embedCodes
+        features: Array.isArray(req.body.features) ? req.body.features :
+                  (req.body.features ? req.body.features.split(',').map(f => f.trim()) : []),
       };
 
       const property = await storage.updateProperty(req.params.id, propertyData);
@@ -566,7 +591,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     if (req.path.match(/\.(mp4|webm|ogg|avi|mov)$/i)) {
       const ext = path.extname(req.path).toLowerCase();
       let contentType = 'video/mp4';
-      
+
       switch (ext) {
         case '.webm':
           contentType = 'video/webm';

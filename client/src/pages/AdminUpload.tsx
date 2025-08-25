@@ -661,6 +661,18 @@ export default function AdminUpload() {
               />
             </div>
 
+            <div>
+              <Label htmlFor="embedCodes">Video Embed Codes</Label>
+              <p className="text-sm text-gray-600 mb-2">Add embed codes from Instagram, YouTube, TikTok, etc. Format: EmbedCode|Title|Platform (one per line)</p>
+              <Textarea
+                id="embedCodes"
+                value={formData.embedCodes || ""}
+                onChange={(e) => handleInputChange('embedCodes', e.target.value)}
+                placeholder='<blockquote class="instagram-media">...</blockquote>|Property Tour|Instagram&#10;<iframe src="https://www.youtube.com/embed/..."></iframe>|Video Tour|YouTube'
+                rows={4}
+              />
+            </div>
+
             <Button type="submit" disabled={isSubmitting} className="w-full">
               {isSubmitting ? (isEditing ? "Updating..." : "Uploading...") : (isEditing ? "Update Property" : "Upload Property")}
             </Button>

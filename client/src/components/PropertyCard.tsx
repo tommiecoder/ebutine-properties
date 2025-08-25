@@ -202,7 +202,9 @@ export default function PropertyCard({ property, onViewDetails, onInquire }: Pro
           {getStatusBadge(property.status, property.featured || false)}
         </div>
         <div className="absolute top-4 right-4 flex space-x-2">
-          {((property.videos && property.videos.length > 0) || (property.externalVideos && property.externalVideos.length > 0)) && (
+          {((property.videos && property.videos.length > 0) || 
+            (property.externalVideos && property.externalVideos.length > 0) ||
+            (property.embedCodes && property.embedCodes.length > 0)) && (
             <button 
               onClick={() => setShowVideoModal(true)}
               className="glass p-2 rounded-full bg-black/40 hover:bg-black/60 transition-colors"
@@ -292,6 +294,7 @@ export default function PropertyCard({ property, onViewDetails, onInquire }: Pro
         onClose={() => setShowVideoModal(false)}
         videos={property.videos || []}
         externalVideos={property.externalVideos || []}
+        embedCodes={property.embedCodes || []}
         propertyTitle={property.title}
       />
     </Card>
