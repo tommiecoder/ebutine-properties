@@ -10,7 +10,12 @@ import {
 } from "../shared/schema.js";
 import { randomUUID } from "crypto";
 import { db } from "./db.js";
-import { users, properties, contacts, propertyInquiries } from "../shared/schema.js";
+import {
+  users,
+  properties,
+  contacts,
+  propertyInquiries,
+} from "../shared/schema.js";
 import { eq, and, gte, lte, sql } from "drizzle-orm";
 
 // Add database connection check function
@@ -87,7 +92,7 @@ export class DatabaseStorage implements IStorage {
           "Strategic Location",
         ],
         images: [],
-        videos: ["/uploads/videos/get.mp4"],
+        videos: [],
         status: "available",
         featured: true,
         createdAt: new Date(),
@@ -121,9 +126,7 @@ export class DatabaseStorage implements IStorage {
           "Chevron, Lekki",
         ],
         images: [],
-        videos: [
-          "/uploads/videos/QUICK SALE‼️1000sqm Cornerpiece Land is currently selling in Atlantic View Estate, New Road, Che.mp4",
-        ],
+        videos: [],
         status: "available",
         featured: true,
         createdAt: new Date(),
@@ -157,9 +160,7 @@ export class DatabaseStorage implements IStorage {
           "Ogombo, Ajah",
         ],
         images: [],
-        videos: [
-          "/uploads/videos/LAND FOR SALE📌SIZE- 660sqm LOCATION- Ogombo, Ajah Price-N55MTitle-Governors consentFOR ENQUIRIE.mp4",
-        ],
+        videos: [],
         status: "available",
         featured: true,
         createdAt: new Date(),
@@ -231,9 +232,7 @@ export class DatabaseStorage implements IStorage {
           "Competitive Price",
         ],
         images: [],
-        videos: [
-          "/uploads/videos/URGENT SALE‼️Land for Sale- 660sqmLocation- Greenland Estate Ogombo, AjahPrice- N55MTitle- Gover.mp4",
-        ],
+        videos: [],
         status: "available",
         featured: true,
         createdAt: new Date(),
@@ -456,26 +455,26 @@ export class DatabaseStorage implements IStorage {
     };
 
     // Copy all primitive properties
-    Object.keys(property).forEach(key => {
-      if (key !== 'features' && key !== 'images' && key !== 'videos') {
+    Object.keys(property).forEach((key) => {
+      if (key !== "features" && key !== "images" && key !== "videos") {
         (updateData as any)[key] = (property as any)[key];
       }
     });
 
     // Handle array properties with explicit typing
     if (property.features !== undefined) {
-      updateData.features = Array.isArray(property.features) 
-        ? property.features.map(String) 
+      updateData.features = Array.isArray(property.features)
+        ? property.features.map(String)
         : [];
     }
     if (property.images !== undefined) {
-      updateData.images = Array.isArray(property.images) 
-        ? property.images.map(String) 
+      updateData.images = Array.isArray(property.images)
+        ? property.images.map(String)
         : [];
     }
     if (property.videos !== undefined) {
-      updateData.videos = Array.isArray(property.videos) 
-        ? property.videos.map(String) 
+      updateData.videos = Array.isArray(property.videos)
+        ? property.videos.map(String)
         : [];
     }
 
@@ -681,9 +680,15 @@ export class DatabaseStorage implements IStorage {
       bedrooms: propertyData.bedrooms || null,
       bathrooms: propertyData.bathrooms || null,
       parking: propertyData.parking || null,
-      features: Array.isArray(propertyData.features) ? propertyData.features as string[] : [],
-      images: Array.isArray(propertyData.images) ? propertyData.images as string[] : [],
-      videos: Array.isArray(propertyData.videos) ? propertyData.videos as string[] : [],
+      features: Array.isArray(propertyData.features)
+        ? (propertyData.features as string[])
+        : [],
+      images: Array.isArray(propertyData.images)
+        ? (propertyData.images as string[])
+        : [],
+      videos: Array.isArray(propertyData.videos)
+        ? (propertyData.videos as string[])
+        : [],
       status: "available",
       featured: propertyData.featured || false,
     };
