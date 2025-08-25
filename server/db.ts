@@ -7,7 +7,17 @@ let isDbConnected = false;
 
 try {
   if (process.env.DATABASE_URL) {
-    const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+    // For deployment, use pooling connection
+    const connectionString = process.env.NODE_ENV === 'production' 
+      ? process.env.DATABASE_URL.replace('.us-east-2', '-pooler.us-east-2')
+      : process.env.DATABASE_URL;
+      
+    const pool = new Pool({ 
+      connectionString,
+      max: 10,
+      connectionTimeoutMillis: 5000,
+    });
+    
     db = drizzle(pool, { 
       schema: { users, properties, contacts, propertyInquiries } 
     });
