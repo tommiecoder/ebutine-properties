@@ -65,7 +65,7 @@ export default function PropertyVideoModal({
         const youtubeEmbedUrl = getYouTubeEmbedUrl(video.url);
         if (youtubeEmbedUrl) {
           return (
-            <div key={`external-${index}`} className="w-full">
+            <div className="w-full max-w-3xl">
               <div className="flex justify-between items-center mb-2">
                 <h4 className="font-medium">{video.title || 'YouTube Video'}</h4>
                 <a 
@@ -79,7 +79,7 @@ export default function PropertyVideoModal({
               </div>
               <iframe
                 src={youtubeEmbedUrl}
-                className="w-full h-64 md:h-80 rounded-lg"
+                className="w-full h-64 md:h-80 rounded-lg mx-auto"
                 frameBorder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 allowFullScreen
@@ -93,7 +93,7 @@ export default function PropertyVideoModal({
         const vimeoEmbedUrl = getVimeoEmbedUrl(video.url);
         if (vimeoEmbedUrl) {
           return (
-            <div key={`external-${index}`} className="w-full">
+            <div className="w-full max-w-3xl">
               <div className="flex justify-between items-center mb-2">
                 <h4 className="font-medium">{video.title || 'Vimeo Video'}</h4>
                 <a 
@@ -107,7 +107,7 @@ export default function PropertyVideoModal({
               </div>
               <iframe
                 src={vimeoEmbedUrl}
-                className="w-full h-64 md:h-80 rounded-lg"
+                className="w-full h-64 md:h-80 rounded-lg mx-auto"
                 frameBorder="0"
                 allow="autoplay; fullscreen; picture-in-picture"
                 allowFullScreen
@@ -119,7 +119,7 @@ export default function PropertyVideoModal({
 
       case 'instagram':
         return (
-          <div key={`external-${index}`} className="w-full">
+          <div className="w-full max-w-3xl">
             <div className="flex justify-between items-center mb-2">
               <h4 className="font-medium">{video.title || 'Instagram Video'}</h4>
               <a 
@@ -134,7 +134,7 @@ export default function PropertyVideoModal({
             {/* Check if we have embed code in the URL field or render the embed */}
             {video.url.includes('blockquote') ? (
               <div 
-                className="instagram-embed-container"
+                className="instagram-embed-container mx-auto"
                 dangerouslySetInnerHTML={{ __html: video.url }}
               />
             ) : (
@@ -152,7 +152,7 @@ export default function PropertyVideoModal({
                 <div className="mt-4">
                   <iframe
                     src={`${video.url}embed/`}
-                    className="w-full h-96 rounded-lg border-0"
+                    className="w-full h-96 rounded-lg border-0 mx-auto"
                     frameBorder="0"
                     scrolling="no"
                     allowTransparency={true}
@@ -165,7 +165,7 @@ export default function PropertyVideoModal({
 
       default:
         return (
-          <div key={`external-${index}`} className="w-full">
+          <div className="w-full max-w-3xl">
             <div className="flex justify-between items-center mb-2">
               <h4 className="font-medium">{video.title || 'External Video'}</h4>
               <a 
@@ -189,6 +189,8 @@ export default function PropertyVideoModal({
           </div>
         );
     }
+    
+    return null; // Return null if no case matches
   };
 
   return (
@@ -205,22 +207,39 @@ export default function PropertyVideoModal({
         
         <div className="space-y-6 max-h-[70vh] overflow-y-auto">
           {/* Embed Codes */}
-          {embedCodes.map((embed, index) => renderEmbedCode(embed, index))}
+          {embedCodes.map((embed, index) => (
+            <div key={`embed-${index}`} className="w-full flex flex-col items-center">
+              <h4 className="font-medium mb-2 text-center">
+                {embed.title || `${embed.platform || 'Video'} ${index + 1}`}
+              </h4>
+              <div 
+                className="w-full max-w-3xl rounded-lg overflow-hidden mx-auto"
+                dangerouslySetInnerHTML={{ __html: embed.embedCode }}
+              />
+            </div>
+          ))}
           
           {/* External Videos */}
-          {externalVideos.map((video, index) => renderExternalVideo(video, index))}
+          {externalVideos.map((video, index) => {
+            const content = renderExternalVideo(video, index);
+            return (
+              <div key={`external-wrapper-${index}`} className="w-full flex flex-col items-center">
+                {content}
+              </div>
+            );
+          })}
           
           {/* Local Videos */}
           {videos.map((videoUrl, index) => {
             const fullVideoUrl = videoUrl.startsWith('http') ? videoUrl : `${window.location.origin}${videoUrl}`;
             
             return (
-              <div key={`local-${index}`} className="w-full">
-                <h4 className="font-medium mb-2">Local Video {index + 1}</h4>
+              <div key={`local-${index}`} className="w-full flex flex-col items-center">
+                <h4 className="font-medium mb-2 text-center">Local Video {index + 1}</h4>
                 <video 
                   controls 
                   autoPlay
-                  className="w-full h-auto max-h-96 rounded-lg"
+                  className="w-full max-w-3xl h-auto max-h-96 rounded-lg mx-auto"
                   preload="metadata"
                   playsInline
                   muted

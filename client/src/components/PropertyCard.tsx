@@ -21,7 +21,20 @@ function PropertyThumbnail({ property }: { property: Property }) {
 
   useEffect(() => {
     const generateThumbnail = async () => {
-      // Priority 1: Check for external videos with thumbnails
+      // Priority 1: Check for embed codes (YouTube videos)
+      if (property.embedCodes && property.embedCodes.length > 0) {
+        const firstEmbed = property.embedCodes[0];
+        // Extract YouTube video ID from embed code
+        const youtubeMatch = firstEmbed.embedCode.match(/(?:youtube\.com\/embed\/)([^"?]+)/);
+        if (youtubeMatch) {
+          const videoId = youtubeMatch[1];
+          const thumbnail = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
+          setThumbnailSrc(thumbnail);
+          return;
+        }
+      }
+
+      // Priority 2: Check for external videos with thumbnails
       if (property.externalVideos && property.externalVideos.length > 0) {
         const firstVideo = property.externalVideos[0];
         
@@ -48,13 +61,13 @@ function PropertyThumbnail({ property }: { property: Property }) {
         }
       }
 
-      // Priority 2: External images
+      // Priority 3: External images
       if (property.externalImages && property.externalImages.length > 0) {
         setThumbnailSrc(property.externalImages[0]);
         return;
       }
 
-      // Priority 3: Local videos - extract thumbnail from first video
+      // Priority 4: Local videos - extract thumbnail from first video
       if (property.videos && property.videos.length > 0) {
         try {
           const video = document.createElement('video');
@@ -152,7 +165,7 @@ function PropertyThumbnail({ property }: { property: Property }) {
     };
 
     generateThumbnail();
-  }, [property.videos, property.images]);
+  }, [property.id]); // Only depend on property.id to avoid infinite re-renders
 
   return (
     <img 

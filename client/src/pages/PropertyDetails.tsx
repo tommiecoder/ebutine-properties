@@ -1,4 +1,4 @@
-import { useRoute } from 'wouter';
+import { useRoute, useLocation } from 'wouter';
 import { useQuery } from "@tanstack/react-query";
 import { Helmet } from "react-helmet";
 import { ArrowLeft, Heart, Phone, MapPin, Bed, Bath, Car, Calendar, Eye, Share2 } from "lucide-react";
@@ -11,9 +11,12 @@ import PropertyVideoModal from "@/components/PropertyVideoModal";
 import type { Property } from "@shared/schema";
 
 export default function PropertyDetails() {
-  const { id } = useRoute<{ id: string }>(`/properties/:id`)[1];
-  const navigate = (path: string) => navigate(path);
+  const [match, params] = useRoute(`/properties/:id`);
+  const id = params?.id;
+  const [, setLocation] = useLocation();
   const [showVideoModal, setShowVideoModal] = useState(false);
+
+  const navigate = (path: string) => setLocation(path);
 
   const { data: property, isLoading, error } = useQuery<Property>({
     queryKey: [`/api/properties/${id}`],
@@ -84,7 +87,8 @@ export default function PropertyDetails() {
 
   const allMedia = [
     ...(property.images || []).map(img => ({ type: 'image', src: img })),
-    ...(property.videos || []).map(video => ({ type: 'video', src: video }))
+    ...(property.videos || []).map(video => ({ type: 'video', src: video })),
+    ...(property.embedCodes || []).map((embed, index) => ({ type: 'embed', src: embed.embedCode, title: embed.title || `Embed ${index + 1}` }))
   ];
 
   return (
@@ -122,19 +126,24 @@ export default function PropertyDetails() {
               <CarouselContent>
                 {allMedia.map((media, index) => (
                   <CarouselItem key={index}>
-                    <div className="relative h-96 md:h-[500px] rounded-2xl overflow-hidden">
+                    <div className="relative h-96 md:h-[500px] rounded-2xl overflow-hidden flex items-center justify-center">
                       {media.type === 'image' ? (
                         <img
                           src={media.src}
                           alt={`${property.title} - Image ${index + 1}`}
                           className="w-full h-full object-cover"
                         />
-                      ) : (
+                      ) : media.type === 'video' ? (
                         <video
                           src={media.src}
                           className="w-full h-full object-cover"
                           controls
                           preload="metadata"
+                        />
+                      ) : (
+                        <div 
+                          className="w-full h-full flex items-center justify-center"
+                          dangerouslySetInnerHTML={{ __html: media.src }}
                         />
                       )}
                     </div>
