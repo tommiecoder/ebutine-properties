@@ -15,6 +15,31 @@ export default function Home() {
       {/* Featured Properties */}
       <FeaturedProperties />
 
+      {/* YouTube Video Section */}
+      <section className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-bold text-ebutine-dark mb-4">Featured Property Tour</h2>
+            <p className="text-xl text-ebutine-blue max-w-2xl mx-auto">
+              Take a virtual tour of our premium properties
+            </p>
+          </div>
+          <div className="flex justify-center">
+            <div className="w-full max-w-4xl">
+              <iframe 
+                width="100%" 
+                height="500" 
+                src="https://www.youtube.com/embed/YOUR_VIDEO_ID?autoplay=1&mute=1&loop=1&playlist=YOUR_VIDEO_ID" 
+                frameBorder="0" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                allowFullScreen
+                className="rounded-2xl shadow-2xl"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* About Section */}
       <section className="py-20 bg-ebutine-light">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
