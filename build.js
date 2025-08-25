@@ -14,6 +14,9 @@ const externals = [
   // Keep these as external since they're platform-specific
   "bufferutil",
   "utf-8-validate",
+  // Add these to prevent bundling issues
+  "lightningcss",
+  "esbuild",
 ];
 
 async function buildServer() {
