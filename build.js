@@ -1,28 +1,33 @@
 #!/usr/bin/env node
 
-import { execSync } from 'child_process';
-import { existsSync, mkdirSync } from 'fs';
-import path from 'path';
+import { build } from 'esbuild';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
 
-console.log('🏗️  Building application...');
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
-try {
-  // Build client first
-  console.log('📦 Building client...');
-  execSync('npm run build:client', { stdio: 'inherit' });
-
-  // Ensure dist/server directory exists
-  const distServerDir = path.resolve('./dist/server');
-  if (!existsSync(distServerDir)) {
-    mkdirSync(distServerDir, { recursive: true });
+async function buildServer() {
+  try {
+    await build({
+      entryPoints: [join(__dirname, 'server/index.ts')],
+      bundle: true,
+      platform: 'node',
+      target: 'node18',
+      format: 'cjs',
+      outfile: 'dist/server/index.js',
+      external: ['express', 'drizzle-orm', '@neondatabase/serverless'],
+      minify: true,
+      sourcemap: false,
+      define: {
+        'process.env.NODE_ENV': '"production"'
+      }
+    });
+    console.log('✅ Server build completed');
+  } catch (error) {
+    console.error('❌ Server build failed:', error);
+    process.exit(1);
   }
-
-  // Build server using TypeScript compiler
-  console.log('🔧 Building server...');
-  execSync('npx tsc --project tsconfig.server.json', { stdio: 'inherit' });
-
-  console.log('✅ Build completed successfully!');
-} catch (error) {
-  console.error('❌ Build failed:', error.message);
-  process.exit(1);
 }
+
+buildServer();

@@ -63,16 +63,34 @@ app.use((req, res, next) => {
   // It is the only port that is not firewalled.
   const port = parseInt(process.env.PORT || "5000", 10);
   
-  server.listen(port, "0.0.0.0", () => {
-    log(`serving on port ${port}`);
+  server.listen(port, "0.0.0.0", (err) => {
+    if (err) {
+      console.error('❌ Failed to start server:', err);
+      process.exit(1);
+    }
+    log(`🚀 Server running on port ${port} in ${process.env.NODE_ENV || 'development'} mode`);
   });
+
+  // Graceful shutdown
+  const gracefulShutdown = () => {
+    console.log('🔄 Graceful shutdown initiated...');
+    server.close(() => {
+      console.log('✅ Server closed successfully');
+      process.exit(0);
+    });
+  };
+
+  process.on('SIGTERM', gracefulShutdown);
+  process.on('SIGINT', gracefulShutdown);
 
   // Handle uncaught exceptions
   process.on('uncaughtException', (err) => {
-    console.error('Uncaught Exception:', err);
+    console.error('💥 Uncaught Exception:', err);
+    process.exit(1);
   });
 
   process.on('unhandledRejection', (reason, promise) => {
-    console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+    console.error('💥 Unhandled Rejection at:', promise, 'reason:', reason);
+    process.exit(1);
   });
 })();

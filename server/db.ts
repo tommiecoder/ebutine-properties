@@ -7,17 +7,22 @@ let isDbConnected = false;
 
 try {
   if (process.env.DATABASE_URL) {
-    // For deployment, use pooling connection
-    const connectionString = process.env.NODE_ENV === 'production' 
-      ? process.env.DATABASE_URL.replace('.us-east-2', '-pooler.us-east-2')
-      : process.env.DATABASE_URL;
-      
+    const isProduction = process.env.NODE_ENV === 'production';
+
+    // Use pooler URL for production with SSL
+    let connectionString = process.env.DATABASE_URL;
+    if (isProduction && !connectionString.includes('-pooler.')) {
+      connectionString = connectionString.replace('.us-east-2', '-pooler.us-east-2');
+    }
+
     const pool = new Pool({ 
-      connectionString,
-      max: 10,
-      connectionTimeoutMillis: 5000,
+      connectionString: connectionString + (isProduction ? '?sslmode=require' : ''),
+      max: isProduction ? 3 : 10,
+      connectionTimeoutMillis: 15000,
+      idleTimeoutMillis: 30000,
+      ssl: isProduction ? { rejectUnauthorized: false } : false
     });
-    
+
     db = drizzle(pool, { 
       schema: { users, properties, contacts, propertyInquiries } 
     });
