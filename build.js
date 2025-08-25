@@ -1,7 +1,9 @@
-import { build } from "esbuild";
-import { fileURLToPath } from "url";
-import { dirname, join } from "path";
-import { readFileSync } from "fs";
+#!/usr/bin/env node
+
+import { build } from 'esbuild';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+import { readFileSync, mkdirSync, existsSync } from 'fs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -17,6 +19,13 @@ const externals = [
 async function buildServer() {
   try {
     console.log("🔧 Building server...");
+
+    // Ensure dist directory exists
+    const distDir = join(__dirname, 'dist', 'server');
+    if (!existsSync(distDir)) {
+      mkdirSync(distDir, { recursive: true });
+      console.log('📁 Created dist directory');
+    }
 
     await build({
       entryPoints: [join(__dirname, "server/index.ts")],
