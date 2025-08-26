@@ -35,7 +35,7 @@ async function buildServer() {
       platform: "node",
       target: "node20",
       format: "cjs",
-      outfile: "dist/server/index.js",
+      outfile: "dist/server/index.cjs",
       external: externals,
       minify: false, // Disable minification for debugging
       sourcemap: true,

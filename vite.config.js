@@ -1,7 +1,11 @@
-const { defineConfig } = require("vite");
-const path = require("path");
+import { defineConfig } from "vite";
+import { fileURLToPath } from "url";
+import { dirname, resolve } from "path";
 
-module.exports = defineConfig(async () => {
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+export default defineConfig(async () => {
   // Use dynamic imports for ESM-only packages
   const react = await import("@vitejs/plugin-react");
   
@@ -21,17 +25,17 @@ module.exports = defineConfig(async () => {
     plugins,
     resolve: {
       alias: {
-        "@": path.resolve(__dirname, "client", "src"),
-        "@shared": path.resolve(__dirname, "shared"),
-        "@assets": path.resolve(__dirname, "attached_assets"),
+        "@": resolve(__dirname, "client", "src"),
+        "@shared": resolve(__dirname, "shared"),
+        "@assets": resolve(__dirname, "attached_assets"),
       },
     },
-    root: path.resolve(__dirname, "client"),
+    root: resolve(__dirname, "client"),
     build: {
-      outDir: path.resolve(__dirname, "dist/public"),
+      outDir: resolve(__dirname, "dist/public"),
       emptyOutDir: true,
       rollupOptions: {
-        input: path.resolve(__dirname, "client/index.html"),
+        input: resolve(__dirname, "client/index.html"),
       },
     },
   };
