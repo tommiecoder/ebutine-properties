@@ -6,7 +6,7 @@
   "scripts": {
     "clean": "node clean.js",
     "dev": "tsx server/index.ts",
-    "build": "npm run build:client && node build.js",
+    "build": "tsc && npm run build:client && node build.js",
     "build:client": "npx vite build",
     "start": "NODE_ENV=production node dist/server/index.js",
     "db:generate": "drizzle-kit generate",
@@ -108,11 +108,4 @@
     "tsx": "^4.20.5",
     "typescript": "^5.6.3"
   }
-  {
-  "scripts": {
-    "build": "tsc",
-    "start": "NODE_ENV=production node dist/server/index.js"
-  }
-}
-
 }
