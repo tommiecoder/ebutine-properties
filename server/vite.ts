@@ -23,8 +23,9 @@ export async function setupVite(app: Express, server: Server) {
   if (process.env.NODE_ENV === "production") return;
 
   // 🔹 dynamically import vite.config.ts
-  const rawConfigModule = (await import("../vite.config.ts")) as {
-    default: () => Promise<UserConfig> | UserConfig;
+  // @ts-ignore
+  const viteConfig = (await import("../vite.config.ts")).default as UserConfig;
+
   };
   // 🔹 call the default export to get the actual config object
   const userConfig: UserConfig = await rawConfigModule.default();
