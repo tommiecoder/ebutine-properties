@@ -23,12 +23,13 @@ export async function setupVite(app: Express, server: Server) {
   if (process.env.NODE_ENV === "production") return;
 
   // 🔹 dynamically import vite.config.ts
-  // @ts-ignore
-  const viteConfig = (await import("../vite.config.ts")).default as UserConfig;
+  // @ts-ignore – ignore missing .d.ts
+  const rawConfigModule = await import("../vite.config.ts");
+  const rawConfig = rawConfigModule.default;
 
-  };
-  // 🔹 call the default export to get the actual config object
-  const userConfig: UserConfig = await rawConfigModule.default();
+  // If vite.config.ts exports an async function (like yours), call it:
+  const userConfig: UserConfig =
+    typeof rawConfig === "function" ? await rawConfig() : rawConfig;
 
   const serverOptions = {
     middlewareMode: true,
@@ -51,6 +52,7 @@ export async function setupVite(app: Express, server: Server) {
   });
 
   app.use(vite.middlewares);
+
   app.use("*", async (req, res, next) => {
     const url = req.originalUrl;
 
@@ -59,10 +61,10 @@ export async function setupVite(app: Express, server: Server) {
         import.meta.dirname,
         "..",
         "client",
-        "index.html"
+        "index.html",
       );
 
-      // always reload the index.html file from disk incase it changes
+      // always reload the index.html file from disk in case it changes
       let template = await fs.promises.readFile(clientTemplate, "utf-8");
       template = await vite.transformIndexHtml(url, template);
       res.status(200).set({ "Content-Type": "text/html" }).end(template);
@@ -72,6 +74,7 @@ export async function setupVite(app: Express, server: Server) {
     }
   });
 }
+
 export function serveStatic(app: Express) {
   const distPath = path.resolve("dist");
   const publicPath = path.join(distPath, "public");
