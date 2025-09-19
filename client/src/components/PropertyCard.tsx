@@ -313,15 +313,27 @@ export default function PropertyCard({
           </Button>
         </div>
       </CardContent>
-
       <PropertyVideoModal
         isOpen={showVideoModal}
         onClose={() => setShowVideoModal(false)}
         videos={property.videos || []}
-        externalVideos={property.externalVideos || []}
+        externalVideos={(property.externalVideos || []).map((v) => ({
+          ...v,
+          platform: (["youtube", "instagram", "vimeo", "facebook", "tiktok"].includes(v.platform)
+            ? v.platform
+            : "other") as
+            | "youtube"
+            | "instagram"
+            | "vimeo"
+            | "facebook"
+            | "tiktok"
+            | "other",
+        }))}
         embedCodes={property.embedCodes || []}
         propertyTitle={property.title}
       />
+
+     
     </Card>
   );
 }
