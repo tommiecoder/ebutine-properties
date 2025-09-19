@@ -3,11 +3,6 @@ import fs from "fs";
 import path from "path";
 import { createServer as createViteServer, createLogger } from "vite";
 import { type Server } from "http";
-// Use dynamic import to handle missing config gracefully
-const viteConfig =
-  process.env.NODE_ENV === "production"
-    ? {}
-    : (await import("../vite.config.js")).default;
 import { nanoid } from "nanoid";
 
 const viteLogger = createLogger();
@@ -24,6 +19,12 @@ export function log(message: string, source = "express") {
 }
 
 export async function setupVite(app: Express, server: Server) {
+  // ✅ moved dynamic import here
+  const viteConfig =
+    process.env.NODE_ENV === "production"
+      ? {}
+      : ((await import("../vite.config.js")).default as any);
+
   const serverOptions = {
     middlewareMode: true,
     hmr: { server },
@@ -53,7 +54,7 @@ export async function setupVite(app: Express, server: Server) {
         import.meta.dirname,
         "..",
         "client",
-        "index.html",
+        "index.html"
       );
 
       // always reload the index.html file from disk incase it changes
