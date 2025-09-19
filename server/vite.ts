@@ -21,9 +21,10 @@ export function log(message: string, source = "express") {
 export async function setupVite(app: Express, server: Server) {
   // ✅ moved dynamic import here
   const viteConfig =
-    process.env.NODE_ENV === "production"
-      ? {}
-      : ((await import("../vite.config.js")).default as any);
+  process.env.NODE_ENV === "production"
+    ? {}
+    : ((await import("../vite.config.js")) as any).default;
+
 
   const serverOptions = {
     middlewareMode: true,
