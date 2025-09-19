@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -26,13 +26,14 @@ export default function AdminUpload() {
     features: "",
     images: [] as File[],
     videos: [] as File[],
-    externalVideos: ""
+    externalVideos: "", // newline separated list of URL|platform|title
+    embedCodes: "" // <-- ADDED: embedCodes field (string). Use string or change to string[] if you want array
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isGeneratingAI, setIsGeneratingAI] = useState(false);
   const [editingProperty, setEditingProperty] = useState<Property | null>(null);
   const [isEditing, setIsEditing] = useState(false);
-  const [thumbnail, setThumbnail] = useState<string>('');
+  const [thumbnail, setThumbnail] = useState<string>("");
 
   // Fetch existing properties for management
   const { data: properties = [], refetch } = useQuery<Property[]>({
@@ -44,33 +45,9 @@ export default function AdminUpload() {
     },
   });
 
-  const handleInputChange = (field: string, value: string) => {
+  // flexible handler (value can be string, File[], etc.)
+  const handleInputChange = (field: string, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
-  };
-
-  const handleFileChange = async (field: 'images' | 'videos', files: FileList | null) => {
-    if (files) {
-      const fileArray = Array.from(files);
-      if (field === 'images') {
-        const compressedImages = await Promise.all(
-          fileArray.map(file => compressImage(file))
-        );
-        setFormData(prev => ({ ...prev, [field]: compressedImages }));
-        if (compressedImages.length > 0 && !thumbnail) {
-          const thumb = await generateThumbnail(compressedImages[0]);
-          setThumbnail(thumb);
-        }
-      } else if (field === 'videos') {
-        const compressedVideos = await Promise.all(
-          fileArray.map(file => compressVideo(file))
-        );
-        setFormData(prev => ({ ...prev, [field]: compressedVideos }));
-        if (compressedVideos.length > 0 && !thumbnail) {
-          const thumb = await generateThumbnail(compressedVideos[0]);
-          setThumbnail(thumb);
-        }
-      }
-    }
   };
 
   const compressImage = (file: File, quality: number = 0.8): Promise<File> => {
@@ -109,18 +86,21 @@ export default function AdminUpload() {
               lastModified: Date.now(),
             });
             resolve(compressedFile);
+          } else {
+            // fallback to original file if blob failed
+            resolve(file);
           }
         }, 'image/jpeg', quality);
       };
 
+      img.onerror = () => resolve(file);
       img.src = URL.createObjectURL(file);
     });
   };
 
   const compressVideo = (file: File): Promise<File> => {
-    // For video compression, we'll reduce the file size by limiting resolution
-    // In a real implementation, you might use ffmpeg.wasm or similar
-    return Promise.resolve(file); // Placeholder - actual video compression would need additional libraries
+    // Placeholder — actual client-side video compression needs a library (ffmpeg.wasm etc.)
+    return Promise.resolve(file);
   };
 
   const generateThumbnail = (file: File): Promise<string> => {
@@ -135,34 +115,49 @@ export default function AdminUpload() {
         const ctx = canvas.getContext('2d');
 
         video.onloadedmetadata = () => {
-          canvas.width = video.videoWidth;
-          canvas.height = video.videoHeight;
-          video.currentTime = 1; // Get frame at 1 second
+          // Ensure there's at least a small duration
+          try {
+            canvas.width = video.videoWidth || 320;
+            canvas.height = video.videoHeight || 240;
+            // choose a safe time
+            video.currentTime = Math.min(1, video.duration || 1);
+          } catch {
+            resolve('');
+          }
         };
 
         video.onseeked = () => {
           if (ctx) {
-            ctx.drawImage(video, 0, 0);
-            resolve(canvas.toDataURL());
+            try {
+              ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+              resolve(canvas.toDataURL());
+            } catch {
+              resolve('');
+            }
           } else {
-            resolve(''); // Return empty string if canvas context is not available
+            resolve('');
           }
         };
 
+        video.onerror = () => resolve('');
         video.src = URL.createObjectURL(file);
+        // kickoff load
+        video.load();
       } else {
-        resolve(''); // Return empty string for unsupported file types
+        resolve('');
       }
     });
   };
 
+  // file input handlers (simple, keep for backward compatibility)
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const files = Array.from(e.target.files);
-      setFormData(prev => ({ ...prev, images: files })); // Directly set new files
-
-      if (files.length > 0 && !thumbnail) { // Only generate if no thumbnail exists yet
-        const thumb = await generateThumbnail(files[0]);
+      // compress images in sequence (or parallel)
+      const compressed = await Promise.all(files.map(f => compressImage(f)));
+      setFormData(prev => ({ ...prev, images: compressed }));
+      if (compressed.length > 0 && !thumbnail) {
+        const thumb = await generateThumbnail(compressed[0]);
         setThumbnail(thumb);
       }
     }
@@ -171,10 +166,10 @@ export default function AdminUpload() {
   const handleVideoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const files = Array.from(e.target.files);
-      setFormData(prev => ({ ...prev, videos: files })); // Directly set new files
-
-      if (files.length > 0 && !thumbnail) { // Only generate if no thumbnail exists yet
-        const thumb = await generateThumbnail(files[0]);
+      const compressed = await Promise.all(files.map(f => compressVideo(f)));
+      setFormData(prev => ({ ...prev, videos: compressed }));
+      if (compressed.length > 0 && !thumbnail) {
+        const thumb = await generateThumbnail(compressed[0]);
         setThumbnail(thumb);
       }
     }
@@ -185,20 +180,21 @@ export default function AdminUpload() {
     setIsEditing(true);
     setFormData({
       title: property.title,
-      description: property.description || "",
+      description: property.description ?? "",
       price: property.price,
       location: property.location,
       type: property.type,
-      size: property.size || "",
-      bedrooms: property.bedrooms || "",
-      bathrooms: property.bathrooms || "",
+      size: property.size ?? "",
+      bedrooms: (property.bedrooms ?? "") as any,
+      bathrooms: (property.bathrooms ?? "") as any,
       features: property.features ? property.features.join(', ') : "",
-      images: [], // Reset images on edit start
+      images: [], // Reset images on edit start (only replace if new uploads)
       videos: [], // Reset videos on edit start
-      externalVideos: property.externalVideos ? property.externalVideos.map(v => `${v.url}|${v.platform}|${v.title || ''}`).join('\n') : ""
+      externalVideos: property.externalVideos ? property.externalVideos.map(v => `${v.url}|${v.platform}|${v.title || ''}`).join('\n') : "",
+      embedCodes: ( (property as any).embedCodes && typeof (property as any).embedCodes === 'string') 
+                    ? (property as any).embedCodes 
+                    : (Array.isArray((property as any).embedCodes) ? (property as any).embedCodes.join('\n') : "")
     });
-    // Assuming thumbnail is stored with the property or needs to be fetched/generated again
-    // For simplicity, we'll clear it here if editing, and it can be regenerated if new files are uploaded.
     setThumbnail('');
   };
 
@@ -217,7 +213,8 @@ export default function AdminUpload() {
       features: "",
       images: [],
       videos: [],
-      externalVideos: ""
+      externalVideos: "",
+      embedCodes: "" // reset embedCodes too
     });
     setThumbnail('');
   };
@@ -381,14 +378,15 @@ export default function AdminUpload() {
     try {
       const formDataToSend = new FormData();
 
-      // Add text fields
+      // Add text fields except images/videos/externalVideos (these are handled separately)
       Object.entries(formData).forEach(([key, value]) => {
         if (key !== 'images' && key !== 'videos' && key !== 'externalVideos') {
+          // append embedCodes as string (it is part of formData now)
           formDataToSend.append(key, value as string);
         }
       });
 
-      // Process external videos
+      // Process externalVideos (text block -> array)
       if (formData.externalVideos) {
         const externalVideosArray = formData.externalVideos
           .split('\n')
@@ -400,7 +398,7 @@ export default function AdminUpload() {
             const title = parts[2]?.trim() || '';
             return { url, platform, title };
           });
-        
+
         formDataToSend.append('externalVideos', JSON.stringify(externalVideosArray));
       }
 
@@ -417,14 +415,12 @@ export default function AdminUpload() {
         });
       }
 
-      // Append thumbnail if it exists
+      // Append thumbnail if generated
       if (thumbnail) {
-        // Convert data URL to File object to append
         const blob = await fetch(thumbnail).then(res => res.blob());
         const thumbnailFile = new File([blob], 'thumbnail.jpeg', { type: 'image/jpeg' });
         formDataToSend.append('thumbnail', thumbnailFile);
       }
-
 
       const url = isEditing && editingProperty
         ? `/api/admin/properties/${editingProperty.id}`
@@ -438,7 +434,7 @@ export default function AdminUpload() {
       });
 
       if (!response.ok) {
-        const errorData = await response.json(); // Try to get more error details
+        const errorData = await response.json().catch(() => ({}));
         throw new Error(`Failed to ${isEditing ? 'update' : 'upload'} property: ${errorData.message || response.statusText}`);
       }
 
@@ -451,10 +447,10 @@ export default function AdminUpload() {
       cancelEdit();
       refetch();
 
-    } catch (error: any) { // Explicitly type error as any or unknown
+    } catch (error: any) {
       toast({
         title: "Error",
-        description: `Failed to ${isEditing ? 'update' : 'upload'} property. ${error.message}`,
+        description: `Failed to ${isEditing ? 'update' : 'upload'} property. ${error.message || ''}`,
         variant: "destructive",
       });
     } finally {
@@ -472,7 +468,7 @@ export default function AdminUpload() {
 
         <TabsContent value="upload">
           <Card>
-            <CardHeader>
+            <CardHeader className="flex items-center justify-between">
               <CardTitle>
                 {isEditing ? `Edit Property: ${editingProperty?.title}` : 'Upload New Property'}
               </CardTitle>
@@ -482,267 +478,268 @@ export default function AdminUpload() {
                 </Button>
               )}
             </CardHeader>
+
             <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <Label htmlFor="title">Property Title</Label>
-              <Input
-                id="title"
-                value={formData.title}
-                onChange={(e) => handleInputChange('title', e.target.value)}
-                placeholder="Enter a basic title or leave empty for AI to generate"
-                required
-              />
-              <p className="text-xs text-gray-500 mt-1">
-                💡 Tip: Upload images/videos and click "Smart AI" to automatically generate all property details!
-              </p>
-            </div>
-
-            <div>
-              <Label htmlFor="description" className="flex items-center justify-between">
-                Description
-                <div className="flex gap-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={generateSmartProperty}
-                    disabled={isGeneratingAI}
-                  >
-                    <Sparkles className="h-4 w-4 mr-1" />
-                    {isGeneratingAI ? "Analyzing..." : "Smart AI"}
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={generateAIDescription}
-                    disabled={isGeneratingAI}
-                    className="ml-2"
-                  >
-                    <Sparkles className="h-4 w-4 mr-1" />
-                    {isGeneratingAI ? "Generating..." : "AI Enhance"}
-                  </Button>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div>
+                  <Label htmlFor="title">Property Title</Label>
+                  <Input
+                    id="title"
+                    value={formData.title}
+                    onChange={(e) => handleInputChange('title', e.target.value)}
+                    placeholder="Enter a basic title or leave empty for AI to generate"
+                    required
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    💡 Tip: Upload images/videos and click "Smart AI" to automatically generate all property details!
+                  </p>
                 </div>
-              </Label>
-              <Textarea
-                id="description"
-                value={formData.description}
-                onChange={(e) => handleInputChange('description', e.target.value)}
-                rows={4}
-                required
-                placeholder="Describe the property or use AI to generate a description..."
-              />
-            </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="price">Price (₦)</Label>
-                <Input
-                  id="price"
-                  type="number"
-                  value={formData.price}
-                  onChange={(e) => handleInputChange('price', e.target.value)}
-                  required
-                />
-              </div>
-              <div>
-                <Label htmlFor="location">Location</Label>
-                <Input
-                  id="location"
-                  value={formData.location}
-                  onChange={(e) => handleInputChange('location', e.target.value)}
-                  required
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="type">Property Type</Label>
-                <Select value={formData.type} onValueChange={(value) => handleInputChange('type', value)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="land">Land</SelectItem>
-                    <SelectItem value="house">House</SelectItem>
-                    <SelectItem value="apartment">Apartment</SelectItem>
-                    <SelectItem value="commercial">Commercial</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label htmlFor="size">Size (sqm)</Label>
-                <Input
-                  id="size"
-                  value={formData.size}
-                  onChange={(e) => handleInputChange('size', e.target.value)}
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="bedrooms">Bedrooms</Label>
-                <Input
-                  id="bedrooms"
-                  type="number"
-                  value={formData.bedrooms}
-                  onChange={(e) => handleInputChange('bedrooms', e.target.value)}
-                />
-              </div>
-              <div>
-                <Label htmlFor="bathrooms">Bathrooms</Label>
-                <Input
-                  id="bathrooms"
-                  type="number"
-                  value={formData.bathrooms}
-                  onChange={(e) => handleInputChange('bathrooms', e.target.value)}
-                />
-              </div>
-            </div>
-
-            <div>
-              <Label htmlFor="features">Features (comma separated)</Label>
-              <Textarea
-                id="features"
-                value={formData.features}
-                onChange={(e) => handleInputChange('features', e.target.value)}
-                placeholder="e.g., Swimming pool, Garage, Security, etc."
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="images">Property Images {isEditing && "(Leave empty to keep existing images)"}</Label>
-              <p className="text-sm text-gray-600 mb-2">Images will be automatically compressed for faster loading</p>
-              <Input
-                id="images"
-                type="file"
-                multiple
-                accept="image/*"
-                onChange={handleImageUpload}
-              />
-              {thumbnail && !isEditing && ( // Display thumbnail only when not editing and thumbnail is available
-                <div className="mt-2">
-                  <p className="text-sm text-gray-600 mb-1">Generated Thumbnail:</p>
-                  <img src={thumbnail} alt="Generated Thumbnail" className="w-32 h-32 object-cover rounded" />
-                </div>
-              )}
-            </div>
-
-            <div>
-              <Label htmlFor="videos">Property Videos {isEditing && "(Leave empty to keep existing videos)"}</Label>
-              <p className="text-sm text-gray-600 mb-2">Upload local videos or add external video URLs below</p>
-              <Input
-                id="videos"
-                type="file"
-                multiple
-                accept="video/*"
-                onChange={handleVideoUpload}
-              />
-              {thumbnail && !isEditing && ( // Display thumbnail only when not editing and thumbnail is available
-                <div className="mt-2">
-                  <p className="text-sm text-gray-600 mb-1">Generated Thumbnail:</p>
-                  <img src={thumbnail} alt="Generated Thumbnail" className="w-32 h-32 object-cover rounded" />
-                </div>
-              )}
-            </div>
-
-            <div>
-              <Label htmlFor="externalVideos">External Video URLs (YouTube, Instagram, etc.)</Label>
-              <p className="text-sm text-gray-600 mb-2">Add one URL per line. Format: URL|Platform|Title (Platform and Title are optional)</p>
-              <Textarea
-                id="externalVideos"
-                value={formData.externalVideos || ""}
-                onChange={(e) => handleInputChange('externalVideos', e.target.value)}
-                placeholder="https://www.instagram.com/reel/DNOvEZvsqYv/|instagram|Premium Investment in Lekki&#10;https://www.youtube.com/watch?v=example|youtube|Property Tour"
-                rows={3}
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="embedCodes">Video Embed Codes</Label>
-              <p className="text-sm text-gray-600 mb-2">Add embed codes from Instagram, YouTube, TikTok, etc. Format: EmbedCode|Title|Platform (one per line)</p>
-              <Textarea
-                id="embedCodes"
-                value={formData.embedCodes || ""}
-                onChange={(e) => handleInputChange('embedCodes', e.target.value)}
-                placeholder='<blockquote class="instagram-media">...</blockquote>|Property Tour|Instagram&#10;<iframe src="https://www.youtube.com/embed/..."></iframe>|Video Tour|YouTube'
-                rows={4}
-              />
-            </div>
-
-            <Button type="submit" disabled={isSubmitting} className="w-full">
-              {isSubmitting ? (isEditing ? "Updating..." : "Uploading...") : (isEditing ? "Update Property" : "Upload Property")}
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
-    </TabsContent>
-
-    <TabsContent value="manage">
-      <Card>
-        <CardHeader>
-          <CardTitle>Manage Properties ({properties.length})</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {properties.map((property) => (
-              <div key={property.id} className="border rounded-lg p-4">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
-                      <h3 className="font-semibold">{property.title}</h3>
-                      <Badge variant={property.status === 'sold' ? 'destructive' : 'default'}>
-                        {property.status}
-                      </Badge>
-                      {property.featured && <Badge variant="secondary">Featured</Badge>}
-                    </div>
-                    <p className="text-sm text-gray-600 mb-2">{property.location}</p>
-                    <p className="text-lg font-bold text-green-600">₦{parseFloat(property.price).toLocaleString()}</p>
-                    <div className="flex gap-2 mt-2">
-                      {property.bedrooms && <span className="text-xs bg-gray-100 px-2 py-1 rounded">{property.bedrooms} beds</span>}
-                      {property.bathrooms && <span className="text-xs bg-gray-100 px-2 py-1 rounded">{property.bathrooms} baths</span>}
-                      {property.size && <span className="text-xs bg-gray-100 px-2 py-1 rounded">{property.size}</span>}
-                    </div>
-                  </div>
-                  <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => startEdit(property)}
-                    >
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                    {property.status !== 'sold' && (
+                <div>
+                  <Label htmlFor="description" className="flex items-center justify-between">
+                    Description
+                    <div className="flex gap-2">
                       <Button
+                        type="button"
                         variant="outline"
                         size="sm"
-                        onClick={() => markAsSold(property.id)}
+                        onClick={generateSmartProperty}
+                        disabled={isGeneratingAI}
                       >
-                        Mark as Sold
+                        <Sparkles className="h-4 w-4 mr-1" />
+                        {isGeneratingAI ? "Analyzing..." : "Smart AI"}
                       </Button>
-                    )}
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      onClick={() => deleteProperty(property.id)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={generateAIDescription}
+                        disabled={isGeneratingAI}
+                        className="ml-2"
+                      >
+                        <Sparkles className="h-4 w-4 mr-1" />
+                        {isGeneratingAI ? "Generating..." : "AI Enhance"}
+                      </Button>
+                    </div>
+                  </Label>
+                  <Textarea
+                    id="description"
+                    value={formData.description}
+                    onChange={(e) => handleInputChange('description', e.target.value)}
+                    rows={4}
+                    required
+                    placeholder="Describe the property or use AI to generate a description..."
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="price">Price (₦)</Label>
+                    <Input
+                      id="price"
+                      type="number"
+                      value={formData.price}
+                      onChange={(e) => handleInputChange('price', e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="location">Location</Label>
+                    <Input
+                      id="location"
+                      value={formData.location}
+                      onChange={(e) => handleInputChange('location', e.target.value)}
+                      required
+                    />
                   </div>
                 </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="type">Property Type</Label>
+                    <Select value={formData.type} onValueChange={(value) => handleInputChange('type', value)}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="land">Land</SelectItem>
+                        <SelectItem value="house">House</SelectItem>
+                        <SelectItem value="apartment">Apartment</SelectItem>
+                        <SelectItem value="commercial">Commercial</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label htmlFor="size">Size (sqm)</Label>
+                    <Input
+                      id="size"
+                      value={formData.size}
+                      onChange={(e) => handleInputChange('size', e.target.value)}
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="bedrooms">Bedrooms</Label>
+                    <Input
+                      id="bedrooms"
+                      type="number"
+                      value={formData.bedrooms as any}
+                      onChange={(e) => handleInputChange('bedrooms', e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="bathrooms">Bathrooms</Label>
+                    <Input
+                      id="bathrooms"
+                      type="number"
+                      value={formData.bathrooms as any}
+                      onChange={(e) => handleInputChange('bathrooms', e.target.value)}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <Label htmlFor="features">Features (comma separated)</Label>
+                  <Textarea
+                    id="features"
+                    value={formData.features}
+                    onChange={(e) => handleInputChange('features', e.target.value)}
+                    placeholder="e.g., Swimming pool, Garage, Security, etc."
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="images">Property Images {isEditing && "(Leave empty to keep existing images)"}</Label>
+                  <p className="text-sm text-gray-600 mb-2">Images will be automatically compressed for faster loading</p>
+                  <Input
+                    id="images"
+                    type="file"
+                    multiple
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                  />
+                  {thumbnail && !isEditing && (
+                    <div className="mt-2">
+                      <p className="text-sm text-gray-600 mb-1">Generated Thumbnail:</p>
+                      <img src={thumbnail} alt="Generated Thumbnail" className="w-32 h-32 object-cover rounded" />
+                    </div>
+                  )}
+                </div>
+
+                <div>
+                  <Label htmlFor="videos">Property Videos {isEditing && "(Leave empty to keep existing videos)"}</Label>
+                  <p className="text-sm text-gray-600 mb-2">Upload local videos or add external video URLs below</p>
+                  <Input
+                    id="videos"
+                    type="file"
+                    multiple
+                    accept="video/*"
+                    onChange={handleVideoUpload}
+                  />
+                  {thumbnail && !isEditing && (
+                    <div className="mt-2">
+                      <p className="text-sm text-gray-600 mb-1">Generated Thumbnail:</p>
+                      <img src={thumbnail} alt="Generated Thumbnail" className="w-32 h-32 object-cover rounded" />
+                    </div>
+                  )}
+                </div>
+
+                <div>
+                  <Label htmlFor="externalVideos">External Video URLs (YouTube, Instagram, etc.)</Label>
+                  <p className="text-sm text-gray-600 mb-2">Add one URL per line. Format: URL|Platform|Title (Platform and Title are optional)</p>
+                  <Textarea
+                    id="externalVideos"
+                    value={formData.externalVideos || ""}
+                    onChange={(e) => handleInputChange('externalVideos', e.target.value)}
+                    placeholder="https://www.instagram.com/reel/DNOvEZvsqYv/|instagram|Premium Investment in Lekki&#10;https://www.youtube.com/watch?v=example|youtube|Property Tour"
+                    rows={3}
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="embedCodes">Video Embed Codes</Label>
+                  <p className="text-sm text-gray-600 mb-2">Add embed codes from Instagram, YouTube, TikTok, etc. Format: EmbedCode|Title|Platform (one per line)</p>
+                  <Textarea
+                    id="embedCodes"
+                    value={formData.embedCodes || ""}
+                    onChange={(e) => handleInputChange('embedCodes', e.target.value)}
+                    placeholder='<blockquote class="instagram-media">...</blockquote>|Property Tour|Instagram&#10;<iframe src="https://www.youtube.com/embed/..."></iframe>|Video Tour|YouTube'
+                    rows={4}
+                  />
+                </div>
+
+                <Button type="submit" disabled={isSubmitting} className="w-full">
+                  {isSubmitting ? (isEditing ? "Updating..." : "Uploading...") : (isEditing ? "Update Property" : "Upload Property")}
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="manage">
+          <Card>
+            <CardHeader>
+              <CardTitle>Manage Properties ({properties.length})</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {properties.map((property) => (
+                  <div key={property.id} className="border rounded-lg p-4">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-2">
+                          <h3 className="font-semibold">{property.title}</h3>
+                          <Badge variant={property.status === 'sold' ? 'destructive' : 'default'}>
+                            {property.status}
+                          </Badge>
+                          {property.featured && <Badge variant="secondary">Featured</Badge>}
+                        </div>
+                        <p className="text-sm text-gray-600 mb-2">{property.location}</p>
+                        <p className="text-lg font-bold text-green-600">₦{parseFloat(property.price).toLocaleString()}</p>
+                        <div className="flex gap-2 mt-2">
+                          {property.bedrooms && <span className="text-xs bg-gray-100 px-2 py-1 rounded">{property.bedrooms} beds</span>}
+                          {property.bathrooms && <span className="text-xs bg-gray-100 px-2 py-1 rounded">{property.bathrooms} baths</span>}
+                          {property.size && <span className="text-xs bg-gray-100 px-2 py-1 rounded">{property.size}</span>}
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => startEdit(property)}
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        {property.status !== 'sold' && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => markAsSold(property.id)}
+                          >
+                            Mark as Sold
+                          </Button>
+                        )}
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={() => deleteProperty(property.id)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                {properties.length === 0 && (
+                  <p className="text-center text-gray-500 py-8">No properties found.</p>
+                )}
               </div>
-            ))}
-            {properties.length === 0 && (
-              <p className="text-center text-gray-500 py-8">No properties found.</p>
-            )}
-          </div>
-        </CardContent>
-      </Card>
-    </TabsContent>
-  </Tabs>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
