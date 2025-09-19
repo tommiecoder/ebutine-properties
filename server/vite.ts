@@ -20,10 +20,14 @@ export function log(message: string, source = "express") {
 }
 
 export async function setupVite(app: Express, server: Server) {
-  // ✅ moved dynamic import here
-  const viteConfig = (await import("../vite.config.ts")) as { default: UserConfig };
+  if (process.env.NODE_ENV === "production") return;
 
-
+  // 🔹 dynamically import vite.config.ts
+  const rawConfigModule = (await import("../vite.config.ts")) as {
+    default: () => Promise<UserConfig> | UserConfig;
+  };
+  // 🔹 call the default export to get the actual config object
+  const userConfig: UserConfig = await rawConfigModule.default();
 
   const serverOptions = {
     middlewareMode: true,
@@ -32,7 +36,7 @@ export async function setupVite(app: Express, server: Server) {
   };
 
   const vite = await createViteServer({
-    ...viteConfig,
+    ...userConfig,
     configFile: false,
     customLogger: {
       ...viteLogger,
@@ -89,4 +93,6 @@ export function serveStatic(app: Express) {
     const indexPath = path.resolve(publicPath, "index.html");
     res.sendFile(indexPath);
   });
+}
+
 }
