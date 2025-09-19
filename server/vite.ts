@@ -93,6 +93,5 @@ export function serveStatic(app: Express) {
     const indexPath = path.resolve(publicPath, "index.html");
     res.sendFile(indexPath);
   });
-}
+} // <- closes serveStatic function only, nothing else after this
 
-}
