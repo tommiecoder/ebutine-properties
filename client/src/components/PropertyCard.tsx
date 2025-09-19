@@ -4,11 +4,15 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useState, useEffect, useRef } from "react";
 import PropertyVideoModal from "./PropertyVideoModal";
-import type { Property } from "@shared/schema";
+import type { Property as BaseProperty } from "@shared/schema";
+
+/** Extend the base Property type with externalImages */
+interface Property extends BaseProperty {
+  externalImages?: string[] | null;
+}
 
 function PropertyThumbnail({ property }: { property: Property }) {
   const [thumbnailSrc, setThumbnailSrc] = useState<string>("");
-  const [videoLoaded, setVideoLoaded] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   const getYouTubeThumbnail = (url: string) => {
@@ -17,26 +21,23 @@ function PropertyThumbnail({ property }: { property: Property }) {
   };
 
   const getInstagramThumbnail = (url: string) => {
-    // Instagram doesn't provide direct thumbnail access, but we can try the embed endpoint
-    return url.includes('instagram.com') ? `${url}media/?size=l` : null;
+    return url.includes("instagram.com") ? `${url}media/?size=l` : null;
   };
 
   useEffect(() => {
     const generateThumbnail = async () => {
-      // Priority 1: Check for embed codes (YouTube videos)
+      // 1. embed codes (YouTube)
       if (property.embedCodes && property.embedCodes.length > 0) {
         const firstEmbed = property.embedCodes[0];
-        // Extract YouTube video ID from embed code
         const youtubeMatch = firstEmbed.embedCode.match(/(?:youtube\.com\/embed\/)([^"?]+)/);
         if (youtubeMatch) {
           const videoId = youtubeMatch[1];
-          const thumbnail = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
-          setThumbnailSrc(thumbnail);
+          setThumbnailSrc(`https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`);
           return;
         }
       }
 
-      // Priority 2: Check for external videos with thumbnails
+      // 2. external videos
       if (property.externalVideos && property.externalVideos.length > 0) {
         const firstVideo = property.externalVideos[0];
 
@@ -45,8 +46,7 @@ function PropertyThumbnail({ property }: { property: Property }) {
           return;
         }
 
-        // Generate thumbnail based on platform
-        if (firstVideo.platform === 'youtube') {
+        if (firstVideo.platform === "youtube") {
           const ytThumbnail = getYouTubeThumbnail(firstVideo.url);
           if (ytThumbnail) {
             setThumbnailSrc(ytThumbnail);
@@ -54,7 +54,7 @@ function PropertyThumbnail({ property }: { property: Property }) {
           }
         }
 
-        if (firstVideo.platform === 'instagram') {
+        if (firstVideo.platform === "instagram") {
           const igThumbnail = getInstagramThumbnail(firstVideo.url);
           if (igThumbnail) {
             setThumbnailSrc(igThumbnail);
@@ -63,22 +63,22 @@ function PropertyThumbnail({ property }: { property: Property }) {
         }
       }
 
-      // Priority 3: External images
+      // 3. external images
       if (property.externalImages && property.externalImages.length > 0) {
         setThumbnailSrc(property.externalImages[0]);
         return;
       }
 
-      // Priority 4: Local videos - extract thumbnail from first video
+      // 4. local videos – extract frame
       if (property.videos && property.videos.length > 0) {
         try {
-          const video = document.createElement('video');
+          const video = document.createElement("video");
           video.muted = true;
-          video.preload = 'metadata';
+          video.preload = "metadata";
           video.playsInline = true;
 
-          const canvas = document.createElement('canvas');
-          const ctx = canvas.getContext('2d');
+          const canvas = document.createElement("canvas");
+          const ctx = canvas.getContext("2d");
 
           let thumbnailGenerated = false;
           let timeoutId: NodeJS.Timeout;
@@ -90,20 +90,20 @@ function PropertyThumbnail({ property }: { property: Property }) {
               canvas.width = video.videoWidth;
               canvas.height = video.videoHeight;
               ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-              const thumbnail = canvas.toDataURL('image/jpeg', 0.7);
+              const thumbnail = canvas.toDataURL("image/jpeg", 0.7);
               setThumbnailSrc(thumbnail);
               thumbnailGenerated = true;
-              console.log('Video thumbnail generated successfully');
               if (timeoutId) clearTimeout(timeoutId);
             } catch (err) {
-              console.warn('Error generating thumbnail from video frame:', err);
               useFallback();
             }
           };
 
           const useFallback = () => {
             if (!thumbnailGenerated) {
-              const fallback = property.images?.[0] || "https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3";
+              const fallback =
+                property.images?.[0] ||
+                "https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3";
               setThumbnailSrc(fallback);
               thumbnailGenerated = true;
             }
@@ -111,18 +111,15 @@ function PropertyThumbnail({ property }: { property: Property }) {
 
           video.onloadedmetadata = () => {
             if (video.duration > 0) {
-              video.currentTime = 0.1; // Small offset to ensure frame is available
+              video.currentTime = 0.1;
             } else {
               useFallback();
             }
           };
 
-          video.onseeked = () => {
-            generateFromFrame();
-          };
+          video.onseeked = () => generateFromFrame();
 
           video.oncanplay = () => {
-            // Additional attempt if onseeked doesn't fire
             setTimeout(() => {
               if (!thumbnailGenerated && video.videoWidth > 0) {
                 generateFromFrame();
@@ -130,48 +127,45 @@ function PropertyThumbnail({ property }: { property: Property }) {
             }, 200);
           };
 
-          video.onerror = (e) => {
-            console.warn('Video loading failed for thumbnail generation:', e);
-            useFallback();
-          };
+          video.onerror = () => useFallback();
 
-          // Set video source with proper URL formatting
           const videoUrl = property.videos[0];
-          const fullVideoUrl = videoUrl.startsWith('http') ? videoUrl : `${window.location.origin}${videoUrl}`;
+          const fullVideoUrl = videoUrl.startsWith("http")
+            ? videoUrl
+            : `${window.location.origin}${videoUrl}`;
 
           video.src = fullVideoUrl;
-          console.log('Loading video for thumbnail:', fullVideoUrl);
 
-          // Reduced timeout for faster fallback
           timeoutId = setTimeout(() => {
             if (!thumbnailGenerated) {
-              console.warn('Video thumbnail generation timeout, using fallback');
               useFallback();
             }
           }, 3000);
 
-          // Start loading
           video.load();
-
         } catch (error) {
-          console.warn('Video thumbnail generation setup error:', error);
-          // Fallback to first image or default
-          const fallback = property.images?.[0] || "https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3";
+          const fallback =
+            property.images?.[0] ||
+            "https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3";
           setThumbnailSrc(fallback);
         }
       } else {
-        // Use first image or default
-        const fallback = property.images?.[0] || "https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3";
+        const fallback =
+          property.images?.[0] ||
+          "https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3";
         setThumbnailSrc(fallback);
       }
     };
 
     generateThumbnail();
-  }, [property.id]); // Only depend on property.id to avoid infinite re-renders
+  }, [property.id]);
 
   return (
-    <img 
-      src={thumbnailSrc || "https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3"} 
+    <img
+      src={
+        thumbnailSrc ||
+        "https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3"
+      }
       alt={property.title}
       className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-500"
       loading="lazy"
@@ -185,7 +179,11 @@ interface PropertyCardProps {
   onInquire?: (id: string) => void;
 }
 
-export default function PropertyCard({ property, onViewDetails, onInquire }: PropertyCardProps) {
+export default function PropertyCard({
+  property,
+  onViewDetails,
+  onInquire,
+}: PropertyCardProps) {
   const [showVideoModal, setShowVideoModal] = useState(false);
 
   const formatPrice = (price: string) => {
@@ -204,12 +202,20 @@ export default function PropertyCard({ property, onViewDetails, onInquire }: Pro
   };
 
   const handleInquire = () => {
-    const message = `Hi, I'm interested in "${property.title}" located in ${property.location}, priced at ${formatPrice(property.price)}. Can you provide more details?`;
-    window.open(`https://wa.me/2349061461411?text=${encodeURIComponent(message)}`, '_blank');
+    const message = `Hi, I'm interested in "${property.title}" located in ${property.location}, priced at ${formatPrice(
+      property.price,
+    )}. Can you provide more details?`;
+    window.open(
+      `https://wa.me/2349061461411?text=${encodeURIComponent(message)}`,
+      "_blank",
+    );
   };
 
   return (
-    <Card className="card-enhanced overflow-hidden group" data-testid={`property-card-${property.id}`}>
+    <Card
+      className="card-enhanced overflow-hidden group"
+      data-testid={`property-card-${property.id}`}
+    >
       <div className="relative overflow-hidden">
         <PropertyThumbnail property={property} />
         <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
@@ -217,10 +223,10 @@ export default function PropertyCard({ property, onViewDetails, onInquire }: Pro
           {getStatusBadge(property.status, property.featured || false)}
         </div>
         <div className="absolute top-4 right-4 flex space-x-2">
-          {((property.videos && property.videos.length > 0) || 
-            (property.externalVideos && property.externalVideos.length > 0) ||
-            (property.embedCodes && property.embedCodes.length > 0)) && (
-            <button 
+          {(property.videos?.length ||
+            property.externalVideos?.length ||
+            property.embedCodes?.length) && (
+            <button
               onClick={() => setShowVideoModal(true)}
               className="glass p-2 rounded-full bg-black/40 hover:bg-black/60 transition-colors"
               title="View property videos"
@@ -228,7 +234,7 @@ export default function PropertyCard({ property, onViewDetails, onInquire }: Pro
               <Play className="h-4 w-4 text-white" />
             </button>
           )}
-          <button 
+          <button
             className="glass p-3 rounded-full hover:bg-white/40 transition-all-smooth transform hover:scale-110"
             data-testid={`favorite-button-${property.id}`}
           >
@@ -243,7 +249,10 @@ export default function PropertyCard({ property, onViewDetails, onInquire }: Pro
       </div>
 
       <CardContent className="p-6">
-        <h3 className="text-xl font-bold text-ebutine-dark mb-3 group-hover:text-ebutine-orange transition-colors duration-300" data-testid={`property-title-${property.id}`}>
+        <h3
+          className="text-xl font-bold text-ebutine-dark mb-3 group-hover:text-ebutine-orange transition-colors duration-300"
+          data-testid={`property-title-${property.id}`}
+        >
           {property.title}
         </h3>
         <p className="text-ebutine-blue-light mb-4 flex items-center">
@@ -251,13 +260,15 @@ export default function PropertyCard({ property, onViewDetails, onInquire }: Pro
           {property.location}
         </p>
         <div className="mb-4">
-          <p className="text-3xl font-bold text-gradient mb-1" data-testid={`property-price-${property.id}`}>
+          <p
+            className="text-3xl font-bold text-gradient mb-1"
+            data-testid={`property-price-${property.id}`}
+          >
             {formatPrice(property.price)}
           </p>
           <p className="text-sm text-ebutine-blue-light">Starting price</p>
         </div>
 
-        {/* Property Details */}
         <div className="grid grid-cols-3 gap-4 text-sm text-ebutine-blue mb-6">
           {property.bedrooms && (
             <div className="flex items-center p-2 bg-ebutine-light rounded-lg">
@@ -285,16 +296,15 @@ export default function PropertyCard({ property, onViewDetails, onInquire }: Pro
           )}
         </div>
 
-        {/* Action Buttons */}
         <div className="flex space-x-3">
-          <Button 
+          <Button
             className="btn-primary flex-1"
             onClick={() => onViewDetails?.(property.id)}
             data-testid={`view-details-button-${property.id}`}
           >
             View Details
           </Button>
-          <Button 
+          <Button
             className="btn-secondary px-4"
             onClick={handleInquire}
             data-testid={`inquire-button-${property.id}`}
