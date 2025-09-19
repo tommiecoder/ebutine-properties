@@ -4,6 +4,7 @@ import path from "path";
 import { createServer as createViteServer, createLogger } from "vite";
 import { type Server } from "http";
 import { nanoid } from "nanoid";
+import type { UserConfig } from "vite";
 
 const viteLogger = createLogger();
 
@@ -20,10 +21,7 @@ export function log(message: string, source = "express") {
 
 export async function setupVite(app: Express, server: Server) {
   // ✅ moved dynamic import here
-  const viteConfig =
-    process.env.NODE_ENV === "production"
-      ? {}
-      : ((await import("../vite.config.ts")) as any).default;
+  const viteConfig = (await import("../vite.config.ts")) as { default: UserConfig };
 
 
 
