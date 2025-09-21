@@ -24,7 +24,7 @@ export async function setupVite(app: Express, server: Server) {
 
   // 🔹 dynamically import vite.config.ts
   // @ts-ignore – ignore missing .d.ts
-  const rawConfigModule = await import("../vite.config.ts");
+  const rawConfigModule = await import("../vite.config.js");
   const rawConfig = rawConfigModule.default;
 
   // If vite.config.ts exports an async function (like yours), call it:
