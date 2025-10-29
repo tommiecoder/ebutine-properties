@@ -6,9 +6,9 @@
   "scripts": {
     "clean": "node clean.js",
     "dev": "tsx server/index.ts",
-    "build": "tsc && npm run build:client && node build.js",
+    "build": "vite build",
     "build:client": "npx vite build",
-    "start": "NODE_ENV=production tsx server/index.ts",
+    "start": "node functions/hello.js",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "tsx scripts/migrate.ts"
   },
