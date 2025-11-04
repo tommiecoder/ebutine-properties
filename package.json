@@ -8,7 +8,7 @@
     "dev": "tsx server/index.ts",
     "build": "vite build",
     "build:client": "npx vite build",
-    "start": "node functions/hello.js",
+    "start": "node server.js",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "tsx scripts/migrate.ts"
   },
